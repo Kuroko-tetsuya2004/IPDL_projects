@@ -33,7 +33,7 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'email'    => 'required|email',
+            'email'    => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -43,7 +43,7 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         // Fallback spécial pour le superadmin initial directeur@ucad.edu.sn s'il n'est pas encore dans Keycloak
-        if (!$accessToken && $validated['email'] === 'directeur@ucad.edu.sn') {
+        if (!$accessToken && ($validated['email'] === 'directeur@ucad.edu.sn' || $validated['email'] === 'directeur')) {
             if ($user && Hash::check($validated['password'], $user->password)) {
                 // Créer et activer le superadmin dans Keycloak à la volée
                 $this->registerUserInKeycloak($user, $validated['password']);

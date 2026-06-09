@@ -1618,7 +1618,7 @@ INSERT INTO public.tags VALUES ('9081382b-d449-42ee-b83d-0ca5e1375389', 'Agricul
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.users VALUES ('ac86624f-9adf-4eaa-a2b4-35e4ab25259e', '7d485d56-3358-45fe-a593-f779ad08bc59', 'directeur@ucad.edu.sn', 'Directeur', 'Directeur', 'super_admin', 'active', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'en', true, '2026-06-09 01:54:22+00', '2026-06-08 11:05:37.982267+00', '2026-06-09 01:54:22.3728+00', NULL, '$2y$10$7wYxubtREI7CKM3yABaNu.jGE.SVbwVbSE.YmQNKQMQPUQWhcnkOG');
+INSERT INTO public.users VALUES ('ac86624f-9adf-4eaa-a2b4-35e4ab25259e', '7d485d56-3358-45fe-a593-f779ad08bc59', 'directeur', 'Directeur', 'Directeur', 'super_admin', 'active', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'en', true, '2026-06-09 01:54:22+00', '2026-06-08 11:05:37.982267+00', '2026-06-09 01:54:22.3728+00', NULL, '$2y$10$7wYxubtREI7CKM3yABaNu.jGE.SVbwVbSE.YmQNKQMQPUQWhcnkOG');
 
 
 --
