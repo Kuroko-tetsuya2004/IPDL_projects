@@ -15,6 +15,7 @@ app/bootstrap/cache/
 
 # Ignore database dumps and temporary logs
 *.sql
+!ummisco_database.sql
 *.log
 
 # Ignore IDE and Git directories
