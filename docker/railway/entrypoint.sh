@@ -20,7 +20,25 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 echo "▶ Vérification de la base de données PostgreSQL..."
 php -r "
     try {
-        \$pdo = new PDO('pgsql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+        \$dbUrl = getenv('DATABASE_URL');
+        if (\$dbUrl) {
+            \$parsed = parse_url(\$dbUrl);
+            \$host = \$parsed['host'] ?? '';
+            \$port = \$parsed['port'] ?? '5432';
+            \$dbName = ltrim(\$parsed['path'] ?? '', '/');
+            \$user = \$parsed['user'] ?? '';
+            \$pass = \$parsed['pass'] ?? '';
+            \$dsn = \"pgsql:host=\$host;port=\$port;dbname=\$dbName\";
+        } else {
+            \$host = getenv('DB_HOST');
+            \$port = getenv('DB_PORT');
+            \$dbName = getenv('DB_DATABASE');
+            \$user = getenv('DB_USERNAME');
+            \$pass = getenv('DB_PASSWORD');
+            \$dsn = \"pgsql:host=\$host;port=\$port;dbname=\$dbName\";
+        }
+
+        \$pdo = new PDO(\$dsn, \$user, \$pass);
         \$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         \$stmt = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public' AND table_name='publications'\");
         \$exists = \$stmt->fetchColumn();
