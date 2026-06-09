@@ -41,9 +41,6 @@ php -r "
         \$pdo = new PDO(\$dsn, \$user, \$pass);
         \$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        // FORCE RESET TO APPLY NEW CLEAN SCHEMA WITH DIRECTEUR USER
-        echo \"  ℹ️ Réinitialisation forcée de la base de données (DROP/CREATE public)...\n\";
-        \$pdo->exec(\"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\");
         
         \$stmt = \$pdo->query(\"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public' AND table_name='publications'\");
         \$exists = \$stmt->fetchColumn();
