@@ -25,14 +25,15 @@ WORKDIR /var/www/html
 # Copier le code source
 COPY app/ .
 
+# Créer les répertoires nécessaires et définir les permissions avant le composer install
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Installer les dépendances (sans dev)
 RUN composer install \
     --no-dev --no-interaction --prefer-dist \
     --optimize-autoloader --ignore-platform-reqs
-
-# Permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Configuration Nginx
 COPY docker/nginx/conf.d/prod.conf /etc/nginx/http.d/default.conf
