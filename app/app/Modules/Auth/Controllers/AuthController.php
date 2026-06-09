@@ -115,7 +115,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Gère l'inscription locale et crée le compte désactivé dans Keycloak.
+     * Gère l'inscription locale et crée le compte dans Keycloak.
      */
     public function register(Request $request): RedirectResponse
     {
@@ -124,21 +124,23 @@ class AuthController extends Controller
             'nom'               => 'required|string|max:100',
             'email'             => 'required|email|max:255|unique:users,email',
             'password'          => 'required|string|min:6|confirmed',
-            'role'              => 'required|in:researcher,doctoral_student',
+            'role'              => 'required|in:researcher,doctoral_student,super_admin',
             'specialite'        => 'required_if:role,researcher|nullable|string|max:200',
             'domaine_expertise' => 'required_if:role,doctoral_student|nullable|string|max:200',
             'axe_principal_id'  => 'required_if:role,doctoral_student|nullable|uuid|exists:axes_thematiques,id',
         ]);
 
         return DB::transaction(function () use ($validated) {
-            // Création de l'utilisateur en statut 'pending'
+            $isSuperAdmin = $validated['role'] === 'super_admin';
+            
+            // Création de l'utilisateur (active pour super_admin, pending sinon)
             $user = User::create([
                 'keycloak_id'         => 'local-register-' . uniqid(),
                 'prenom'              => $validated['prenom'],
                 'nom'                 => $validated['nom'],
                 'email'               => $validated['email'],
                 'role'                => $validated['role'],
-                'statut'              => 'pending',
+                'statut'              => $isSuperAdmin ? 'active' : 'pending',
                 'password'            => Hash::make($validated['password']),
                 'axe_principal_id'    => $validated['role'] === 'doctoral_student' ? $validated['axe_principal_id'] : null,
                 'langue_preference'   => 'fr',
@@ -161,8 +163,31 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Créer le compte en statut désactivé (enabled => false) dans Keycloak
+            // Créer le compte Keycloak
             $this->registerUserInKeycloak($user, $validated['password']);
+
+            // Si c'est un superadmin, on l'active directement dans Keycloak également
+            if ($isSuperAdmin) {
+                $this->enableUserInKeycloak($user);
+                
+                // On essaie de s'authentifier directement avec son compte pour l'initier
+                $accessToken = $this->authenticateWithKeycloak($validated['email'], $validated['password']);
+                if ($accessToken) {
+                    $this->initSession($user, $accessToken);
+                    $user->update(['derniere_connexion' => now()]);
+                    
+                    AuditLog::log(
+                        AuditLog::ACTION_LOGIN,
+                        $user->id,
+                        'user',
+                        $user->id,
+                        ['mode' => 'register_auto_login', 'role' => 'super_admin'],
+                    );
+                    
+                    return redirect()->route('dashboard')
+                        ->with('success', "Compte Super-Administrateur créé et connecté avec succès ! Bienvenue, {$user->nom_complet}.");
+                }
+            }
 
             return redirect()->route('login')
                 ->with('success', 'Votre inscription a été enregistrée avec succès. Elle est maintenant en attente de validation par un administrateur.');
