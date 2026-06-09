@@ -254,6 +254,18 @@ Dans Railway, allez dans le service **Laravel App** → **Variables** et ajoutez
 | `KEYCLOAK_REDIRECT_URI` | `https://votre-domaine.railway.app/auth/callback` |
 | `KEYCLOAK_MOCK` | `false` |
 
+### MinIO (Stockage d'objets S3)
+
+| Variable | Valeur | Description |
+|----------|--------|-------------|
+| `FILESYSTEM_DISK` | `minio` | Configure le disque par défaut sur MinIO |
+| `MINIO_ENDPOINT` | `https://votre-minio-api.up.railway.app` | URL de l'API MinIO (externe ou interne) |
+| `MINIO_KEY` | `votre-access-key` | Clé d'accès générée dans la console MinIO |
+| `MINIO_SECRET` | `votre-secret-key` | Clé secrète générée dans la console MinIO |
+| `MINIO_REGION` | `us-east-1` | Région S3 (garder `us-east-1` pour MinIO) |
+| `MINIO_BUCKET_PUBLIC` | `ummisco-public` | Nom du bucket principal utilisé par le portail |
+| `MINIO_USE_PATH_STYLE` | `true` | Doit être à `true` pour le bon routage avec MinIO |
+
 ### Autres
 
 | Variable | Valeur |

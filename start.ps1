@@ -62,7 +62,7 @@ if ($envContent -match 'APP_KEY=base64:PLACEHOLDER') {
 Write-Host ""
 Write-Host "▶ Démarrage des services Docker..." -ForegroundColor Yellow
 Set-Location $BASE
-docker compose up -d postgres redis
+docker compose -f docker-compose.dev.yml up -d postgres redis
 
 Write-Host "  ⏳ Attente de PostgreSQL (max 60s)..." -ForegroundColor Yellow
 $attempts = 0
@@ -74,13 +74,13 @@ do {
 
 if ($health -ne "healthy") {
     Write-Host "  ❌ PostgreSQL n'a pas démarré correctement" -ForegroundColor Red
-    docker compose logs postgres | Select-Object -Last 20
+    docker compose -f docker-compose.dev.yml logs postgres | Select-Object -Last 20
     exit 1
 }
 Write-Host "  ✅ PostgreSQL prêt" -ForegroundColor Green
 
 # ── Démarrer tous les autres services ────────────────────────────────────────
-docker compose up -d
+docker compose -f docker-compose.dev.yml up -d
 Write-Host "  ✅ Tous les services démarrés" -ForegroundColor Green
 
 # ── Vérifier si la BDD est initialisée ───────────────────────────────────────

@@ -25,6 +25,9 @@ WORKDIR /var/www/html
 # Copier le code source
 COPY app/ .
 
+# Copier le schéma SQL pour l'importation automatique en production
+COPY ummisco_database.sql /var/www/html/ummisco_database.sql
+
 # Créer l'arborescence complète de stockage Laravel et définir les permissions avant le composer install
 RUN mkdir -p /var/www/html/storage/app/public \
              /var/www/html/storage/framework/cache/data \

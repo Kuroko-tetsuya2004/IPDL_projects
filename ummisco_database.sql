@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict DyBi21P510CLkqtLc2e71hoHwONhkUMKufkl6SbzKzJWXzbuBXWQbyfHXPllvhR
+-- \restrict Yhw8TZl41NSJdcQB0iKFeCm9G1ej3972csg3t30orMCJw0ARnNtoCXXbF1VsvHx
 
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
@@ -19,16 +19,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: public; Type: SCHEMA; Schema: -; Owner: ummisco_user
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
 -- *not* creating schema, since initdb creates it
 
 
-ALTER SCHEMA public OWNER TO ummisco_user;
-
 --
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: ummisco_user
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON SCHEMA public IS '';
@@ -42,7 +40,7 @@ CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
@@ -56,7 +54,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -70,7 +68,7 @@ CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
@@ -84,14 +82,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
--- Name: audit_action; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: audit_action; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.audit_action AS ENUM (
@@ -110,10 +108,8 @@ CREATE TYPE public.audit_action AS ENUM (
 );
 
 
-ALTER TYPE public.audit_action OWNER TO ummisco_user;
-
 --
--- Name: dataset_licence; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: dataset_licence; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.dataset_licence AS ENUM (
@@ -128,10 +124,8 @@ CREATE TYPE public.dataset_licence AS ENUM (
 );
 
 
-ALTER TYPE public.dataset_licence OWNER TO ummisco_user;
-
 --
--- Name: language_code; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: language_code; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.language_code AS ENUM (
@@ -140,10 +134,8 @@ CREATE TYPE public.language_code AS ENUM (
 );
 
 
-ALTER TYPE public.language_code OWNER TO ummisco_user;
-
 --
--- Name: notification_channel; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: notification_channel; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.notification_channel AS ENUM (
@@ -153,10 +145,8 @@ CREATE TYPE public.notification_channel AS ENUM (
 );
 
 
-ALTER TYPE public.notification_channel OWNER TO ummisco_user;
-
 --
--- Name: notification_status; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: notification_status; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.notification_status AS ENUM (
@@ -167,10 +157,8 @@ CREATE TYPE public.notification_status AS ENUM (
 );
 
 
-ALTER TYPE public.notification_status OWNER TO ummisco_user;
-
 --
--- Name: publication_status; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: publication_status; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.publication_status AS ENUM (
@@ -183,10 +171,8 @@ CREATE TYPE public.publication_status AS ENUM (
 );
 
 
-ALTER TYPE public.publication_status OWNER TO ummisco_user;
-
 --
--- Name: publication_type; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: publication_type; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.publication_type AS ENUM (
@@ -201,10 +187,8 @@ CREATE TYPE public.publication_type AS ENUM (
 );
 
 
-ALTER TYPE public.publication_type OWNER TO ummisco_user;
-
 --
--- Name: tool_integration_type; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: tool_integration_type; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.tool_integration_type AS ENUM (
@@ -214,10 +198,8 @@ CREATE TYPE public.tool_integration_type AS ENUM (
 );
 
 
-ALTER TYPE public.tool_integration_type OWNER TO ummisco_user;
-
 --
--- Name: user_role; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: user_role; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.user_role AS ENUM (
@@ -230,10 +212,8 @@ CREATE TYPE public.user_role AS ENUM (
 );
 
 
-ALTER TYPE public.user_role OWNER TO ummisco_user;
-
 --
--- Name: user_status; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: user_status; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.user_status AS ENUM (
@@ -244,10 +224,8 @@ CREATE TYPE public.user_status AS ENUM (
 );
 
 
-ALTER TYPE public.user_status OWNER TO ummisco_user;
-
 --
--- Name: visibility; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: visibility; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.visibility AS ENUM (
@@ -257,10 +235,8 @@ CREATE TYPE public.visibility AS ENUM (
 );
 
 
-ALTER TYPE public.visibility OWNER TO ummisco_user;
-
 --
--- Name: workflow_status; Type: TYPE; Schema: public; Owner: ummisco_user
+-- Name: workflow_status; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.workflow_status AS ENUM (
@@ -271,10 +247,8 @@ CREATE TYPE public.workflow_status AS ENUM (
 );
 
 
-ALTER TYPE public.workflow_status OWNER TO ummisco_user;
-
 --
--- Name: fn_audit_logs_immutable(); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_audit_logs_immutable(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_audit_logs_immutable() RETURNS trigger
@@ -286,10 +260,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_audit_logs_immutable() OWNER TO ummisco_user;
-
 --
--- Name: fn_audit_publication_statut(); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_audit_publication_statut(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_audit_publication_statut() RETURNS trigger
@@ -322,10 +294,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_audit_publication_statut() OWNER TO ummisco_user;
-
 --
--- Name: fn_generate_convention_numero(); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_generate_convention_numero(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_generate_convention_numero() RETURNS trigger
@@ -341,10 +311,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_generate_convention_numero() OWNER TO ummisco_user;
-
 --
--- Name: fn_increment_vues(uuid); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_increment_vues(uuid); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_increment_vues(p_publication_id uuid) RETURNS void
@@ -358,17 +326,15 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_increment_vues(p_publication_id uuid) OWNER TO ummisco_user;
-
 --
--- Name: FUNCTION fn_increment_vues(p_publication_id uuid); Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: FUNCTION fn_increment_vues(p_publication_id uuid); Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON FUNCTION public.fn_increment_vues(p_publication_id uuid) IS 'Appeler via background job pour éviter les locks sur les lectures';
 
 
 --
--- Name: fn_purge_audit_logs(integer); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_purge_audit_logs(integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_purge_audit_logs(retention_months integer DEFAULT 12) RETURNS integer
@@ -393,17 +359,15 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_purge_audit_logs(retention_months integer) OWNER TO ummisco_user;
-
 --
--- Name: FUNCTION fn_purge_audit_logs(retention_months integer); Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: FUNCTION fn_purge_audit_logs(retention_months integer); Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON FUNCTION public.fn_purge_audit_logs(retention_months integer) IS 'À appeler via Laravel Scheduler — purge les logs de plus de 12 mois';
 
 
 --
--- Name: fn_set_updated_at(); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_set_updated_at() RETURNS trigger
@@ -416,10 +380,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_set_updated_at() OWNER TO ummisco_user;
-
 --
--- Name: fn_update_nb_publications(); Type: FUNCTION; Schema: public; Owner: ummisco_user
+-- Name: fn_update_nb_publications(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.fn_update_nb_publications() RETURNS trigger
@@ -454,14 +416,12 @@ END;
 $$;
 
 
-ALTER FUNCTION public.fn_update_nb_publications() OWNER TO ummisco_user;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: actualites; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: actualites; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.actualites (
@@ -471,10 +431,8 @@ CREATE TABLE public.actualites (
 );
 
 
-ALTER TABLE public.actualites OWNER TO ummisco_user;
-
 --
--- Name: articles; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: articles; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.articles (
@@ -493,10 +451,8 @@ CREATE TABLE public.articles (
 );
 
 
-ALTER TABLE public.articles OWNER TO ummisco_user;
-
 --
--- Name: audit_logs; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: audit_logs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.audit_logs (
@@ -517,17 +473,15 @@ CREATE TABLE public.audit_logs (
 );
 
 
-ALTER TABLE public.audit_logs OWNER TO ummisco_user;
-
 --
--- Name: TABLE audit_logs; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE audit_logs; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.audit_logs IS 'Journal d''audit immuable — aucun UPDATE ni DELETE — conservation 12 mois minimum';
 
 
 --
--- Name: axes_thematiques; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: axes_thematiques; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.axes_thematiques (
@@ -547,17 +501,15 @@ CREATE TABLE public.axes_thematiques (
 );
 
 
-ALTER TABLE public.axes_thematiques OWNER TO ummisco_user;
-
 --
--- Name: TABLE axes_thematiques; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE axes_thematiques; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.axes_thematiques IS 'Axes de recherche thématiques du laboratoire UMMISCO';
 
 
 --
--- Name: chatbot_feedbacks; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: chatbot_feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.chatbot_feedbacks (
@@ -571,10 +523,8 @@ CREATE TABLE public.chatbot_feedbacks (
 );
 
 
-ALTER TABLE public.chatbot_feedbacks OWNER TO ummisco_user;
-
 --
--- Name: chatbot_sessions; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: chatbot_sessions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.chatbot_sessions (
@@ -592,17 +542,15 @@ CREATE TABLE public.chatbot_sessions (
 );
 
 
-ALTER TABLE public.chatbot_sessions OWNER TO ummisco_user;
-
 --
--- Name: TABLE chatbot_sessions; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE chatbot_sessions; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.chatbot_sessions IS 'Métadonnées de sessions chatbot — les messages ne sont JAMAIS persistés (RG-022)';
 
 
 --
--- Name: controle_acces; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: controle_acces; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.controle_acces (
@@ -618,24 +566,22 @@ CREATE TABLE public.controle_acces (
 );
 
 
-ALTER TABLE public.controle_acces OWNER TO ummisco_user;
-
 --
--- Name: TABLE controle_acces; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE controle_acces; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.controle_acces IS 'ACL granulaire — contrôle l''accès à chaque ressource par groupe Keycloak';
 
 
 --
--- Name: COLUMN controle_acces.groupe; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN controle_acces.groupe; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.controle_acces.groupe IS 'Nom du groupe Keycloak (ex: partners_epidemio) ou rôle global';
 
 
 --
--- Name: conventions_stage; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.conventions_stage (
@@ -660,10 +606,8 @@ CREATE TABLE public.conventions_stage (
 );
 
 
-ALTER TABLE public.conventions_stage OWNER TO ummisco_user;
-
 --
--- Name: datasets; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: datasets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.datasets (
@@ -686,17 +630,15 @@ CREATE TABLE public.datasets (
 );
 
 
-ALTER TABLE public.datasets OWNER TO ummisco_user;
-
 --
--- Name: COLUMN datasets.metadonnees; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN datasets.metadonnees; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.datasets.metadonnees IS 'Métadonnées libres au format JSONB — ex: {"variables": ["temp","hum"], "capteurs": 12}';
 
 
 --
--- Name: datasets_fichiers; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: datasets_fichiers; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.datasets_fichiers (
@@ -715,10 +657,8 @@ CREATE TABLE public.datasets_fichiers (
 );
 
 
-ALTER TABLE public.datasets_fichiers OWNER TO ummisco_user;
-
 --
--- Name: datasets_versions; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: datasets_versions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.datasets_versions (
@@ -731,10 +671,8 @@ CREATE TABLE public.datasets_versions (
 );
 
 
-ALTER TABLE public.datasets_versions OWNER TO ummisco_user;
-
 --
--- Name: demandes_collaboration; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.demandes_collaboration (
@@ -753,10 +691,8 @@ CREATE TABLE public.demandes_collaboration (
 );
 
 
-ALTER TABLE public.demandes_collaboration OWNER TO ummisco_user;
-
 --
--- Name: demandes_contact; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: demandes_contact; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.demandes_contact (
@@ -777,10 +713,8 @@ CREATE TABLE public.demandes_contact (
 );
 
 
-ALTER TABLE public.demandes_contact OWNER TO ummisco_user;
-
 --
--- Name: demandes_suppression; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: demandes_suppression; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.demandes_suppression (
@@ -794,10 +728,8 @@ CREATE TABLE public.demandes_suppression (
 );
 
 
-ALTER TABLE public.demandes_suppression OWNER TO ummisco_user;
-
 --
--- Name: documents; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: documents; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.documents (
@@ -813,10 +745,8 @@ CREATE TABLE public.documents (
 );
 
 
-ALTER TABLE public.documents OWNER TO ummisco_user;
-
 --
--- Name: evenements; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: evenements; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.evenements (
@@ -836,10 +766,8 @@ CREATE TABLE public.evenements (
 );
 
 
-ALTER TABLE public.evenements OWNER TO ummisco_user;
-
 --
--- Name: medias; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: medias; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.medias (
@@ -860,10 +788,8 @@ CREATE TABLE public.medias (
 );
 
 
-ALTER TABLE public.medias OWNER TO ummisco_user;
-
 --
--- Name: newsletter_abonnes; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: newsletter_abonnes; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.newsletter_abonnes (
@@ -879,10 +805,8 @@ CREATE TABLE public.newsletter_abonnes (
 );
 
 
-ALTER TABLE public.newsletter_abonnes OWNER TO ummisco_user;
-
 --
--- Name: notifications; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: notifications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.notifications (
@@ -905,10 +829,8 @@ CREATE TABLE public.notifications (
 );
 
 
-ALTER TABLE public.notifications OWNER TO ummisco_user;
-
 --
--- Name: notifications_templates; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: notifications_templates; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.notifications_templates (
@@ -925,10 +847,8 @@ CREATE TABLE public.notifications_templates (
 );
 
 
-ALTER TABLE public.notifications_templates OWNER TO ummisco_user;
-
 --
--- Name: outils_doctoraux; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: outils_doctoraux; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.outils_doctoraux (
@@ -952,17 +872,15 @@ CREATE TABLE public.outils_doctoraux (
 );
 
 
-ALTER TABLE public.outils_doctoraux OWNER TO ummisco_user;
-
 --
--- Name: TABLE outils_doctoraux; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE outils_doctoraux; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.outils_doctoraux IS 'Outils externes intégrés via iframe (Evelop, outil carbone, capteurs)';
 
 
 --
--- Name: parametres_systeme; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: parametres_systeme; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.parametres_systeme (
@@ -974,17 +892,15 @@ CREATE TABLE public.parametres_systeme (
 );
 
 
-ALTER TABLE public.parametres_systeme OWNER TO ummisco_user;
-
 --
--- Name: TABLE parametres_systeme; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE parametres_systeme; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.parametres_systeme IS 'Configuration globale du portail (clé-valeur)';
 
 
 --
--- Name: profils_chercheurs; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: profils_chercheurs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.profils_chercheurs (
@@ -999,10 +915,8 @@ CREATE TABLE public.profils_chercheurs (
 );
 
 
-ALTER TABLE public.profils_chercheurs OWNER TO ummisco_user;
-
 --
--- Name: profils_doctorants; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.profils_doctorants (
@@ -1020,10 +934,8 @@ CREATE TABLE public.profils_doctorants (
 );
 
 
-ALTER TABLE public.profils_doctorants OWNER TO ummisco_user;
-
 --
--- Name: profils_partenaires; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: profils_partenaires; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.profils_partenaires (
@@ -1038,10 +950,8 @@ CREATE TABLE public.profils_partenaires (
 );
 
 
-ALTER TABLE public.profils_partenaires OWNER TO ummisco_user;
-
 --
--- Name: publications; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: publications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.publications (
@@ -1072,31 +982,29 @@ CREATE TABLE public.publications (
 );
 
 
-ALTER TABLE public.publications OWNER TO ummisco_user;
-
 --
--- Name: TABLE publications; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE publications; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.publications IS 'Table centrale — tous les contenus publiés ou en cours';
 
 
 --
--- Name: COLUMN publications.fts_fr; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN publications.fts_fr; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.publications.fts_fr IS 'Index full-text français — généré automatiquement';
 
 
 --
--- Name: COLUMN publications.fts_en; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN publications.fts_en; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.publications.fts_en IS 'Index full-text anglais — généré automatiquement';
 
 
 --
--- Name: publications_auteurs; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: publications_auteurs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.publications_auteurs (
@@ -1110,10 +1018,8 @@ CREATE TABLE public.publications_auteurs (
 );
 
 
-ALTER TABLE public.publications_auteurs OWNER TO ummisco_user;
-
 --
--- Name: publications_medias; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: publications_medias; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.publications_medias (
@@ -1124,10 +1030,8 @@ CREATE TABLE public.publications_medias (
 );
 
 
-ALTER TABLE public.publications_medias OWNER TO ummisco_user;
-
 --
--- Name: publications_tags; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: publications_tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.publications_tags (
@@ -1136,10 +1040,8 @@ CREATE TABLE public.publications_tags (
 );
 
 
-ALTER TABLE public.publications_tags OWNER TO ummisco_user;
-
 --
--- Name: seq_convention_numero; Type: SEQUENCE; Schema: public; Owner: ummisco_user
+-- Name: seq_convention_numero; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.seq_convention_numero
@@ -1150,10 +1052,8 @@ CREATE SEQUENCE public.seq_convention_numero
     CACHE 1;
 
 
-ALTER SEQUENCE public.seq_convention_numero OWNER TO ummisco_user;
-
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.tags (
@@ -1164,10 +1064,8 @@ CREATE TABLE public.tags (
 );
 
 
-ALTER TABLE public.tags OWNER TO ummisco_user;
-
 --
--- Name: users; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -1198,31 +1096,29 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO ummisco_user;
-
 --
--- Name: TABLE users; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE users; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.users IS 'Tous les utilisateurs du portail (chercheurs, doctorants, partenaires, admins)';
 
 
 --
--- Name: COLUMN users.keycloak_id; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN users.keycloak_id; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.users.keycloak_id IS 'Identifiant unique dans Keycloak — source de vérité pour l''authentification';
 
 
 --
--- Name: COLUMN users.deleted_at; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN users.deleted_at; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.users.deleted_at IS 'Soft delete : le compte est désactivé mais les publications restent';
 
 
 --
--- Name: users_axes; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: users_axes; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users_axes (
@@ -1233,10 +1129,8 @@ CREATE TABLE public.users_axes (
 );
 
 
-ALTER TABLE public.users_axes OWNER TO ummisco_user;
-
 --
--- Name: v_datasets_catalogue; Type: VIEW; Schema: public; Owner: ummisco_user
+-- Name: v_datasets_catalogue; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.v_datasets_catalogue AS
@@ -1267,10 +1161,8 @@ CREATE VIEW public.v_datasets_catalogue AS
   WHERE ((p.statut = 'published'::public.publication_status) AND (p.deleted_at IS NULL));
 
 
-ALTER VIEW public.v_datasets_catalogue OWNER TO ummisco_user;
-
 --
--- Name: v_membres_actifs; Type: VIEW; Schema: public; Owner: ummisco_user
+-- Name: v_membres_actifs; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.v_membres_actifs AS
@@ -1300,10 +1192,8 @@ CREATE VIEW public.v_membres_actifs AS
   WHERE ((u.statut = 'active'::public.user_status) AND (u.deleted_at IS NULL) AND (u.role = ANY (ARRAY['researcher'::public.user_role, 'doctoral_student'::public.user_role, 'axe_admin'::public.user_role])));
 
 
-ALTER VIEW public.v_membres_actifs OWNER TO ummisco_user;
-
 --
--- Name: v_publications_publiques; Type: VIEW; Schema: public; Owner: ummisco_user
+-- Name: v_publications_publiques; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.v_publications_publiques AS
@@ -1333,17 +1223,15 @@ CREATE VIEW public.v_publications_publiques AS
   WHERE ((p.statut = 'published'::public.publication_status) AND (p.visibilite = 'public'::public.visibility) AND (p.deleted_at IS NULL));
 
 
-ALTER VIEW public.v_publications_publiques OWNER TO ummisco_user;
-
 --
--- Name: VIEW v_publications_publiques; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: VIEW v_publications_publiques; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON VIEW public.v_publications_publiques IS 'Publications publiées et publiques — utilisée par le portail public';
 
 
 --
--- Name: workflow_validations; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.workflow_validations (
@@ -1363,24 +1251,22 @@ CREATE TABLE public.workflow_validations (
 );
 
 
-ALTER TABLE public.workflow_validations OWNER TO ummisco_user;
-
 --
--- Name: TABLE workflow_validations; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: TABLE workflow_validations; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON TABLE public.workflow_validations IS 'Historique complet des cycles de validation pour les soumissions doctorants';
 
 
 --
--- Name: COLUMN workflow_validations.version; Type: COMMENT; Schema: public; Owner: ummisco_user
+-- Name: COLUMN workflow_validations.version; Type: COMMENT; Schema: public; Owner: -
 --
 
 COMMENT ON COLUMN public.workflow_validations.version IS 'Incrémenté à chaque nouvelle soumission après correction';
 
 
 --
--- Name: v_soumissions_en_attente; Type: VIEW; Schema: public; Owner: ummisco_user
+-- Name: v_soumissions_en_attente; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.v_soumissions_en_attente AS
@@ -1403,10 +1289,8 @@ CREATE VIEW public.v_soumissions_en_attente AS
   WHERE (wv.statut = 'pending'::public.workflow_status);
 
 
-ALTER VIEW public.v_soumissions_en_attente OWNER TO ummisco_user;
-
 --
--- Name: v_statistiques_laboratoire; Type: VIEW; Schema: public; Owner: ummisco_user
+-- Name: v_statistiques_laboratoire; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.v_statistiques_laboratoire AS
@@ -1437,10 +1321,8 @@ CREATE VIEW public.v_statistiques_laboratoire AS
           WHERE ((publications.statut = 'published'::public.publication_status) AND (publications.deleted_at IS NULL))) AS total_telechargements;
 
 
-ALTER VIEW public.v_statistiques_laboratoire OWNER TO ummisco_user;
-
 --
--- Name: votes_suppression; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: votes_suppression; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.votes_suppression (
@@ -1453,10 +1335,8 @@ CREATE TABLE public.votes_suppression (
 );
 
 
-ALTER TABLE public.votes_suppression OWNER TO ummisco_user;
-
 --
--- Name: workflow_historique; Type: TABLE; Schema: public; Owner: ummisco_user
+-- Name: workflow_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.workflow_historique (
@@ -1470,10 +1350,8 @@ CREATE TABLE public.workflow_historique (
 );
 
 
-ALTER TABLE public.workflow_historique OWNER TO ummisco_user;
-
 --
--- Data for Name: actualites; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: actualites; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.actualites (publication_id, en_une, ordre_une) FROM stdin;
@@ -1481,7 +1359,7 @@ COPY public.actualites (publication_id, en_une, ordre_une) FROM stdin;
 
 
 --
--- Data for Name: articles; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: articles; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.articles (publication_id, doi, revue, conference, volume, numero, pages, annee_publication, lien_externe, indexation, facteur_impact, peer_reviewed) FROM stdin;
@@ -1489,7 +1367,7 @@ COPY public.articles (publication_id, doi, revue, conference, volume, numero, pa
 
 
 --
--- Data for Name: audit_logs; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: audit_logs; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.audit_logs (id, user_id, user_email, user_role, action, ressource_type, ressource_id, details, ip_address, user_agent, session_id, succes, message_erreur, created_at) FROM stdin;
@@ -1566,7 +1444,7 @@ a1fa72f0-e04e-4a6f-9a54-9961f77f415e	a1fa6b52-f6d3-486f-8f71-e8b55d1845b7	kuroko
 
 
 --
--- Data for Name: axes_thematiques; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: axes_thematiques; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.axes_thematiques (id, code, nom_fr, nom_en, description_fr, description_en, logo_url, couleur_hex, ordre_affichage, actif, created_at, updated_at, responsable_id) FROM stdin;
@@ -1579,7 +1457,7 @@ ae57ef87-fc44-4049-a6e6-db90b867bac0	methodes	Méthodes & Algorithmes	Methods & 
 
 
 --
--- Data for Name: chatbot_feedbacks; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: chatbot_feedbacks; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.chatbot_feedbacks (id, session_id, note, commentaire, created_at) FROM stdin;
@@ -1587,7 +1465,7 @@ COPY public.chatbot_feedbacks (id, session_id, note, commentaire, created_at) FR
 
 
 --
--- Data for Name: chatbot_sessions; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: chatbot_sessions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.chatbot_sessions (id, user_id, session_token, modele_llm, nb_messages, langue, ip_address, user_agent, debut_session, fin_session, created_at) FROM stdin;
@@ -1595,7 +1473,7 @@ COPY public.chatbot_sessions (id, user_id, session_token, modele_llm, nb_message
 
 
 --
--- Data for Name: controle_acces; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: controle_acces; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.controle_acces (id, ressource_type, ressource_id, groupe, permissions, "accordé_par", date_expiration, created_at, updated_at) FROM stdin;
@@ -1603,7 +1481,7 @@ COPY public.controle_acces (id, ressource_type, ressource_id, groupe, permission
 
 
 --
--- Data for Name: conventions_stage; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: conventions_stage; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.conventions_stage (id, numero, stagiaire_id, stagiaire_nom, stagiaire_email, encadrant_id, axe_id, sujet, date_debut, date_fin, etablissement, statut, validee_par, validee_le, document_url, created_at, updated_at) FROM stdin;
@@ -1611,7 +1489,7 @@ COPY public.conventions_stage (id, numero, stagiaire_id, stagiaire_nom, stagiair
 
 
 --
--- Data for Name: datasets; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: datasets; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.datasets (publication_id, licence, format_principal, formats_disponibles, taille_totale_mo, version, doi, metadonnees, periode_collecte_debut, periode_collecte_fin, zone_geographique, methodologie, conditions_acces, lien_externe) FROM stdin;
@@ -1619,7 +1497,7 @@ COPY public.datasets (publication_id, licence, format_principal, formats_disponi
 
 
 --
--- Data for Name: datasets_fichiers; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: datasets_fichiers; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.datasets_fichiers (id, dataset_id, nom, description, chemin_minio, bucket_minio, taille_octets, format, checksum_sha256, version, est_principal, created_at) FROM stdin;
@@ -1627,7 +1505,7 @@ COPY public.datasets_fichiers (id, dataset_id, nom, description, chemin_minio, b
 
 
 --
--- Data for Name: datasets_versions; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: datasets_versions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.datasets_versions (id, dataset_id, version, notes_version, cree_par, created_at) FROM stdin;
@@ -1635,7 +1513,7 @@ COPY public.datasets_versions (id, dataset_id, version, notes_version, cree_par,
 
 
 --
--- Data for Name: demandes_collaboration; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: demandes_collaboration; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.demandes_collaboration (id, demandeur_id, nom_externe, email_externe, organisation, description, type_collab, axe_cible_id, statut, traite_par, created_at, updated_at) FROM stdin;
@@ -1643,7 +1521,7 @@ COPY public.demandes_collaboration (id, demandeur_id, nom_externe, email_externe
 
 
 --
--- Data for Name: demandes_contact; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: demandes_contact; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.demandes_contact (id, nom, email, organisation, sujet, message, type_demande, axe_concerne_id, traite, traite_par, traite_le, notes_admin, ip_address, created_at) FROM stdin;
@@ -1652,7 +1530,7 @@ dc290577-db38-4c4b-a560-b899b7457069	Test User	test@example.com	Test Org	Test su
 
 
 --
--- Data for Name: demandes_suppression; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: demandes_suppression; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.demandes_suppression (id, publication_id, propose_par, motif, statut, created_at, updated_at) FROM stdin;
@@ -1661,7 +1539,7 @@ COPY public.demandes_suppression (id, publication_id, propose_par, motif, statut
 
 
 --
--- Data for Name: documents; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: documents; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.documents (publication_id, fichier_url, fichier_nom, fichier_taille, fichier_mime, nb_pages, these_soutenue, date_soutenance, jury_membres) FROM stdin;
@@ -1672,7 +1550,7 @@ a1fa6f0d-ae7d-46e9-b4a9-7366271b57d2	documents/ToTfoBEZTo9U5kTR25PLGq4xaaMmyr8tM
 
 
 --
--- Data for Name: evenements; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: evenements; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.evenements (publication_id, date_debut, date_fin, lieu, lieu_details, format, lien_inscription, lien_visio, capacite_max, nb_inscrits, programme, intervenants) FROM stdin;
@@ -1680,7 +1558,7 @@ COPY public.evenements (publication_id, date_debut, date_fin, lieu, lieu_details
 
 
 --
--- Data for Name: medias; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: medias; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.medias (id, nom, alt_text, chemin_minio, bucket_minio, url_publique, mime_type, taille_octets, largeur_px, hauteur_px, owner_id, reference_type, reference_id, created_at) FROM stdin;
@@ -1688,7 +1566,7 @@ COPY public.medias (id, nom, alt_text, chemin_minio, bucket_minio, url_publique,
 
 
 --
--- Data for Name: newsletter_abonnes; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: newsletter_abonnes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.newsletter_abonnes (id, email, nom, langue, actif, token_unsub, subscribed_at, unsubscribed_at, created_at) FROM stdin;
@@ -1696,7 +1574,7 @@ COPY public.newsletter_abonnes (id, email, nom, langue, actif, token_unsub, subs
 
 
 --
--- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.notifications (id, destinataire_id, type, canal, statut, sujet, contenu, contenu_html, metadonnees, reference_type, reference_id, tentatives, derniere_tentative, envoyee_le, lue_le, created_at) FROM stdin;
@@ -1704,7 +1582,7 @@ COPY public.notifications (id, destinataire_id, type, canal, statut, sujet, cont
 
 
 --
--- Data for Name: notifications_templates; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: notifications_templates; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.notifications_templates (id, code, langue, type, sujet, corps_text, corps_html, actif, created_at, updated_at) FROM stdin;
@@ -1716,7 +1594,7 @@ COPY public.notifications_templates (id, code, langue, type, sujet, corps_text, 
 
 
 --
--- Data for Name: outils_doctoraux; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: outils_doctoraux; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.outils_doctoraux (id, nom, description_fr, description_en, type_integration, url_integration, doctorant_id, axe_id, actif, requiert_auth, hauteur_iframe, largeur_iframe, parametres, ordre_affichage, domaines_autorises, created_at, updated_at) FROM stdin;
@@ -1724,7 +1602,7 @@ COPY public.outils_doctoraux (id, nom, description_fr, description_en, type_inte
 
 
 --
--- Data for Name: parametres_systeme; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: parametres_systeme; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.parametres_systeme (cle, valeur, description, modifiable, updated_at) FROM stdin;
@@ -1748,7 +1626,7 @@ workflow_delai_jours	14	Délai de validation en jours	t	2026-06-06 21:53:49.1740
 
 
 --
--- Data for Name: profils_chercheurs; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: profils_chercheurs; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.profils_chercheurs (user_id, specialite, domaines_expertise, h_index, nb_publications, date_entree_labo, statut_chercheur, updated_at) FROM stdin;
@@ -1758,7 +1636,7 @@ a1fa6b52-f6d3-486f-8f71-e8b55d1845b7	Méthodes & Algorithmes	\N	\N	0	\N	\N	2026-
 
 
 --
--- Data for Name: profils_doctorants; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: profils_doctorants; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.profils_doctorants (user_id, directeur_id, co_directeur_id, titre_these, date_inscription, date_soutenance_prev, date_soutenance_eff, ecole_doctorale, financement, updated_at, domaine_expertise) FROM stdin;
@@ -1767,7 +1645,7 @@ a1fa6a70-3a9c-4eb0-b7fa-c3b6b38d9109	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-09 01:36:36
 
 
 --
--- Data for Name: profils_partenaires; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: profils_partenaires; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.profils_partenaires (user_id, organisation, pays, domaine_acces, date_debut_partenariat, date_fin_partenariat, contact_referent, updated_at) FROM stdin;
@@ -1775,7 +1653,7 @@ COPY public.profils_partenaires (user_id, organisation, pays, domaine_acces, dat
 
 
 --
--- Data for Name: publications; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: publications; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.publications (id, titre_fr, titre_en, resume_fr, resume_en, type, statut, visibilite, langue_principale, auteur_id, axe_id, mots_cles, image_couverture_url, nb_vues, nb_telechargements, date_publication, date_soumission, created_at, updated_at, deleted_at) FROM stdin;
@@ -1788,7 +1666,7 @@ a1fa6f0d-ae7d-46e9-b4a9-7366271b57d2	zerer	\N	azerfgf	\N	report	published	public
 
 
 --
--- Data for Name: publications_auteurs; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: publications_auteurs; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.publications_auteurs (publication_id, user_id, ordre, auteur_externe, nom_externe, affiliation_externe) FROM stdin;
@@ -1796,7 +1674,7 @@ COPY public.publications_auteurs (publication_id, user_id, ordre, auteur_externe
 
 
 --
--- Data for Name: publications_medias; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: publications_medias; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.publications_medias (publication_id, media_id, role, ordre) FROM stdin;
@@ -1804,7 +1682,7 @@ COPY public.publications_medias (publication_id, media_id, role, ordre) FROM std
 
 
 --
--- Data for Name: publications_tags; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: publications_tags; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.publications_tags (publication_id, tag_id) FROM stdin;
@@ -1812,7 +1690,7 @@ COPY public.publications_tags (publication_id, tag_id) FROM stdin;
 
 
 --
--- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.tags (id, nom_fr, nom_en, slug) FROM stdin;
@@ -1835,7 +1713,7 @@ fcf2d345-ece0-4aff-8907-a444637f0956	IoT	IoT	iot
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.users (id, keycloak_id, email, nom, prenom, role, statut, axe_principal_id, photo_url, biographie_fr, biographie_en, titre_academique, grade, orcid_id, page_web_url, linkedin_url, researchgate_url, langue_preference, email_notifications, derniere_connexion, created_at, updated_at, deleted_at, password) FROM stdin;
@@ -1852,7 +1730,7 @@ a1f63b58-d148-4396-a293-83e8b69d271b	mock-super_admin-6a24b02f67a6e	mock_super_a
 
 
 --
--- Data for Name: users_axes; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: users_axes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.users_axes (user_id, axe_id, role_dans_axe, depuis) FROM stdin;
@@ -1860,7 +1738,7 @@ COPY public.users_axes (user_id, axe_id, role_dans_axe, depuis) FROM stdin;
 
 
 --
--- Data for Name: votes_suppression; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: votes_suppression; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.votes_suppression (id, demande_suppression_id, user_id, daccord, created_at, updated_at) FROM stdin;
@@ -1869,7 +1747,7 @@ COPY public.votes_suppression (id, demande_suppression_id, user_id, daccord, cre
 
 
 --
--- Data for Name: workflow_historique; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: workflow_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.workflow_historique (id, workflow_id, statut_avant, statut_apres, commentaire, acteur_id, created_at) FROM stdin;
@@ -1879,7 +1757,7 @@ b4586dd0-b38b-4b56-beae-bf5d49de9d23	a1fa6f14-31ae-4bc3-9003-2dcf8c0b6f98	pendin
 
 
 --
--- Data for Name: workflow_validations; Type: TABLE DATA; Schema: public; Owner: ummisco_user
+-- Data for Name: workflow_validations; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.workflow_validations (id, publication_id, soumetteur_id, validateur_id, statut, commentaire_admin, commentaire_auteur, version, date_soumission, date_decision, date_limite, created_at, updated_at) FROM stdin;
@@ -1889,14 +1767,14 @@ a1fa6f14-31ae-4bc3-9003-2dcf8c0b6f98	a1fa6f0d-ae7d-46e9-b4a9-7366271b57d2	a1fa6a
 
 
 --
--- Name: seq_convention_numero; Type: SEQUENCE SET; Schema: public; Owner: ummisco_user
+-- Name: seq_convention_numero; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.seq_convention_numero', 1, false);
 
 
 --
--- Name: actualites actualites_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: actualites actualites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.actualites
@@ -1904,7 +1782,7 @@ ALTER TABLE ONLY public.actualites
 
 
 --
--- Name: articles articles_doi_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: articles articles_doi_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.articles
@@ -1912,7 +1790,7 @@ ALTER TABLE ONLY public.articles
 
 
 --
--- Name: articles articles_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: articles articles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.articles
@@ -1920,7 +1798,7 @@ ALTER TABLE ONLY public.articles
 
 
 --
--- Name: audit_logs audit_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: audit_logs audit_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.audit_logs
@@ -1928,7 +1806,7 @@ ALTER TABLE ONLY public.audit_logs
 
 
 --
--- Name: axes_thematiques axes_thematiques_code_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: axes_thematiques axes_thematiques_code_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.axes_thematiques
@@ -1936,7 +1814,7 @@ ALTER TABLE ONLY public.axes_thematiques
 
 
 --
--- Name: axes_thematiques axes_thematiques_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: axes_thematiques axes_thematiques_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.axes_thematiques
@@ -1944,7 +1822,7 @@ ALTER TABLE ONLY public.axes_thematiques
 
 
 --
--- Name: chatbot_feedbacks chatbot_feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: chatbot_feedbacks chatbot_feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chatbot_feedbacks
@@ -1952,7 +1830,7 @@ ALTER TABLE ONLY public.chatbot_feedbacks
 
 
 --
--- Name: chatbot_sessions chatbot_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: chatbot_sessions chatbot_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chatbot_sessions
@@ -1960,7 +1838,7 @@ ALTER TABLE ONLY public.chatbot_sessions
 
 
 --
--- Name: chatbot_sessions chatbot_sessions_session_token_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: chatbot_sessions chatbot_sessions_session_token_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chatbot_sessions
@@ -1968,7 +1846,7 @@ ALTER TABLE ONLY public.chatbot_sessions
 
 
 --
--- Name: controle_acces controle_acces_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: controle_acces controle_acces_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.controle_acces
@@ -1976,7 +1854,7 @@ ALTER TABLE ONLY public.controle_acces
 
 
 --
--- Name: controle_acces controle_acces_ressource_type_ressource_id_groupe_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: controle_acces controle_acces_ressource_type_ressource_id_groupe_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.controle_acces
@@ -1984,7 +1862,7 @@ ALTER TABLE ONLY public.controle_acces
 
 
 --
--- Name: conventions_stage conventions_stage_numero_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_numero_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -1992,7 +1870,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: conventions_stage conventions_stage_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -2000,7 +1878,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: datasets datasets_doi_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets datasets_doi_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets
@@ -2008,7 +1886,7 @@ ALTER TABLE ONLY public.datasets
 
 
 --
--- Name: datasets_fichiers datasets_fichiers_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_fichiers datasets_fichiers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_fichiers
@@ -2016,7 +1894,7 @@ ALTER TABLE ONLY public.datasets_fichiers
 
 
 --
--- Name: datasets datasets_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets datasets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets
@@ -2024,7 +1902,7 @@ ALTER TABLE ONLY public.datasets
 
 
 --
--- Name: datasets_versions datasets_versions_dataset_id_version_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_versions datasets_versions_dataset_id_version_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_versions
@@ -2032,7 +1910,7 @@ ALTER TABLE ONLY public.datasets_versions
 
 
 --
--- Name: datasets_versions datasets_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_versions datasets_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_versions
@@ -2040,7 +1918,7 @@ ALTER TABLE ONLY public.datasets_versions
 
 
 --
--- Name: demandes_collaboration demandes_collaboration_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration demandes_collaboration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_collaboration
@@ -2048,7 +1926,7 @@ ALTER TABLE ONLY public.demandes_collaboration
 
 
 --
--- Name: demandes_contact demandes_contact_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_contact demandes_contact_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_contact
@@ -2056,7 +1934,7 @@ ALTER TABLE ONLY public.demandes_contact
 
 
 --
--- Name: demandes_suppression demandes_suppression_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_suppression demandes_suppression_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_suppression
@@ -2064,7 +1942,7 @@ ALTER TABLE ONLY public.demandes_suppression
 
 
 --
--- Name: documents documents_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: documents documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.documents
@@ -2072,7 +1950,7 @@ ALTER TABLE ONLY public.documents
 
 
 --
--- Name: evenements evenements_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: evenements evenements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.evenements
@@ -2080,7 +1958,7 @@ ALTER TABLE ONLY public.evenements
 
 
 --
--- Name: medias medias_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: medias medias_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.medias
@@ -2088,7 +1966,7 @@ ALTER TABLE ONLY public.medias
 
 
 --
--- Name: newsletter_abonnes newsletter_abonnes_email_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: newsletter_abonnes newsletter_abonnes_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.newsletter_abonnes
@@ -2096,7 +1974,7 @@ ALTER TABLE ONLY public.newsletter_abonnes
 
 
 --
--- Name: newsletter_abonnes newsletter_abonnes_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: newsletter_abonnes newsletter_abonnes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.newsletter_abonnes
@@ -2104,7 +1982,7 @@ ALTER TABLE ONLY public.newsletter_abonnes
 
 
 --
--- Name: newsletter_abonnes newsletter_abonnes_token_unsub_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: newsletter_abonnes newsletter_abonnes_token_unsub_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.newsletter_abonnes
@@ -2112,7 +1990,7 @@ ALTER TABLE ONLY public.newsletter_abonnes
 
 
 --
--- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.notifications
@@ -2120,7 +1998,7 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- Name: notifications_templates notifications_templates_code_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: notifications_templates notifications_templates_code_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.notifications_templates
@@ -2128,7 +2006,7 @@ ALTER TABLE ONLY public.notifications_templates
 
 
 --
--- Name: notifications_templates notifications_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: notifications_templates notifications_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.notifications_templates
@@ -2136,7 +2014,7 @@ ALTER TABLE ONLY public.notifications_templates
 
 
 --
--- Name: outils_doctoraux outils_doctoraux_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: outils_doctoraux outils_doctoraux_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.outils_doctoraux
@@ -2144,7 +2022,7 @@ ALTER TABLE ONLY public.outils_doctoraux
 
 
 --
--- Name: parametres_systeme parametres_systeme_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: parametres_systeme parametres_systeme_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.parametres_systeme
@@ -2152,7 +2030,7 @@ ALTER TABLE ONLY public.parametres_systeme
 
 
 --
--- Name: profils_chercheurs profils_chercheurs_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_chercheurs profils_chercheurs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_chercheurs
@@ -2160,7 +2038,7 @@ ALTER TABLE ONLY public.profils_chercheurs
 
 
 --
--- Name: profils_doctorants profils_doctorants_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants profils_doctorants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_doctorants
@@ -2168,7 +2046,7 @@ ALTER TABLE ONLY public.profils_doctorants
 
 
 --
--- Name: profils_partenaires profils_partenaires_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_partenaires profils_partenaires_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_partenaires
@@ -2176,7 +2054,7 @@ ALTER TABLE ONLY public.profils_partenaires
 
 
 --
--- Name: publications_auteurs publications_auteurs_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_auteurs publications_auteurs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_auteurs
@@ -2184,7 +2062,7 @@ ALTER TABLE ONLY public.publications_auteurs
 
 
 --
--- Name: publications_medias publications_medias_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_medias publications_medias_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_medias
@@ -2192,7 +2070,7 @@ ALTER TABLE ONLY public.publications_medias
 
 
 --
--- Name: publications publications_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications publications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications
@@ -2200,7 +2078,7 @@ ALTER TABLE ONLY public.publications
 
 
 --
--- Name: publications_tags publications_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_tags publications_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_tags
@@ -2208,7 +2086,7 @@ ALTER TABLE ONLY public.publications_tags
 
 
 --
--- Name: tags tags_nom_fr_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: tags tags_nom_fr_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -2216,7 +2094,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -2224,7 +2102,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: tags tags_slug_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: tags tags_slug_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -2232,7 +2110,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: users_axes users_axes_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users_axes users_axes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_axes
@@ -2240,7 +2118,7 @@ ALTER TABLE ONLY public.users_axes
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -2248,7 +2126,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_keycloak_id_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users users_keycloak_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -2256,7 +2134,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_orcid_id_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users users_orcid_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -2264,7 +2142,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -2272,7 +2150,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: votes_suppression votes_suppression_demande_suppression_id_user_id_key; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: votes_suppression votes_suppression_demande_suppression_id_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.votes_suppression
@@ -2280,7 +2158,7 @@ ALTER TABLE ONLY public.votes_suppression
 
 
 --
--- Name: votes_suppression votes_suppression_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: votes_suppression votes_suppression_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.votes_suppression
@@ -2288,7 +2166,7 @@ ALTER TABLE ONLY public.votes_suppression
 
 
 --
--- Name: workflow_historique workflow_historique_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_historique workflow_historique_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_historique
@@ -2296,7 +2174,7 @@ ALTER TABLE ONLY public.workflow_historique
 
 
 --
--- Name: workflow_validations workflow_validations_pkey; Type: CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations workflow_validations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_validations
@@ -2304,399 +2182,399 @@ ALTER TABLE ONLY public.workflow_validations
 
 
 --
--- Name: idx_acl_groupe; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_acl_groupe; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_acl_groupe ON public.controle_acces USING btree (groupe);
 
 
 --
--- Name: idx_acl_ressource; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_acl_ressource; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_acl_ressource ON public.controle_acces USING btree (ressource_type, ressource_id);
 
 
 --
--- Name: idx_articles_annee; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_articles_annee; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_articles_annee ON public.articles USING btree (annee_publication);
 
 
 --
--- Name: idx_articles_doi; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_articles_doi; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_articles_doi ON public.articles USING btree (doi) WHERE (doi IS NOT NULL);
 
 
 --
--- Name: idx_audit_action; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_audit_action; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_audit_action ON public.audit_logs USING btree (action);
 
 
 --
--- Name: idx_audit_created_at; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_audit_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_audit_created_at ON public.audit_logs USING btree (created_at DESC);
 
 
 --
--- Name: idx_audit_ressource; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_audit_ressource; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_audit_ressource ON public.audit_logs USING btree (ressource_type, ressource_id);
 
 
 --
--- Name: idx_audit_user; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_audit_user; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_audit_user ON public.audit_logs USING btree (user_id);
 
 
 --
--- Name: idx_datasets_licence; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_datasets_licence; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_datasets_licence ON public.datasets USING btree (licence);
 
 
 --
--- Name: idx_datasets_metadonnees; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_datasets_metadonnees; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_datasets_metadonnees ON public.datasets USING gin (metadonnees);
 
 
 --
--- Name: idx_evenements_dates; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_evenements_dates; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_evenements_dates ON public.evenements USING btree (date_debut, date_fin);
 
 
 --
--- Name: idx_notif_destinataire; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_notif_destinataire; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_notif_destinataire ON public.notifications USING btree (destinataire_id);
 
 
 --
--- Name: idx_notif_statut; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_notif_statut; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_notif_statut ON public.notifications USING btree (statut) WHERE (statut = 'pending'::public.notification_status);
 
 
 --
--- Name: idx_outils_axe; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_outils_axe; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_outils_axe ON public.outils_doctoraux USING btree (axe_id) WHERE (actif = true);
 
 
 --
--- Name: idx_outils_doctorant; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_outils_doctorant; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_outils_doctorant ON public.outils_doctoraux USING btree (doctorant_id);
 
 
 --
--- Name: idx_publications_auteur; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_auteur; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_auteur ON public.publications USING btree (auteur_id);
 
 
 --
--- Name: idx_publications_axe; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_axe; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_axe ON public.publications USING btree (axe_id);
 
 
 --
--- Name: idx_publications_date_pub; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_date_pub; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_date_pub ON public.publications USING btree (date_publication DESC);
 
 
 --
--- Name: idx_publications_deleted; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_deleted; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_deleted ON public.publications USING btree (deleted_at) WHERE (deleted_at IS NULL);
 
 
 --
--- Name: idx_publications_fts_en; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_fts_en; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_fts_en ON public.publications USING gin (fts_en);
 
 
 --
--- Name: idx_publications_fts_fr; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_fts_fr; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_fts_fr ON public.publications USING gin (fts_fr);
 
 
 --
--- Name: idx_publications_mots_cles; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_mots_cles; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_mots_cles ON public.publications USING gin (mots_cles);
 
 
 --
--- Name: idx_publications_statut; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_statut; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_statut ON public.publications USING btree (statut);
 
 
 --
--- Name: idx_publications_titre_trgm; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_titre_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_titre_trgm ON public.publications USING gin (titre_fr public.gin_trgm_ops);
 
 
 --
--- Name: idx_publications_type; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_type ON public.publications USING btree (type);
 
 
 --
--- Name: idx_publications_visibilite; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_publications_visibilite; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_publications_visibilite ON public.publications USING btree (visibilite);
 
 
 --
--- Name: idx_users_axe; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_axe; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_axe ON public.users USING btree (axe_principal_id);
 
 
 --
--- Name: idx_users_axes_axe; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_axes_axe; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_axes_axe ON public.users_axes USING btree (axe_id);
 
 
 --
--- Name: idx_users_email; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_email ON public.users USING btree (email);
 
 
 --
--- Name: idx_users_keycloak_id; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_keycloak_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_keycloak_id ON public.users USING btree (keycloak_id);
 
 
 --
--- Name: idx_users_nom_trgm; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_nom_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_nom_trgm ON public.users USING gin (nom public.gin_trgm_ops);
 
 
 --
--- Name: idx_users_prenom_trgm; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_prenom_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_prenom_trgm ON public.users USING gin (prenom public.gin_trgm_ops);
 
 
 --
--- Name: idx_users_role; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_role; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_role ON public.users USING btree (role);
 
 
 --
--- Name: idx_users_statut; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_users_statut; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_statut ON public.users USING btree (statut) WHERE (statut = 'active'::public.user_status);
 
 
 --
--- Name: idx_workflow_publication; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_workflow_publication; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_workflow_publication ON public.workflow_validations USING btree (publication_id);
 
 
 --
--- Name: idx_workflow_soumetteur; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_workflow_soumetteur; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_workflow_soumetteur ON public.workflow_validations USING btree (soumetteur_id);
 
 
 --
--- Name: idx_workflow_statut; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_workflow_statut; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_workflow_statut ON public.workflow_validations USING btree (statut);
 
 
 --
--- Name: idx_workflow_validateur; Type: INDEX; Schema: public; Owner: ummisco_user
+-- Name: idx_workflow_validateur; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_workflow_validateur ON public.workflow_validations USING btree (validateur_id);
 
 
 --
--- Name: audit_logs trg_audit_logs_no_delete; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: audit_logs trg_audit_logs_no_delete; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_audit_logs_no_delete BEFORE DELETE ON public.audit_logs FOR EACH ROW EXECUTE FUNCTION public.fn_audit_logs_immutable();
 
 
 --
--- Name: audit_logs trg_audit_logs_no_update; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: audit_logs trg_audit_logs_no_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_audit_logs_no_update BEFORE UPDATE ON public.audit_logs FOR EACH ROW EXECUTE FUNCTION public.fn_audit_logs_immutable();
 
 
 --
--- Name: publications trg_audit_publication_statut; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: publications trg_audit_publication_statut; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_audit_publication_statut AFTER UPDATE OF statut ON public.publications FOR EACH ROW EXECUTE FUNCTION public.fn_audit_publication_statut();
 
 
 --
--- Name: axes_thematiques trg_axes_thematiques_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: axes_thematiques trg_axes_thematiques_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_axes_thematiques_updated_at BEFORE UPDATE ON public.axes_thematiques FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: controle_acces trg_controle_acces_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: controle_acces trg_controle_acces_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_controle_acces_updated_at BEFORE UPDATE ON public.controle_acces FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: conventions_stage trg_convention_numero; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage trg_convention_numero; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_convention_numero BEFORE INSERT ON public.conventions_stage FOR EACH ROW EXECUTE FUNCTION public.fn_generate_convention_numero();
 
 
 --
--- Name: conventions_stage trg_conventions_stage_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage trg_conventions_stage_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_conventions_stage_updated_at BEFORE UPDATE ON public.conventions_stage FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: demandes_collaboration trg_demandes_collaboration_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration trg_demandes_collaboration_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_demandes_collaboration_updated_at BEFORE UPDATE ON public.demandes_collaboration FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: notifications_templates trg_notifications_templates_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: notifications_templates trg_notifications_templates_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_notifications_templates_updated_at BEFORE UPDATE ON public.notifications_templates FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: outils_doctoraux trg_outils_doctoraux_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: outils_doctoraux trg_outils_doctoraux_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_outils_doctoraux_updated_at BEFORE UPDATE ON public.outils_doctoraux FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: parametres_systeme trg_parametres_systeme_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: parametres_systeme trg_parametres_systeme_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_parametres_systeme_updated_at BEFORE UPDATE ON public.parametres_systeme FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: profils_chercheurs trg_profils_chercheurs_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: profils_chercheurs trg_profils_chercheurs_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_profils_chercheurs_updated_at BEFORE UPDATE ON public.profils_chercheurs FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: profils_doctorants trg_profils_doctorants_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants trg_profils_doctorants_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_profils_doctorants_updated_at BEFORE UPDATE ON public.profils_doctorants FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: profils_partenaires trg_profils_partenaires_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: profils_partenaires trg_profils_partenaires_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_profils_partenaires_updated_at BEFORE UPDATE ON public.profils_partenaires FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: publications trg_publications_nb_count; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: publications trg_publications_nb_count; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_publications_nb_count AFTER INSERT OR DELETE OR UPDATE OF statut ON public.publications FOR EACH ROW EXECUTE FUNCTION public.fn_update_nb_publications();
 
 
 --
--- Name: publications trg_publications_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: publications trg_publications_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_publications_updated_at BEFORE UPDATE ON public.publications FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: users trg_users_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: users trg_users_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: workflow_validations trg_workflow_validations_updated_at; Type: TRIGGER; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations trg_workflow_validations_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trg_workflow_validations_updated_at BEFORE UPDATE ON public.workflow_validations FOR EACH ROW EXECUTE FUNCTION public.fn_set_updated_at();
 
 
 --
--- Name: actualites actualites_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: actualites actualites_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.actualites
@@ -2704,7 +2582,7 @@ ALTER TABLE ONLY public.actualites
 
 
 --
--- Name: articles articles_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: articles articles_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.articles
@@ -2712,7 +2590,7 @@ ALTER TABLE ONLY public.articles
 
 
 --
--- Name: audit_logs audit_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: audit_logs audit_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.audit_logs
@@ -2720,7 +2598,7 @@ ALTER TABLE ONLY public.audit_logs
 
 
 --
--- Name: axes_thematiques axes_thematiques_responsable_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: axes_thematiques axes_thematiques_responsable_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.axes_thematiques
@@ -2728,7 +2606,7 @@ ALTER TABLE ONLY public.axes_thematiques
 
 
 --
--- Name: chatbot_feedbacks chatbot_feedbacks_session_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: chatbot_feedbacks chatbot_feedbacks_session_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chatbot_feedbacks
@@ -2736,7 +2614,7 @@ ALTER TABLE ONLY public.chatbot_feedbacks
 
 
 --
--- Name: chatbot_sessions chatbot_sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: chatbot_sessions chatbot_sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chatbot_sessions
@@ -2744,7 +2622,7 @@ ALTER TABLE ONLY public.chatbot_sessions
 
 
 --
--- Name: controle_acces controle_acces_accordé_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: controle_acces controle_acces_accordé_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.controle_acces
@@ -2752,7 +2630,7 @@ ALTER TABLE ONLY public.controle_acces
 
 
 --
--- Name: conventions_stage conventions_stage_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -2760,7 +2638,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: conventions_stage conventions_stage_encadrant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_encadrant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -2768,7 +2646,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: conventions_stage conventions_stage_stagiaire_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_stagiaire_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -2776,7 +2654,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: conventions_stage conventions_stage_validee_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: conventions_stage conventions_stage_validee_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.conventions_stage
@@ -2784,7 +2662,7 @@ ALTER TABLE ONLY public.conventions_stage
 
 
 --
--- Name: datasets_fichiers datasets_fichiers_dataset_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_fichiers datasets_fichiers_dataset_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_fichiers
@@ -2792,7 +2670,7 @@ ALTER TABLE ONLY public.datasets_fichiers
 
 
 --
--- Name: datasets datasets_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets datasets_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets
@@ -2800,7 +2678,7 @@ ALTER TABLE ONLY public.datasets
 
 
 --
--- Name: datasets_versions datasets_versions_cree_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_versions datasets_versions_cree_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_versions
@@ -2808,7 +2686,7 @@ ALTER TABLE ONLY public.datasets_versions
 
 
 --
--- Name: datasets_versions datasets_versions_dataset_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: datasets_versions datasets_versions_dataset_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.datasets_versions
@@ -2816,7 +2694,7 @@ ALTER TABLE ONLY public.datasets_versions
 
 
 --
--- Name: demandes_collaboration demandes_collaboration_axe_cible_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration demandes_collaboration_axe_cible_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_collaboration
@@ -2824,7 +2702,7 @@ ALTER TABLE ONLY public.demandes_collaboration
 
 
 --
--- Name: demandes_collaboration demandes_collaboration_demandeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration demandes_collaboration_demandeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_collaboration
@@ -2832,7 +2710,7 @@ ALTER TABLE ONLY public.demandes_collaboration
 
 
 --
--- Name: demandes_collaboration demandes_collaboration_traite_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_collaboration demandes_collaboration_traite_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_collaboration
@@ -2840,7 +2718,7 @@ ALTER TABLE ONLY public.demandes_collaboration
 
 
 --
--- Name: demandes_contact demandes_contact_axe_concerne_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_contact demandes_contact_axe_concerne_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_contact
@@ -2848,7 +2726,7 @@ ALTER TABLE ONLY public.demandes_contact
 
 
 --
--- Name: demandes_contact demandes_contact_traite_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_contact demandes_contact_traite_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_contact
@@ -2856,7 +2734,7 @@ ALTER TABLE ONLY public.demandes_contact
 
 
 --
--- Name: demandes_suppression demandes_suppression_propose_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_suppression demandes_suppression_propose_par_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_suppression
@@ -2864,7 +2742,7 @@ ALTER TABLE ONLY public.demandes_suppression
 
 
 --
--- Name: demandes_suppression demandes_suppression_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: demandes_suppression demandes_suppression_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.demandes_suppression
@@ -2872,7 +2750,7 @@ ALTER TABLE ONLY public.demandes_suppression
 
 
 --
--- Name: documents documents_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: documents documents_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.documents
@@ -2880,7 +2758,7 @@ ALTER TABLE ONLY public.documents
 
 
 --
--- Name: evenements evenements_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: evenements evenements_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.evenements
@@ -2888,7 +2766,7 @@ ALTER TABLE ONLY public.evenements
 
 
 --
--- Name: medias medias_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: medias medias_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.medias
@@ -2896,7 +2774,7 @@ ALTER TABLE ONLY public.medias
 
 
 --
--- Name: notifications notifications_destinataire_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: notifications notifications_destinataire_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.notifications
@@ -2904,7 +2782,7 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- Name: outils_doctoraux outils_doctoraux_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: outils_doctoraux outils_doctoraux_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.outils_doctoraux
@@ -2912,7 +2790,7 @@ ALTER TABLE ONLY public.outils_doctoraux
 
 
 --
--- Name: outils_doctoraux outils_doctoraux_doctorant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: outils_doctoraux outils_doctoraux_doctorant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.outils_doctoraux
@@ -2920,7 +2798,7 @@ ALTER TABLE ONLY public.outils_doctoraux
 
 
 --
--- Name: profils_chercheurs profils_chercheurs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_chercheurs profils_chercheurs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_chercheurs
@@ -2928,7 +2806,7 @@ ALTER TABLE ONLY public.profils_chercheurs
 
 
 --
--- Name: profils_doctorants profils_doctorants_co_directeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants profils_doctorants_co_directeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_doctorants
@@ -2936,7 +2814,7 @@ ALTER TABLE ONLY public.profils_doctorants
 
 
 --
--- Name: profils_doctorants profils_doctorants_directeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants profils_doctorants_directeur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_doctorants
@@ -2944,7 +2822,7 @@ ALTER TABLE ONLY public.profils_doctorants
 
 
 --
--- Name: profils_doctorants profils_doctorants_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_doctorants profils_doctorants_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_doctorants
@@ -2952,7 +2830,7 @@ ALTER TABLE ONLY public.profils_doctorants
 
 
 --
--- Name: profils_partenaires profils_partenaires_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: profils_partenaires profils_partenaires_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.profils_partenaires
@@ -2960,7 +2838,7 @@ ALTER TABLE ONLY public.profils_partenaires
 
 
 --
--- Name: publications publications_auteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications publications_auteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications
@@ -2968,7 +2846,7 @@ ALTER TABLE ONLY public.publications
 
 
 --
--- Name: publications_auteurs publications_auteurs_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_auteurs publications_auteurs_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_auteurs
@@ -2976,7 +2854,7 @@ ALTER TABLE ONLY public.publications_auteurs
 
 
 --
--- Name: publications_auteurs publications_auteurs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_auteurs publications_auteurs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_auteurs
@@ -2984,7 +2862,7 @@ ALTER TABLE ONLY public.publications_auteurs
 
 
 --
--- Name: publications publications_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications publications_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications
@@ -2992,7 +2870,7 @@ ALTER TABLE ONLY public.publications
 
 
 --
--- Name: publications_medias publications_medias_media_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_medias publications_medias_media_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_medias
@@ -3000,7 +2878,7 @@ ALTER TABLE ONLY public.publications_medias
 
 
 --
--- Name: publications_medias publications_medias_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_medias publications_medias_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_medias
@@ -3008,7 +2886,7 @@ ALTER TABLE ONLY public.publications_medias
 
 
 --
--- Name: publications_tags publications_tags_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_tags publications_tags_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_tags
@@ -3016,7 +2894,7 @@ ALTER TABLE ONLY public.publications_tags
 
 
 --
--- Name: publications_tags publications_tags_tag_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: publications_tags publications_tags_tag_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications_tags
@@ -3024,7 +2902,7 @@ ALTER TABLE ONLY public.publications_tags
 
 
 --
--- Name: users users_axe_principal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users users_axe_principal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -3032,7 +2910,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users_axes users_axes_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users_axes users_axes_axe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_axes
@@ -3040,7 +2918,7 @@ ALTER TABLE ONLY public.users_axes
 
 
 --
--- Name: users_axes users_axes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: users_axes users_axes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_axes
@@ -3048,7 +2926,7 @@ ALTER TABLE ONLY public.users_axes
 
 
 --
--- Name: votes_suppression votes_suppression_demande_suppression_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: votes_suppression votes_suppression_demande_suppression_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.votes_suppression
@@ -3056,7 +2934,7 @@ ALTER TABLE ONLY public.votes_suppression
 
 
 --
--- Name: votes_suppression votes_suppression_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: votes_suppression votes_suppression_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.votes_suppression
@@ -3064,7 +2942,7 @@ ALTER TABLE ONLY public.votes_suppression
 
 
 --
--- Name: workflow_historique workflow_historique_acteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_historique workflow_historique_acteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_historique
@@ -3072,7 +2950,7 @@ ALTER TABLE ONLY public.workflow_historique
 
 
 --
--- Name: workflow_historique workflow_historique_workflow_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_historique workflow_historique_workflow_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_historique
@@ -3080,7 +2958,7 @@ ALTER TABLE ONLY public.workflow_historique
 
 
 --
--- Name: workflow_validations workflow_validations_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations workflow_validations_publication_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_validations
@@ -3088,7 +2966,7 @@ ALTER TABLE ONLY public.workflow_validations
 
 
 --
--- Name: workflow_validations workflow_validations_soumetteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations workflow_validations_soumetteur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_validations
@@ -3096,7 +2974,7 @@ ALTER TABLE ONLY public.workflow_validations
 
 
 --
--- Name: workflow_validations workflow_validations_validateur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ummisco_user
+-- Name: workflow_validations workflow_validations_validateur_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.workflow_validations
@@ -3104,15 +2982,8 @@ ALTER TABLE ONLY public.workflow_validations
 
 
 --
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: ummisco_user
---
-
-REVOKE USAGE ON SCHEMA public FROM PUBLIC;
-
-
---
 -- PostgreSQL database dump complete
 --
 
-\unrestrict DyBi21P510CLkqtLc2e71hoHwONhkUMKufkl6SbzKzJWXzbuBXWQbyfHXPllvhR
+\unrestrict Yhw8TZl41NSJdcQB0iKFeCm9G1ej3972csg3t30orMCJw0ARnNtoCXXbF1VsvHx
 

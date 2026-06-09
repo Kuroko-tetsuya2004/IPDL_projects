@@ -29,3 +29,4 @@ Thumbs.db
 *.log
 KEYCLOAK_PROD.md
 RAILWAY_ENV.txt
+MINIO_RAILWAY.md
