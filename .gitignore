@@ -27,3 +27,5 @@ app/bootstrap/cache/*.php
 .DS_Store
 Thumbs.db
 *.log
+KEYCLOAK_PROD.md
+RAILWAY_ENV.txt
