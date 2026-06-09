@@ -1,20 +1,26 @@
-vendor/
-node_modules/
-.env
-.env.local
-.env.staging
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-*.sql.bak
+# Ignore local development dependencies
+**/node_modules/
+**/vendor/
+
+# Ignore local environment files and logs
+app/.env
+app/.env.*
+app/storage/logs/
+app/storage/framework/cache/
+app/storage/framework/sessions/
+app/storage/framework/views/
+app/public/hot
+app/public/storage
+app/bootstrap/cache/
+
+# Ignore database dumps and temporary logs
+*.sql
 *.log
+
+# Ignore IDE and Git directories
 .git/
 .github/
-tests/
-docker/nginx/
-docker/postgres/
-public/hot
-public/storage
-.phpunit.result.cache
-bootstrap/cache/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  # ── BASE DE DONNÉES POSTGRESQL ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ummisco_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+
+  # ── CACHE & FILES D'ATTENTE REDIS ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ummisco_redis_prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - backend_net
+
+  # ── STOCKAGE OBJET S3 (MINIO) ──────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: ummisco_minio_prod
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BROWSER_REDIRECT_URL: https://console.storage.portail.ummisco.sn
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_prod_data:/data
+    networks:
+      - backend_net
+      - frontend_net
+
+  # ── AUTHENTIFICATION KEYCLOAK ──────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: ummisco_keycloak_prod
+    restart: always
+    command: start --optimized
+    environment:
+      KC_HOSTNAME: auth.portail.ummisco.sn
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${DB_DATABASE}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - backend_net
+      - frontend_net
+
+  # ── APPLICATION PORTAIL WEB ───────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ummisco_app_prod
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY}
+      APP_URL: https://portail.ummisco.sn
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      KEYCLOAK_BASE_URL: https://auth.portail.ummisco.sn
+      KEYCLOAK_REALM: ummisco
+      KEYCLOAK_CLIENT_ID: laravel-app
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_REDIRECT_URI: https://portail.ummisco.sn/auth/callback
+      KEYCLOAK_MOCK: "false"
+      MINIO_ENDPOINT: https://storage.portail.ummisco.sn
+      MINIO_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ummisco-public
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - app_prod_storage:/var/www/html/storage
+    networks:
+      - backend_net
+      - frontend_net
+
+  # ── SCHEDULER & CRON ───────────────────────────────────────────────────────
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ummisco_scheduler_prod
+    restart: always
+    command: php artisan schedule:work
+    depends_on:
+      - app
+    networks:
+      - backend_net
+
+  # ── QUEUE WORKER (TRAITEMENTS ASYNCHRONES) ────────────────────────────────
+  queue_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ummisco_queue_prod
+    restart: always
+    command: php artisan queue:work --queue=default --sleep=3 --tries=3
+    depends_on:
+      - app
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge
+  frontend_net:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  minio_prod_data:
+  app_prod_storage:
