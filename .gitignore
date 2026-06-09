@@ -1,0 +1,29 @@
+# Fichiers d'environnement et secrets
+app/.env
+app/.env.*
+!app/.env.example
+*.key
+*.pem
+
+# Dépendances (bibliothèques)
+app/vendor/
+app/node_modules/
+
+# Fichiers compilés par le Frontend (Vite)
+app/public/build/
+app/public/hot
+
+# Caches et logs de l'application Laravel
+app/storage/logs/*.log
+app/storage/framework/cache/data/*
+app/storage/framework/sessions/*
+app/storage/framework/views/*
+app/storage/app/public/*
+app/bootstrap/cache/*.php
+
+# Fichiers Système et configuration IDE
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
