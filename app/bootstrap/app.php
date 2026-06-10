@@ -12,10 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+
+        // ✅ Exclure logout et langue du CSRF
+        $middleware->validateCsrfTokens(except: [
+            '/auth/logout',
+            '/langue/*',
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
+
         $middleware->alias([
             'role' => \App\Modules\Auth\Middleware\KeycloakMiddleware::class,
         ]);
