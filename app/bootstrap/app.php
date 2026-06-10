@@ -13,10 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        // ✅ Exclure logout et langue du CSRF
+        // ✅ Routes exclues du CSRF
         $middleware->validateCsrfTokens(except: [
             '/auth/logout',
             '/langue/*',
+            '/admin/membres/*',  // ✅ AJOUT — validation/modification utilisateur
         ]);
 
         $middleware->web(append: [
