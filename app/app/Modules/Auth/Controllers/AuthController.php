@@ -37,19 +37,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // 1. Essayer de s'authentifier auprès de Keycloak (Direct Access Grant)
         $accessToken = $this->authenticateWithKeycloak($validated['email'], $validated['password']);
 
         $user = User::where('email', $validated['email'])->first();
 
-        // Fallback spécial pour le superadmin initial directeur@ucad.edu.sn s'il n'est pas encore dans Keycloak
         if (!$accessToken && ($validated['email'] === 'directeur@ucad.edu.sn' || $validated['email'] === 'directeur')) {
             if ($user && Hash::check($validated['password'], $user->password)) {
-                // Créer et activer le superadmin dans Keycloak à la volée
                 $this->registerUserInKeycloak($user, $validated['password']);
                 $this->enableUserInKeycloak($user);
-                
-                // Re-tenter l'authentification Keycloak
                 $accessToken = $this->authenticateWithKeycloak($validated['email'], $validated['password']);
             }
         }
@@ -60,7 +55,6 @@ class AuthController extends Controller
             ])->withInput($request->only('email'));
         }
 
-        // Si l'utilisateur s'est connecté via Keycloak mais n'existe pas localement (sécurité additionnelle)
         if (!$user) {
             $user = User::create([
                 'keycloak_id'         => 'keycloak-sync-' . uniqid(),
@@ -75,7 +69,6 @@ class AuthController extends Controller
             ]);
         }
 
-        // Vérifier le statut de validation locale
         if ($user->statut === 'pending') {
             return back()->withErrors([
                 'email' => 'Votre compte est en attente de validation par un administrateur.',
@@ -88,7 +81,6 @@ class AuthController extends Controller
             ])->withInput($request->only('email'));
         }
 
-        // Connecter l'utilisateur (initialiser session)
         $this->initSession($user, $accessToken);
 
         $user->update(['derniere_connexion' => now()]);
@@ -132,8 +124,7 @@ class AuthController extends Controller
 
         return DB::transaction(function () use ($validated) {
             $isSuperAdmin = $validated['role'] === 'super_admin';
-            
-            // Création de l'utilisateur (active pour super_admin, pending sinon)
+
             $user = User::create([
                 'keycloak_id'         => 'local-register-' . uniqid(),
                 'prenom'              => $validated['prenom'],
@@ -147,13 +138,12 @@ class AuthController extends Controller
                 'email_notifications' => true,
             ]);
 
-            // Création du profil lié
             if ($validated['role'] === 'researcher') {
                 DB::table('profils_chercheurs')->insert([
-                    'user_id'          => $user->id,
-                    'specialite'       => $validated['specialite'],
-                    'nb_publications'  => 0,
-                    'updated_at'       => now(),
+                    'user_id'         => $user->id,
+                    'specialite'      => $validated['specialite'],
+                    'nb_publications' => 0,
+                    'updated_at'      => now(),
                 ]);
             } elseif ($validated['role'] === 'doctoral_student') {
                 DB::table('profils_doctorants')->insert([
@@ -163,19 +153,16 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Créer le compte Keycloak
             $this->registerUserInKeycloak($user, $validated['password']);
 
-            // Si c'est un superadmin, on l'active directement dans Keycloak également
             if ($isSuperAdmin) {
                 $this->enableUserInKeycloak($user);
-                
-                // On essaie de s'authentifier directement avec son compte pour l'initier
+
                 $accessToken = $this->authenticateWithKeycloak($validated['email'], $validated['password']);
                 if ($accessToken) {
                     $this->initSession($user, $accessToken);
                     $user->update(['derniere_connexion' => now()]);
-                    
+
                     AuditLog::log(
                         AuditLog::ACTION_LOGIN,
                         $user->id,
@@ -183,7 +170,7 @@ class AuthController extends Controller
                         $user->id,
                         ['mode' => 'register_auto_login', 'role' => 'super_admin'],
                     );
-                    
+
                     return redirect()->route('dashboard')
                         ->with('success', "Compte Super-Administrateur créé et connecté avec succès ! Bienvenue, {$user->nom_complet}.");
                 }
@@ -195,7 +182,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Déconnecte l'utilisateur.
+     * ✅ CORRIGÉ — Déconnecte l'utilisateur proprement.
      */
     public function logout(Request $request)
     {
@@ -208,10 +195,13 @@ class AuthController extends Controller
             );
         }
 
-        Session::flush();
+        // ✅ invalidate() d'abord — détruit la session et régénère l'ID
+        // ✅ regenerateToken() ensuite — génère un nouveau token CSRF propre
+        // ❌ Session::flush() supprimé — causait la perte du token CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // ✅ Réponse correcte pour Inertia (full page reload vers login)
         if ($request->hasHeader('X-Inertia')) {
             return \Inertia\Inertia::location(route('login'));
         }
@@ -268,7 +258,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Récupère un token d'administrateur Keycloak pour appeler les API d'administration.
+     * Récupère un token d'administrateur Keycloak.
      */
     private function getKeycloakAdminToken(): ?string
     {
@@ -309,7 +299,6 @@ class AuthController extends Controller
         $realm   = env('KEYCLOAK_REALM', 'ummisco');
 
         try {
-            // 1. Créer l'utilisateur (enabled => false tant que pas validé !)
             $response = Http::withToken($adminToken)->post("{$baseUrl}/admin/realms/{$realm}/users", [
                 'username'      => $user->email,
                 'email'         => $user->email,
@@ -323,7 +312,7 @@ class AuthController extends Controller
                         'value'     => $plainPassword,
                         'temporary' => false,
                     ]
-                ]
+                ],
             ]);
 
             $keycloakId = null;
@@ -336,7 +325,6 @@ class AuthController extends Controller
                     return false;
                 }
             } else {
-                // Récupérer le Keycloak ID généré
                 $location = $response->header('Location');
                 if ($location) {
                     $parts = explode('/', $location);
@@ -356,18 +344,16 @@ class AuthController extends Controller
             if ($keycloakId) {
                 $user->update(['keycloak_id' => $keycloakId]);
 
-                // Si l'utilisateur existait déjà (409 Conflict), on réinitialise son mot de passe pour correspondre au mot de passe local
                 if (!$response->successful() && $response->status() === 409) {
                     $this->resetKeycloakPassword($user, $plainPassword);
                 }
 
-                // Attribuer le rôle dans Keycloak
                 $roleName = $user->role;
                 $roleRepResponse = Http::withToken($adminToken)->get("{$baseUrl}/admin/realms/{$realm}/roles/{$roleName}");
                 if ($roleRepResponse->successful()) {
                     $roleRep = $roleRepResponse->json();
                     Http::withToken($adminToken)->post("{$baseUrl}/admin/realms/{$realm}/users/{$keycloakId}/role-mappings/realm", [
-                        $roleRep
+                        $roleRep,
                     ]);
                 }
                 return true;
@@ -470,7 +456,6 @@ class AuthController extends Controller
         try {
             $rolesList = ['visitor', 'researcher', 'doctoral_student', 'partner', 'axe_admin', 'super_admin'];
 
-            // 1. Récupérer les rôles actuels
             $mappedRolesResponse = Http::withToken($adminToken)->get("{$baseUrl}/admin/realms/{$realm}/users/{$keycloakId}/role-mappings/realm");
             if ($mappedRolesResponse->successful()) {
                 $mappedRoles = $mappedRolesResponse->json();
@@ -483,13 +468,12 @@ class AuthController extends Controller
                 }
             }
 
-            // 2. Assigner le nouveau rôle
             $roleName = $user->role;
             $roleRepResponse = Http::withToken($adminToken)->get("{$baseUrl}/admin/realms/{$realm}/roles/{$roleName}");
             if ($roleRepResponse->successful()) {
                 $roleRep = $roleRepResponse->json();
                 Http::withToken($adminToken)->post("{$baseUrl}/admin/realms/{$realm}/users/{$keycloakId}/role-mappings/realm", [
-                    $roleRep
+                    $roleRep,
                 ]);
             }
             return true;
