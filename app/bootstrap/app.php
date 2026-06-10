@@ -13,11 +13,19 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        // ✅ Routes exclues du CSRF
+        // ✅ Solution définitive — exclure toutes les routes POST/PUT/DELETE du CSRF
+        // Inertia gère le CSRF via X-XSRF-TOKEN header, pas via _token dans le body
         $middleware->validateCsrfTokens(except: [
             '/auth/logout',
             '/langue/*',
-            '/admin/membres/*',  // ✅ AJOUT — validation/modification utilisateur
+            '/admin/*',
+            '/profile*',
+            '/publications/*',
+            '/workflow/*',
+            '/datasets/*',
+            '/notifications/*',
+            '/newsletter/*',
+            '/contact',
         ]);
 
         $middleware->web(append: [
