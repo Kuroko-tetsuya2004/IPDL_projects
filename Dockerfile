@@ -1,4 +1,21 @@
 # Dockerfile — Production
+
+# ── STAGE 1 : Build des assets front-end (Node) ──────────────────────────────
+FROM node:20-alpine AS node_builder
+
+WORKDIR /app
+
+# Copier package.json en premier pour profiter du cache Docker
+COPY app/package.json app/package-lock.json ./
+RUN npm ci --ignore-scripts
+
+# Copier tout le code source
+COPY app/ .
+
+# Builder les assets Vite → génère public/build/manifest.json
+RUN npm run build
+
+# ── STAGE 2 : Image PHP de production ────────────────────────────────────────
 FROM php:8.3-fpm-alpine
 
 # Extensions système requises
@@ -22,13 +39,16 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copier le code source
+# Copier le code source PHP
 COPY app/ .
 
-# Copier le schéma SQL pour l'importation automatique en production
+# ✅ Récupérer les assets buildés depuis le stage Node
+COPY --from=node_builder /app/public/build ./public/build
+
+# Copier le schéma SQL
 COPY ummisco_database.sql /var/www/html/ummisco_database.sql
 
-# Créer l'arborescence complète de stockage Laravel et définir les permissions avant le composer install
+# Créer l'arborescence complète de stockage Laravel et définir les permissions
 RUN mkdir -p /var/www/html/storage/app/public \
              /var/www/html/storage/framework/cache/data \
              /var/www/html/storage/framework/sessions \
@@ -38,7 +58,7 @@ RUN mkdir -p /var/www/html/storage/app/public \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Installer les dépendances (sans dev)
+# Installer les dépendances PHP (sans dev)
 RUN composer install \
     --no-dev --no-interaction --prefer-dist \
     --optimize-autoloader --ignore-platform-reqs
