@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, usePage, router } from '@inertiajs/vue3'
 import {
   Bars3Icon, XMarkIcon, MagnifyingGlassIcon,
   BellIcon, ChevronDownIcon, LanguageIcon,
@@ -33,12 +33,12 @@ function toggleTheme() {
 }
 
 const navLinks = [
-  { label: 'Accueil',       labelEn: 'Home',         href: '/'},
-  { label: 'Publications',  labelEn: 'Publications',  href: '/publications'},
-  { label: 'Axes',          labelEn: 'Research Areas',href: '/axes'},
-  { label: 'Données',       labelEn: 'Datasets',      href: '/datasets'},
-  { label: 'Équipe',        labelEn: 'Team',          href: '/equipe'},
-  { label: 'Contact',       labelEn: 'Contact',       href: '/contact'},
+  { label: 'Accueil',       labelEn: 'Home',          href: '/'},
+  { label: 'Publications',  labelEn: 'Publications',   href: '/publications'},
+  { label: 'Axes',          labelEn: 'Research Areas', href: '/axes'},
+  { label: 'Données',       labelEn: 'Datasets',       href: '/datasets'},
+  { label: 'Équipe',        labelEn: 'Team',           href: '/equipe'},
+  { label: 'Contact',       labelEn: 'Contact',        href: '/contact'},
 ]
 
 function label(link) {
@@ -47,8 +47,13 @@ function label(link) {
 
 function toggleLocale() {
   const next = locale.value === 'fr' ? 'en' : 'fr'
-  // POST /langue/{lang}
   window.axios.post(`/langue/${next}`).then(() => window.location.reload())
+}
+
+// ✅ AJOUT — Logout propre via router.post()
+function handleLogout() {
+  userMenuOpen.value = false
+  router.post('/auth/logout')
 }
 </script>
 
@@ -61,27 +66,19 @@ function toggleLocale() {
       <!-- Logo -->
       <Link href="/" class="flex items-center gap-3 group shrink-0">
         <svg viewBox="0 0 100 100" class="w-9 h-9 filter drop-shadow(0 2px 8px rgba(14, 165, 233, 0.15))" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer glowing rings -->
           <circle cx="50" cy="50" r="45" stroke="url(#logo-grad)" stroke-width="2" stroke-dasharray="10 6" />
           <circle cx="50" cy="50" r="38" stroke="url(#logo-grad2)" stroke-width="1" stroke-opacity="0.3" />
-          
-          <!-- Interconnected complexity nodes forming an abstract 'U' -->
           <path d="M30 35 V60 C30 71 39 80 50 80 C61 80 70 71 70 60 V35" stroke="url(#logo-grad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M40 40 V60 C40 65 44 70 50 70 C56 70 60 65 60 60 V40" stroke="url(#logo-grad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2" />
-          
-          <!-- Node dots representing agents/complexity -->
           <circle cx="30" cy="35" r="4" fill="#0ea5e9" />
           <circle cx="70" cy="35" r="4" fill="#0ea5e9" />
           <circle cx="50" cy="80" r="5" fill="#2563eb" />
           <circle cx="40" cy="65" r="3" fill="#ffffff" />
           <circle cx="60" cy="65" r="3" fill="#ffffff" />
           <circle cx="50" cy="50" r="3.5" fill="#38bdf8" />
-          
-          <!-- Connecting network links -->
           <line x1="30" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
           <line x1="70" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
           <line x1="50" y1="50" x2="50" y2="80" stroke="#2563eb" stroke-width="1.5" stroke-opacity="0.6" />
-
           <defs>
             <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stop-color="#0ea5e9" />
@@ -122,7 +119,7 @@ function toggleLocale() {
           {{ locale === 'fr' ? 'EN' : 'FR' }}
         </button>
 
-        <!-- Thème (Sombre / Clair) -->
+        <!-- Thème -->
         <button @click="toggleTheme"
           class="btn-ghost btn-sm rounded-lg flex items-center justify-center"
           :title="isDark ? 'Passer au mode clair' : 'Passer au mode sombre'">
@@ -165,24 +162,30 @@ function toggleLocale() {
                   <span class="badge-blue mt-1 text-[10px]">{{ user.role.replace('_', ' ') }}</span>
                 </div>
                 <nav class="py-1">
-                  <Link href="/dashboard" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
+                  <Link href="/dashboard"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
                     <HomeIcon class="w-4 h-4" /> Tableau de bord
                   </Link>
-                  <Link href="/profile" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
+                  <Link href="/profile"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
                     <UserCircleIcon class="w-4 h-4" /> Mon profil
                   </Link>
-                  <a href="/" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
+                  <a href="/"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
                     <GlobeAltIcon class="w-4 h-4" /> Portail public
                   </a>
                   <Link v-if="['axe_admin','super_admin'].includes(user.role)"
-                    href="/admin" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
+                    href="/admin"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
                     Administration
                   </Link>
                   <div class="border-t border-white/8 mt-1 pt-1">
-                    <Link href="/auth/logout" method="post" as="button"
+                    <!-- ✅ CORRIGÉ — router.post() au lieu de Link method="post" -->
+                    <button
+                      @click="handleLogout"
                       class="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/5">
                       <ArrowRightOnRectangleIcon class="w-4 h-4" /> Déconnexion
-                    </Link>
+                    </button>
                   </div>
                 </nav>
               </div>
@@ -191,8 +194,7 @@ function toggleLocale() {
         </template>
 
         <!-- Non connecté -->
-        <a v-else href="/auth/login"
-          class="btn-primary btn-sm rounded-xl">
+        <a v-else href="/auth/login" class="btn-primary btn-sm rounded-xl">
           Connexion SSO
         </a>
 
