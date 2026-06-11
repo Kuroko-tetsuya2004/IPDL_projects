@@ -47,7 +47,8 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
             ],
             'locale' => $locale,
-            'unread_count' => function () use ($userId, $userRole) {
+            'unread_count' => fn () => {
+                if (!$userId) return 0;
                 
                 $unreadNotifications = \Illuminate\Support\Facades\DB::table('notifications')
                     ->where('destinataire_id', $userId)

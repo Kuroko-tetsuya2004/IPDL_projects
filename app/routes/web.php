@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Admin\Controllers\AdminController;
+use App\Modules\Admin\Controllers\DocumentController;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Auth\Middleware\KeycloakMiddleware;
 use App\Modules\Content\Controllers\WorkflowValidationController;
@@ -117,5 +118,13 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
         Route::get('/parametres', [AdminController::class, 'parametres'])->name('parametres')->middleware('role:super_admin');
         Route::put('/parametres/{cle}', [AdminController::class, 'updateParametre'])->name('parametres.update')->middleware('role:super_admin');
         Route::get('/acl', [AdminController::class, 'acl'])->name('acl')->middleware('role:super_admin');
+
+        // ── Documents administratifs (super_admin uniquement) ─────────────────
+        Route::prefix('documents')->name('documents.')->middleware('role:super_admin')->group(function () {
+            Route::get('/', [DocumentController::class, 'index'])->name('index');
+            Route::get('/convention-stage', [DocumentController::class, 'conventionStage'])->name('convention-stage');
+            Route::get('/prestation-service', [DocumentController::class, 'prestationService'])->name('prestation-service');
+            Route::get('/bon-achat', [DocumentController::class, 'bonAchat'])->name('bon-achat');
+        });
     });
 });

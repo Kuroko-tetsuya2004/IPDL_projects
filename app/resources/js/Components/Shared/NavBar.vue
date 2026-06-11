@@ -50,7 +50,7 @@ function toggleLocale() {
   window.axios.post(`/langue/${next}`).then(() => window.location.reload())
 }
 
-// ✅ AJOUT — Logout propre via router.post()
+// ✅ Logout propre via router.post()
 function handleLogout() {
   userMenuOpen.value = false
   router.post('/auth/logout')
@@ -59,40 +59,46 @@ function handleLogout() {
 
 <template>
   <header class="fixed top-0 left-0 right-0 z-50">
-    <!-- Bande gradient translucide -->
-    <div class="absolute inset-0 bg-surface-900/80 backdrop-blur-xl border-b border-white/8" />
+    <!-- Fond translucide -->
+    <div class="absolute inset-0 bg-surface-900/90 backdrop-blur-xl border-b border-white/8" />
 
-    <nav class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Logo -->
+    <!-- Bande supérieure partenaires (desktop) -->
+    <div class="relative border-b border-white/5 bg-black/30 hidden lg:block">
+      <div class="max-w-7xl mx-auto px-6 h-8 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+            <img src="/images/logo_ucad.webp" alt="UCAD" class="h-5 w-auto object-contain filter brightness-110" />
+            <span class="text-[10px] text-slate-500 font-medium">Université Cheikh Anta Diop</span>
+          </div>
+          <span class="text-white/10">|</span>
+          <div class="flex items-center gap-2 opacity-80">
+            <span class="text-[10px] text-slate-500 font-medium">IRD · CNRS · Sorbonne Université</span>
+          </div>
+        </div>
+        <div class="text-[10px] text-slate-600 font-medium tracking-wide uppercase">
+          Portail Scientifique — UMMISCO Dakar
+        </div>
+      </div>
+    </div>
+
+    <nav class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <!-- Logo UMMISCO -->
       <Link href="/" class="flex items-center gap-3 group shrink-0">
-        <svg viewBox="0 0 100 100" class="w-9 h-9 filter drop-shadow(0 2px 8px rgba(14, 165, 233, 0.15))" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="45" stroke="url(#logo-grad)" stroke-width="2" stroke-dasharray="10 6" />
-          <circle cx="50" cy="50" r="38" stroke="url(#logo-grad2)" stroke-width="1" stroke-opacity="0.3" />
-          <path d="M30 35 V60 C30 71 39 80 50 80 C61 80 70 71 70 60 V35" stroke="url(#logo-grad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M40 40 V60 C40 65 44 70 50 70 C56 70 60 65 60 60 V40" stroke="url(#logo-grad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2" />
-          <circle cx="30" cy="35" r="4" fill="#0ea5e9" />
-          <circle cx="70" cy="35" r="4" fill="#0ea5e9" />
-          <circle cx="50" cy="80" r="5" fill="#2563eb" />
-          <circle cx="40" cy="65" r="3" fill="#ffffff" />
-          <circle cx="60" cy="65" r="3" fill="#ffffff" />
-          <circle cx="50" cy="50" r="3.5" fill="#38bdf8" />
-          <line x1="30" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-          <line x1="70" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-          <line x1="50" y1="50" x2="50" y2="80" stroke="#2563eb" stroke-width="1.5" stroke-opacity="0.6" />
-          <defs>
-            <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#0ea5e9" />
-              <stop offset="100%" stop-color="#2563eb" />
-            </linearGradient>
-            <linearGradient id="logo-grad2" x1="100" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#38bdf8" />
-              <stop offset="100%" stop-color="#4f46e5" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <div class="relative">
+          <img
+            src="/images/logo_UMMISCO.webp"
+            alt="UMMISCO"
+            class="h-9 w-auto object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+          />
+          <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
         <div class="hidden sm:block leading-none">
-          <span class="text-white font-extrabold text-sm tracking-wide bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">UMMISCO</span>
-          <span class="block text-slate-500 text-[10px] uppercase font-semibold tracking-wider mt-0.5">Portail de recherche</span>
+          <span class="text-white font-extrabold text-sm tracking-wide bg-gradient-to-r from-white via-slate-200 to-brand-300 bg-clip-text text-transparent">
+            UMMISCO
+          </span>
+          <span class="block text-slate-500 text-[10px] uppercase font-semibold tracking-wider mt-0.5">
+            Portail de recherche
+          </span>
         </div>
       </Link>
 
@@ -154,8 +160,9 @@ function handleLogout() {
             <!-- Dropdown -->
             <Transition name="slide-down">
               <div v-if="userMenuOpen"
-                class="absolute right-0 top-full mt-2 w-52 card border border-white/10 shadow-xl py-1 z-50"
+                class="absolute right-0 top-full mt-2 w-56 card border border-white/10 shadow-xl py-1 z-50"
                 @click.outside="userMenuOpen = false">
+                <!-- User info -->
                 <div class="px-4 py-3 border-b border-white/8">
                   <p class="text-sm font-semibold text-white truncate">{{ user.prenom }} {{ user.nom }}</p>
                   <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
@@ -180,7 +187,7 @@ function handleLogout() {
                     Administration
                   </Link>
                   <div class="border-t border-white/8 mt-1 pt-1">
-                    <!-- ✅ CORRIGÉ — router.post() au lieu de Link method="post" -->
+                    <!-- ✅ Logout via router.post() -->
                     <button
                       @click="handleLogout"
                       class="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/5">
@@ -210,6 +217,11 @@ function handleLogout() {
     <Transition name="slide-down">
       <div v-if="mobileOpen"
         class="lg:hidden relative bg-surface-800/95 backdrop-blur-xl border-b border-white/8 px-4 pb-4">
+        <!-- Logos mobiles -->
+        <div class="flex items-center gap-4 py-3 border-b border-white/5 mb-2">
+          <img src="/images/logo_UMMISCO.webp" alt="UMMISCO" class="h-7 w-auto object-contain" />
+          <img src="/images/logo_ucad.webp" alt="UCAD" class="h-6 w-auto object-contain opacity-70" />
+        </div>
         <nav class="flex flex-col gap-1 pt-2">
           <Link v-for="link in navLinks" :key="link.href" :href="link.href"
             @click="mobileOpen = false"

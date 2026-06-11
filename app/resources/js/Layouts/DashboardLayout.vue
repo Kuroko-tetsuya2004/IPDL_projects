@@ -7,7 +7,8 @@ import {
   HomeIcon, DocumentTextIcon, CircleStackIcon,
   UsersIcon, Cog6ToothIcon, ChartBarIcon,
   ShieldCheckIcon, BellIcon, ClipboardDocumentCheckIcon,
-  ArrowRightOnRectangleIcon, ChevronLeftIcon, GlobeAltIcon
+  ArrowRightOnRectangleIcon, ChevronLeftIcon, GlobeAltIcon,
+  DocumentDuplicateIcon
 } from '@heroicons/vue/24/outline'
 
 const page = usePage()
@@ -26,6 +27,7 @@ const adminLinks = computed(() => {
     { href: '/admin/acl',          icon: ShieldCheckIcon,             label: 'Droits ACL',  roles: ['super_admin'] },
     { href: '/admin/statistiques', icon: ChartBarIcon,                label: 'Statistiques',roles: ['axe_admin','super_admin'] },
     { href: '/admin/parametres',   icon: Cog6ToothIcon,               label: 'Paramètres',  roles: ['super_admin'] },
+    { href: '/admin/documents',     icon: DocumentDuplicateIcon,       label: 'Documents admin.', roles: ['super_admin'] },
     { href: '/',                   icon: GlobeAltIcon,                label: 'Portail public', isExternal: true },
   ]
   return all.filter(l => !l.roles || l.roles.includes(role))
