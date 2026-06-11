@@ -6,6 +6,7 @@ use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Auth\Middleware\KeycloakMiddleware;
 use App\Modules\Content\Controllers\WorkflowValidationController;
 use App\Modules\Dataset\Controllers\DatasetController;
+use App\Modules\Integration\Controllers\ImportController;
 use App\Modules\Notification\Controllers\NotificationController;
 use App\Modules\PublicPortal\Controllers\PublicPortalController;
 use App\Modules\Search\Controllers\SearchController;
@@ -30,6 +31,11 @@ Route::get('/recherche', [SearchController::class, 'index'])->name('recherche');
 Route::get('/documents/{id}/download', [PublicPortalController::class, 'downloadDocument'])->name('documents.download')->whereUuid('id');
 Route::get('/documents/{id}/view', [PublicPortalController::class, 'viewDocument'])->name('documents.view')->whereUuid('id');
 Route::get('/datasets/files/{id}/download', [PublicPortalController::class, 'downloadDatasetFile'])->name('datasets.files.download')->whereUuid('id');
+
+// ── Publications externes (lecture seule — Semantic Scholar, OpenAlex, arXiv) ──
+Route::get('/publications/externes', [ImportController::class, 'publicIndex'])->name('publications.externes');
+Route::get('/publications/externes/{id}', [ImportController::class, 'publicShow'])->name('publications.externes.show');
+Route::get('/api/publications/externes/search', [ImportController::class, 'search'])->name('api.publications.externes.search');
 
 // Nouveaux modules UMMISCO (sans formations, ENT, ni CoFab)
 Route::get('/unite/presentation', [PublicPortalController::class, 'presentation'])->name('unite.presentation');
@@ -125,6 +131,12 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
             Route::get('/convention-stage', [DocumentController::class, 'conventionStage'])->name('convention-stage');
             Route::get('/prestation-service', [DocumentController::class, 'prestationService'])->name('prestation-service');
             Route::get('/bon-achat', [DocumentController::class, 'bonAchat'])->name('bon-achat');
+        });
+
+        // ── Import publications externes — supervision (super_admin) ──────────
+        Route::prefix('import')->name('import.')->middleware('role:super_admin')->group(function () {
+            Route::get('/', [ImportController::class, 'adminIndex'])->name('index');
+            Route::post('/run', [ImportController::class, 'adminRun'])->name('run');
         });
     });
 });

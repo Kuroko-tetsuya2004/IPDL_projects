@@ -33,12 +33,13 @@ function toggleTheme() {
 }
 
 const navLinks = [
-  { label: 'Accueil',       labelEn: 'Home',          href: '/'},
-  { label: 'Publications',  labelEn: 'Publications',   href: '/publications'},
-  { label: 'Axes',          labelEn: 'Research Areas', href: '/axes'},
-  { label: 'Données',       labelEn: 'Datasets',       href: '/datasets'},
-  { label: 'Équipe',        labelEn: 'Team',           href: '/equipe'},
-  { label: 'Contact',       labelEn: 'Contact',        href: '/contact'},
+  { label: 'Accueil',              labelEn: 'Home',               href: '/'},
+  { label: 'Publications',         labelEn: 'Publications',        href: '/publications'},
+  { label: 'Axes',                 labelEn: 'Research Areas',      href: '/axes'},
+  { label: 'Données',              labelEn: 'Datasets',            href: '/datasets'},
+  { label: 'Articles externes',    labelEn: 'External Articles',   href: '/publications/externes'},
+  { label: 'Équipe',               labelEn: 'Team',                href: '/equipe'},
+  { label: 'Contact',              labelEn: 'Contact',             href: '/contact'},
 ]
 
 function label(link) {
