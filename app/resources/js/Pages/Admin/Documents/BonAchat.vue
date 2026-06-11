@@ -2,14 +2,7 @@
 import { ref, computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
-import {
-  ShoppingCartIcon,
-  PrinterIcon,
-  ArrowDownTrayIcon,
-  ArrowLeftIcon,
-  PlusIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/outline'
+import { ShoppingCartIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -21,66 +14,143 @@ const form = ref({
   date_dakar: new Date().toLocaleDateString('fr-FR'),
 })
 
-// Tableau d'articles dynamique
 const articles = ref([
-  { objet: '', fournisseur: '', prix_unitaire: '', quantite: '', prix_total: '' },
+  { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
+  { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
+  { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
 ])
 
-const ajouterLigne = () => {
-  articles.value.push({ objet: '', fournisseur: '', prix_unitaire: '', quantite: '', prix_total: '' })
+const ajouterLigne = () => articles.value.push({ objet: '', fournisseur: '', prix_unitaire: '', quantite: '' })
+const supprimerLigne = (i) => { if (articles.value.length > 1) articles.value.splice(i, 1) }
+
+const prixTotal = (a) => {
+  const r = (parseFloat(a.prix_unitaire) || 0) * (parseFloat(a.quantite) || 0)
+  return r > 0 ? r : null
 }
 
-const supprimerLigne = (idx) => {
-  if (articles.value.length > 1) {
-    articles.value.splice(idx, 1)
-  }
-}
+const totalGeneral = computed(() =>
+  articles.value.reduce((s, a) => s + (prixTotal(a) || 0), 0)
+)
 
-// Calcul automatique du prix total par ligne
-const calculerTotal = (article) => {
-  const pu = parseFloat(article.prix_unitaire) || 0
-  const qte = parseFloat(article.quantite) || 0
-  const total = pu * qte
-  article.prix_total = total > 0 ? total.toFixed(0) : ''
-}
-
-// Total général
-const totalGeneral = computed(() => {
-  return articles.value.reduce((sum, a) => {
-    return sum + (parseFloat(a.prix_total) || 0)
-  }, 0)
-})
-
-const formatMontant = (v) => {
-  if (!v && v !== 0) return ''
-  return new Intl.NumberFormat('fr-FR').format(v) + ' F CFA'
-}
+const fmt = (v) => v != null && v !== '' ? new Intl.NumberFormat('fr-FR').format(v) : ''
 
 const generating = ref(false)
 
+// ── Génération PDF fidèle au document original ─────────────────────────────
 async function genererPDF() {
   generating.value = true
-  await new Promise(r => setTimeout(r, 300))
+  const { jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
 
-  const { default: jsPDF } = await import('jspdf')
-  const { default: html2canvas } = await import('html2canvas')
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const mL = 20, mR = 190
+  const pageW = 210
+  let y = 20
 
-  const el = document.getElementById('bonachat-preview')
-  const canvas = await html2canvas(el, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    windowWidth: 794,
+  // ── TITRE ──
+  doc.setFontSize(16)
+  doc.setFont('helvetica', 'bold')
+  doc.text("DEMANDE D'ACHAT", pageW / 2, y, { align: 'center' })
+  y += 4
+  doc.setDrawColor(0)
+  doc.setLineWidth(0.5)
+  doc.line(mL, y, mR, y)
+  y += 10
+
+  // ── CHAMPS EN-TÊTE ──
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'normal')
+
+  const fieldLine = (label, val) => {
+    doc.text(label, mL, y)
+    doc.setFont('helvetica', 'bold')
+    doc.text(val || '', mL + doc.getTextWidth(label) + 1, y)
+    doc.setFont('helvetica', 'normal')
+    y += 7
+  }
+
+  fieldLine('NOM ET PRENOM(S) DU DEMANDEUR : ', form.value.demandeur_nom_prenom)
+  fieldLine('SERVICE ou STRUCTURE : ', form.value.service_structure)
+  fieldLine('EOTP ou CENTRE DE COÛT : ', form.value.eotp_centre_cout)
+  y += 3
+
+  // ── TABLEAU ARTICLES ──
+  const MIN_ROWS = 8
+  const rows = [...articles.value]
+  while (rows.length < MIN_ROWS) rows.push({ objet: '', fournisseur: '', prix_unitaire: '', quantite: '' })
+
+  const tableBody = rows.map(a => {
+    const total = prixTotal(a)
+    return [
+      a.objet || '',
+      a.fournisseur || '',
+      a.prix_unitaire ? fmt(a.prix_unitaire) : '',
+      a.quantite || '',
+      total != null ? fmt(total) : '',
+    ]
   })
 
-  const imgData = canvas.toDataURL('image/jpeg', 0.95)
-  const pdf = new jsPDF.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-  const pdfW = pdf.internal.pageSize.getWidth()
-  const pdfH = pdf.internal.pageSize.getHeight()
-  const imgH = (canvas.height * pdfW) / canvas.width
+  // Ligne total
+  tableBody.push([
+    { content: 'TOTAL', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 240, 240] } },
+    { content: totalGeneral.value > 0 ? fmt(totalGeneral.value) + ' F CFA' : '', styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+  ])
 
-  pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, imgH)
-  pdf.save(`Bon_Achat_${form.value.demandeur_nom_prenom || 'demandeur'}.pdf`)
+  autoTable(doc, {
+    startY: y,
+    head: [['Objet de la commande', 'Fournisseur', 'Prix unitaire', 'Quantité', 'Prix Total']],
+    body: tableBody,
+    theme: 'grid',
+    headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold', fontSize: 9, halign: 'center' },
+    bodyStyles: { fontSize: 9, minCellHeight: 8 },
+    columnStyles: {
+      0: { cellWidth: 55 },
+      1: { cellWidth: 45 },
+      2: { cellWidth: 30, halign: 'right' },
+      3: { cellWidth: 20, halign: 'center' },
+      4: { cellWidth: 30, halign: 'right' },
+    },
+    margin: { left: mL, right: 20 },
+  })
+
+  y = doc.lastAutoTable.finalY + 8
+
+  // ── ADRESSE LIVRAISON ──
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(10)
+  doc.text('Adresse de Livraison : ', mL, y)
+  doc.setFont('helvetica', 'bold')
+  doc.text(form.value.adresse_livraison || '', mL + doc.getTextWidth('Adresse de Livraison : '), y)
+  y += 12
+
+  // ── NOTE ATTENTION ──
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(9)
+  doc.text(
+    "Attention\u00a0: Toute demande de bon d\u2019achat doit \u00eatre accompagn\u00e9e de facture pro forma",
+    pageW / 2, y, { align: 'center' }
+  )
+  y += 14
+
+  // ── DATE ──
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(10)
+  doc.text(`Dakar le\u00a0: ${form.value.date_dakar}`, mL, y)
+  y += 18
+
+  // ── SIGNATURES ──
+  const colLeft = mL + 10
+  const colRight = 125
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(10)
+  doc.text('SIGNATURE DU DEMANDEUR', colLeft, y, { align: 'center' })
+  doc.text("SIGNATURE DU\nRESPONSABLE D\u2019ENVELOPPE", colRight + 25, y, { align: 'center' })
+  y += 25
+  doc.setLineWidth(0.3)
+  doc.line(mL, y, mL + 70, y)
+  doc.line(colRight, y, colRight + 55, y)
+
+  doc.save(`Demande_Achat_${form.value.demandeur_nom_prenom || 'demandeur'}.pdf`)
   generating.value = false
 }
 
@@ -92,7 +162,6 @@ function imprimer() {
 <template>
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
-    <!-- Header -->
     <div class="flex items-center gap-4">
       <Link href="/admin/documents" class="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
@@ -103,7 +172,8 @@ function imprimer() {
           Demande de Bon d'Achat
         </h1>
         <p class="text-slate-400 text-sm mt-0.5">
-          Toute demande de bon d'achat doit être accompagnée de <span class="text-amber-400 font-semibold">facture pro forma</span>
+          Le PDF généré sera <span class="text-amber-400 font-semibold">identique au document officiel IRD</span>.
+          Accompagner de facture pro forma.
         </p>
       </div>
     </div>
@@ -113,17 +183,16 @@ function imprimer() {
       <!-- ─── FORMULAIRE ─── -->
       <div class="space-y-5">
 
-        <!-- Demandeur -->
         <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Informations du Demandeur</h2>
           <div>
             <label class="block text-xs font-medium text-slate-400 mb-1.5">NOM ET PRENOM(S) DU DEMANDEUR *</label>
-            <input v-model="form.demandeur_nom_prenom" type="text" placeholder="Nom complet du demandeur"
+            <input v-model="form.demandeur_nom_prenom" type="text" placeholder="Nom et prénom(s) complets"
               class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-400 mb-1.5">SERVICE ou STRUCTURE</label>
-            <input v-model="form.service_structure" type="text" placeholder="Service ou structure d'appartenance"
+            <input v-model="form.service_structure" type="text" placeholder="Service ou structure"
               class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
@@ -133,71 +202,65 @@ function imprimer() {
           </div>
         </div>
 
-        <!-- Articles -->
         <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Articles commandés</h2>
             <button @click="ajouterLigne"
               class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 rounded-lg border border-amber-500/20 transition-all">
-              <PlusIcon class="w-3.5 h-3.5" />
-              Ajouter une ligne
+              <PlusIcon class="w-3.5 h-3.5" />Ajouter
             </button>
           </div>
-
           <div class="space-y-3">
-            <div v-for="(art, idx) in articles" :key="idx"
-              class="p-3 bg-slate-800/40 rounded-lg border border-white/5 space-y-2">
+            <div v-for="(art, idx) in articles" :key="idx" class="p-3 bg-slate-800/40 rounded-lg border border-white/5 space-y-2">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-bold text-slate-500 uppercase">Article {{ idx + 1 }}</span>
-                <button v-if="articles.length > 1" @click="supprimerLigne(idx)"
-                  class="p-1 rounded text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Ligne {{ idx + 1 }}</span>
+                <button v-if="articles.length > 1" @click="supprimerLigne(idx)" class="p-1 rounded text-slate-500 hover:text-red-400 transition-all">
                   <TrashIcon class="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div>
-                <label class="block text-[10px] font-medium text-slate-500 mb-1">Objet de la commande</label>
-                <input v-model="art.objet" type="text" placeholder="Description de l'article"
-                  class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-medium text-slate-500 mb-1">Fournisseur</label>
-                <input v-model="art.fournisseur" type="text" placeholder="Nom du fournisseur"
-                  class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-500 mb-1">Objet de la commande</label>
+                  <input v-model="art.objet" type="text" placeholder="Description"
+                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-500 mb-1">Fournisseur</label>
+                  <input v-model="art.fournisseur" type="text" placeholder="Fournisseur"
+                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                </div>
               </div>
               <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="block text-[10px] font-medium text-slate-500 mb-1">Prix unitaire (F CFA)</label>
-                  <input v-model="art.prix_unitaire" type="number" placeholder="0" @input="calculerTotal(art)"
+                  <label class="block text-[10px] text-slate-500 mb-1">Prix unitaire (F CFA)</label>
+                  <input v-model="art.prix_unitaire" type="number" placeholder="0"
                     class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-medium text-slate-500 mb-1">Quantité</label>
-                  <input v-model="art.quantite" type="number" placeholder="0" @input="calculerTotal(art)"
+                  <label class="block text-[10px] text-slate-500 mb-1">Quantité</label>
+                  <input v-model="art.quantite" type="number" placeholder="0"
                     class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-medium text-slate-500 mb-1">Prix Total</label>
-                  <div class="bg-slate-600/40 border border-amber-500/20 rounded px-3 py-2 text-xs font-bold text-amber-400">
-                    {{ art.prix_total ? formatMontant(art.prix_total) : '—' }}
+                  <label class="block text-[10px] text-slate-500 mb-1">Prix Total</label>
+                  <div class="bg-slate-600/40 border border-amber-500/20 rounded px-3 py-2 text-xs font-bold text-amber-400 min-h-[32px]">
+                    {{ prixTotal(art) != null ? fmt(prixTotal(art)) + ' F CFA' : '—' }}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Total général -->
           <div class="flex justify-between items-center p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
             <span class="text-xs font-bold text-slate-300 uppercase">Total général</span>
-            <span class="text-base font-extrabold text-amber-400">{{ formatMontant(totalGeneral) }}</span>
+            <span class="text-base font-extrabold text-amber-400">{{ totalGeneral > 0 ? fmt(totalGeneral) + ' F CFA' : '—' }}</span>
           </div>
         </div>
 
-        <!-- Livraison & Date -->
         <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Livraison & Signature</h2>
           <div>
             <label class="block text-xs font-medium text-slate-400 mb-1.5">Adresse de Livraison</label>
-            <input v-model="form.adresse_livraison" type="text" placeholder="Adresse complète de livraison"
+            <input v-model="form.adresse_livraison" type="text" placeholder="Adresse complète"
               class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
@@ -207,12 +270,11 @@ function imprimer() {
           </div>
         </div>
 
-        <!-- Boutons -->
         <div class="flex gap-3">
           <button @click="genererPDF" :disabled="generating"
-            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-600/20">
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5">
             <ArrowDownTrayIcon class="w-5 h-5" />
-            {{ generating ? 'Génération...' : 'Générer PDF' }}
+            {{ generating ? 'Génération...' : 'Générer PDF fidèle' }}
           </button>
           <button @click="imprimer"
             class="flex items-center gap-2 px-5 py-3 border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
@@ -222,95 +284,98 @@ function imprimer() {
         </div>
       </div>
 
-      <!-- ─── APERÇU ─── -->
+      <!-- ─── APERÇU FIDÈLE ─── -->
       <div class="xl:sticky xl:top-6 xl:self-start">
         <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu du document</span>
-          <span class="text-xs text-slate-500">Format A4</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu — fidèle au document original</span>
         </div>
-        <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl">
-          <div id="bonachat-preview" class="bg-white text-black" style="width:794px; padding:40px; font-size:11px; font-family:Arial,sans-serif; line-height:1.6;">
+        <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
+          <!-- Document Bon d'Achat original -->
+          <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#000; background:#fff;">
 
-            <!-- En-tête -->
-            <div style="text-align:center; margin-bottom:20px; border-bottom:3px solid #000; padding-bottom:10px;">
-              <h1 style="font-size:18px; font-weight:bold; text-transform:uppercase; letter-spacing:2px; margin:0;">DEMANDE D'ACHAT</h1>
-              <p style="font-size:10px; margin:4px 0 0; color:#555;">Représentation de l'IRD au Sénégal — Tél : 00221 33 849 35 35 — BP 1386 - Dakar</p>
+            <!-- Titre -->
+            <div style="text-align:center; margin-bottom:4px;">
+              <div style="font-size:18px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">DEMANDE D'ACHAT</div>
             </div>
+            <hr style="border:none; border-top:1.5px solid #000; margin-bottom:14px;" />
 
-            <!-- Demandeur -->
-            <table style="width:100%; border-collapse:collapse; margin-bottom:16px;">
+            <!-- Champs demandeur -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:6px;">
               <tr>
-                <td style="padding:6px 0; width:60%;">NOM ET PRENOM(S) DU DEMANDEUR : <strong>{{ form.demandeur_nom_prenom || '......................................' }}</strong></td>
+                <td style="padding:4px 0; width:100%;">
+                  NOM ET PRENOM(S) DU DEMANDEUR&nbsp;:
+                  <span style="font-weight:bold; border-bottom:1px solid #999; display:inline-block; min-width:200px; padding:0 4px;">{{ form.demandeur_nom_prenom || '' }}</span>
+                </td>
               </tr>
               <tr>
-                <td style="padding:6px 0;">SERVICE ou STRUCTURE : <strong>{{ form.service_structure || '......................................' }}</strong></td>
+                <td style="padding:4px 0;">
+                  SERVICE ou STRUCTURE&nbsp;:
+                  <span style="font-weight:bold; border-bottom:1px solid #999; display:inline-block; min-width:260px; padding:0 4px;">{{ form.service_structure || '' }}</span>
+                </td>
               </tr>
               <tr>
-                <td style="padding:6px 0;">EOTP ou CENTRE DE COÛT : <strong>{{ form.eotp_centre_cout || '......................................' }}</strong></td>
+                <td style="padding:4px 0;">
+                  EOTP ou CENTRE DE CO&Ucirc;T&nbsp;:
+                  <span style="font-weight:bold; border-bottom:1px solid #999; display:inline-block; min-width:250px; padding:0 4px;">{{ form.eotp_centre_cout || '' }}</span>
+                </td>
               </tr>
             </table>
 
             <!-- Tableau articles -->
-            <table style="width:100%; border-collapse:collapse; margin-bottom:16px; border:1px solid #999;">
+            <table style="width:100%; border-collapse:collapse; border:1.5px solid #333; margin-bottom:10px; margin-top:8px;">
               <thead>
-                <tr style="background:#f0f0f0;">
-                  <th style="padding:8px; border:1px solid #999; text-align:left; font-size:10px;">Objet de la commande</th>
-                  <th style="padding:8px; border:1px solid #999; text-align:left; font-size:10px;">Fournisseur</th>
-                  <th style="padding:8px; border:1px solid #999; text-align:right; font-size:10px; white-space:nowrap;">Prix unitaire</th>
-                  <th style="padding:8px; border:1px solid #999; text-align:center; font-size:10px;">Quantité</th>
-                  <th style="padding:8px; border:1px solid #999; text-align:right; font-size:10px; white-space:nowrap;">Prix Total</th>
+                <tr style="background:#e8e8e8;">
+                  <th style="border:1px solid #333; padding:6px 8px; text-align:left; font-size:10px;">Objet de la commande</th>
+                  <th style="border:1px solid #333; padding:6px 8px; text-align:left; font-size:10px;">Fournisseur&nbsp;</th>
+                  <th style="border:1px solid #333; padding:6px 8px; text-align:right; font-size:10px; white-space:nowrap;">Prix unitaire</th>
+                  <th style="border:1px solid #333; padding:6px 8px; text-align:center; font-size:10px;">Quantité</th>
+                  <th style="border:1px solid #333; padding:6px 8px; text-align:right; font-size:10px; white-space:nowrap;">Prix Total</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(art, idx) in articles" :key="idx">
-                  <td style="padding:7px 8px; border:1px solid #ccc;">{{ art.objet || '' }}</td>
-                  <td style="padding:7px 8px; border:1px solid #ccc;">{{ art.fournisseur || '' }}</td>
-                  <td style="padding:7px 8px; border:1px solid #ccc; text-align:right;">{{ art.prix_unitaire ? new Intl.NumberFormat('fr-FR').format(art.prix_unitaire) : '' }}</td>
-                  <td style="padding:7px 8px; border:1px solid #ccc; text-align:center;">{{ art.quantite || '' }}</td>
-                  <td style="padding:7px 8px; border:1px solid #ccc; text-align:right; font-weight:bold;">{{ art.prix_total ? new Intl.NumberFormat('fr-FR').format(art.prix_total) : '' }}</td>
-                </tr>
-                <!-- Ligne vide si peu d'articles -->
-                <tr v-for="n in Math.max(0, 5 - articles.length)" :key="'empty-' + n">
-                  <td style="padding:7px 8px; border:1px solid #ccc; height:28px;"></td>
-                  <td style="padding:7px 8px; border:1px solid #ccc;"></td>
-                  <td style="padding:7px 8px; border:1px solid #ccc;"></td>
-                  <td style="padding:7px 8px; border:1px solid #ccc;"></td>
-                  <td style="padding:7px 8px; border:1px solid #ccc;"></td>
-                </tr>
-                <!-- Total -->
-                <tr style="background:#f9f9f9;">
-                  <td colspan="4" style="padding:8px; border:1px solid #999; text-align:right; font-weight:bold;">TOTAL GÉNÉRAL</td>
-                  <td style="padding:8px; border:1px solid #999; text-align:right; font-weight:bold; font-size:12px;">
-                    {{ totalGeneral > 0 ? new Intl.NumberFormat('fr-FR').format(totalGeneral) + ' F CFA' : '' }}
-                  </td>
+                <template v-for="(art, idx) in articles" :key="idx">
+                  <tr>
+                    <td style="border:1px solid #999; padding:6px 8px; min-height:22px;">{{ art.objet }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px;">{{ art.fournisseur }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px; text-align:right;">{{ art.prix_unitaire ? fmt(art.prix_unitaire) : '' }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px; text-align:center;">{{ art.quantite }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px; text-align:right; font-weight:bold;">{{ prixTotal(art) != null ? fmt(prixTotal(art)) : '' }}</td>
+                  </tr>
+                </template>
+                <!-- Lignes vides jusqu'à min 8 -->
+                <tr v-for="n in Math.max(0, 8 - articles.length)" :key="'e'+n">
+                  <td style="border:1px solid #ccc; padding:0; height:22px;"></td>
+                  <td style="border:1px solid #ccc; padding:0;"></td>
+                  <td style="border:1px solid #ccc; padding:0;"></td>
+                  <td style="border:1px solid #ccc; padding:0;"></td>
+                  <td style="border:1px solid #ccc; padding:0;"></td>
                 </tr>
               </tbody>
             </table>
 
-            <!-- Livraison -->
-            <div style="margin-bottom:16px;">
-              <p>Adresse de Livraison : <strong>{{ form.adresse_livraison || '.................................................................' }}</strong></p>
-            </div>
+            <!-- Adresse livraison -->
+            <p style="margin:8px 0 4px;">
+              Adresse de Livraison&nbsp;:
+              <span style="font-weight:bold; border-bottom:1px solid #999; display:inline-block; min-width:300px; padding:0 4px;">{{ form.adresse_livraison || '' }}</span>
+            </p>
 
             <!-- Note pro forma -->
-            <div style="background:#fff8e1; border:1px solid #f0c040; padding:8px; margin-bottom:20px; font-size:10px;">
-              <strong>Attention :</strong> Toute demande de bon d'achat doit être accompagnée de facture pro forma
+            <div style="border:1.5px solid #333; padding:6px 12px; margin:12px 0; text-align:center; font-size:10px;">
+              <strong>Attention&nbsp;:</strong> Toute demande de bon d'achat doit être accompagnée de facture pro forma
             </div>
 
-            <!-- Signatures -->
-            <div style="display:flex; justify-content:space-between; margin-top:10px;">
-              <div style="text-align:left;">
-                <p>Dakar le : <strong>{{ form.date_dakar }}</strong></p>
-              </div>
+            <!-- Date + Signatures -->
+            <div style="margin-top:10px; display:flex; justify-content:flex-start;">
+              <span>Dakar le&nbsp;: <strong>{{ form.date_dakar }}</strong></span>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-top:30px;">
-              <div style="text-align:center; width:40%;">
-                <p style="font-weight:bold; border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:6px;">SIGNATURE DU DEMANDEUR</p>
-                <div style="height:60px;"></div>
+            <div style="display:flex; justify-content:space-between; margin-top:28px; padding:0 10px;">
+              <div style="text-align:center; width:42%;">
+                <div style="font-weight:bold; font-size:10px; margin-bottom:4px;">SIGNATURE DU DEMANDEUR</div>
+                <div style="border-bottom:1px solid #333; height:50px; margin-top:6px;"></div>
               </div>
-              <div style="text-align:center; width:40%;">
-                <p style="font-weight:bold; border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:6px;">SIGNATURE DU RESPONSABLE D'ENVELOPPE</p>
-                <div style="height:60px;"></div>
+              <div style="text-align:center; width:42%;">
+                <div style="font-weight:bold; font-size:10px; margin-bottom:4px;">SIGNATURE DU<br>RESPONSABLE D'ENVELOPPE</div>
+                <div style="border-bottom:1px solid #333; height:50px; margin-top:6px;"></div>
               </div>
             </div>
 
@@ -324,15 +389,7 @@ function imprimer() {
 <style>
 @media print {
   body * { visibility: hidden; }
-  #bonachat-preview, #bonachat-preview * { visibility: visible; }
-  #bonachat-preview {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    background: white !important;
-    color: black !important;
-    font-family: Arial, sans-serif;
-    font-size: 11pt;
-  }
+  #print-zone, #print-zone * { visibility: visible; }
+  #print-zone { position: fixed; top: 0; left: 0; width: 100%; background: white !important; }
 }
 </style>
