@@ -34,16 +34,19 @@ const sourceIcons = {
   semantic_scholar: BeakerIcon,
   openalex:         GlobeAltIcon,
   arxiv:            NewspaperIcon,
+  crossref:         BookOpenIcon,
 }
 const sourceLabels = {
   semantic_scholar: 'Semantic Scholar',
   openalex:         'OpenAlex',
   arxiv:            'arXiv',
+  crossref:         'CrossRef',
 }
 const sourceColors = {
   semantic_scholar: 'text-blue-400',
   openalex:         'text-violet-400',
   arxiv:            'text-orange-400',
+  crossref:         'text-red-400',
 }
 
 function formatDate(dateStr) {
@@ -129,6 +132,7 @@ function formatDate(dateStr) {
               <option value="semantic_scholar">Semantic Scholar</option>
               <option value="openalex">OpenAlex</option>
               <option value="arxiv">arXiv</option>
+              <option value="crossref">CrossRef</option>
             </select>
           </div>
           <div>

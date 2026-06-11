@@ -22,6 +22,7 @@ class PublicationImportService
         private SemanticScholarService $semanticScholar,
         private OpenAlexService        $openAlex,
         private ArxivService           $arxiv,
+        private CrossrefService        $crossref,
         private UnpaywallService       $unpaywall,
     ) {}
 
@@ -30,7 +31,7 @@ class PublicationImportService
      * et persiste les résultats dans external_publications.
      *
      * @param  string  $query   Mots-clés de recherche
-     * @param  string  $source  'all' | 'semantic_scholar' | 'openalex' | 'arxiv'
+     * @param  string  $source  'all' | 'semantic_scholar' | 'openalex' | 'arxiv' | 'crossref'
      * @param  int     $limit   Limite par source
      * @return array            Statistiques : ['fetched' => n, 'new' => n, 'updated' => n]
      */
@@ -57,6 +58,12 @@ class PublicationImportService
                 $ax = $this->arxiv->search($query, $limit);
                 Log::info("[Import] arXiv: {$query} → " . count($ax) . " résultats");
                 $articles = array_merge($articles, $ax);
+            }
+
+            if ($source === 'all' || $source === 'crossref') {
+                $cr = $this->crossref->searchByQuery($query, $limit);
+                Log::info("[Import] CrossRef: {$query} → " . count($cr) . " résultats");
+                $articles = array_merge($articles, $cr);
             }
 
         } catch (\Throwable $e) {
@@ -143,8 +150,9 @@ class PublicationImportService
 
         $ss = $this->semanticScholar->searchByAuthor($authorName, $limit);
         $ax = $this->arxiv->searchByAuthor($authorName, $limit);
+        $cr = $this->crossref->searchByAuthor($authorName, $limit);
 
-        $articles = array_merge($articles, $ss, $ax);
+        $articles = array_merge($articles, $ss, $ax, $cr);
         $articles = $this->unpaywall->enrichWithPdfUrls($articles);
 
         $stats = ['fetched' => count($articles), 'new' => 0, 'updated' => 0];

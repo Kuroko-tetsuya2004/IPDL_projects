@@ -37,6 +37,7 @@ const sourceColors = {
   semantic_scholar: { bg: 'bg-blue-500/10 border-blue-500/20',  text: 'text-blue-400',  label: 'Semantic Scholar' },
   openalex:         { bg: 'bg-violet-500/10 border-violet-500/20', text: 'text-violet-400', label: 'OpenAlex' },
   arxiv:            { bg: 'bg-orange-500/10 border-orange-500/20', text: 'text-orange-400', label: 'arXiv' },
+  crossref:         { bg: 'bg-red-500/10 border-red-500/20',    text: 'text-red-400',    label: 'CrossRef' },
 }
 
 function getSourceStyle(source) {
@@ -48,6 +49,7 @@ function externalUrl(article) {
     case 'semantic_scholar': return `https://www.semanticscholar.org/paper/${article.external_id}`
     case 'openalex':         return `https://openalex.org/works/${article.external_id}`
     case 'arxiv':            return `https://arxiv.org/abs/${article.external_id}`
+    case 'crossref':         return `https://doi.org/${article.external_id}`
     default: return article.doi ? `https://doi.org/${article.doi}` : null
   }
 }
@@ -115,7 +117,7 @@ function parseAuteurs(auteurs) {
                 :class="selectedSource === '' ? 'bg-blue-600/30 text-blue-300 font-semibold' : 'text-slate-400 hover:bg-white/5'">
                 Toutes les sources
               </button>
-              <button v-for="src in ['semantic_scholar','openalex','arxiv']" :key="src"
+              <button v-for="src in ['semantic_scholar','openalex','arxiv','crossref']" :key="src"
                 @click="selectedSource = src"
                 class="w-full text-left text-sm px-3 py-2 rounded-lg transition-all"
                 :class="selectedSource === src

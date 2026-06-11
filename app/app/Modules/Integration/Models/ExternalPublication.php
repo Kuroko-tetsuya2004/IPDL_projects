@@ -23,6 +23,7 @@ class ExternalPublication extends Model
     public const SOURCE_SEMANTIC_SCHOLAR = 'semantic_scholar';
     public const SOURCE_OPENALEX         = 'openalex';
     public const SOURCE_ARXIV            = 'arxiv';
+    public const SOURCE_CROSSREF         = 'crossref';
 
     // Statuts
     public const STATUT_DISPONIBLE = 'disponible';
@@ -98,6 +99,7 @@ class ExternalPublication extends Model
             self::SOURCE_SEMANTIC_SCHOLAR => 'Semantic Scholar',
             self::SOURCE_OPENALEX         => 'OpenAlex',
             self::SOURCE_ARXIV            => 'arXiv',
+            self::SOURCE_CROSSREF         => 'CrossRef',
             default                       => ucfirst($this->source),
         };
     }

@@ -19,10 +19,10 @@ class ImportPublications extends Command
     protected $signature = 'publications:import
                             {--query=* : Requêtes de recherche (peuvent être multiples)}
                             {--author= : Nom d\'un auteur à cibler}
-                            {--source=all : Source (all|semantic_scholar|openalex|arxiv)}
+                            {--source=all : Source (all|semantic_scholar|openalex|arxiv|crossref)}
                             {--limit=50 : Nombre max de résultats par source}';
 
-    protected $description = 'Importe les publications depuis Semantic Scholar, OpenAlex et arXiv';
+    protected $description = 'Importe les publications depuis Semantic Scholar, OpenAlex, arXiv et CrossRef';
 
     // Requêtes par défaut ciblant les thématiques UMMISCO
     private const DEFAULT_QUERIES = [
