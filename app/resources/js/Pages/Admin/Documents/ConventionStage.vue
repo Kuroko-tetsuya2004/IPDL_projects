@@ -87,13 +87,15 @@ async function genererPDF() {
     return currentY + 3
   }
 
-  // ══ TITRE ══
-  doc.setFontSize(16)
+  // ══ TITRE (encadré gris fidèle au document) ══
+  doc.setFillColor(242, 242, 242)
+  doc.setDrawColor(0)
+  doc.setLineWidth(0.5)
+  doc.rect(mL, y - 6, mR - mL, 12, 'FD')
+  doc.setFontSize(14)
   doc.setFont('helvetica', 'bold')
-  doc.text('CONVENTION DE STAGE', pageW / 2, y, { align: 'center' })
-  y += 4
-  y = hRule(y)
-  y += 5
+  doc.text('CONVENTION DE STAGE', pageW / 2, y + 2, { align: 'center' })
+  y += 15
 
   // ══ PRÉAMBULE ══
   doc.setFontSize(10)
@@ -515,8 +517,10 @@ function imprimer() {
         <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
           <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#000; background:#fff; line-height:1.6;">
 
-            <div style="text-align:center; font-size:18px; font-weight:bold; letter-spacing:1px; margin-bottom:6px;">CONVENTION DE STAGE</div>
-            <hr style="border:none; border-top:1.5px solid #000; margin-bottom:14px;" />
+            <!-- Titre -->
+            <div style="background-color:#F2F2F2; border:1px solid #000; padding:10px; margin-bottom:20px; text-align:center;">
+              <div style="font-size:16px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">CONVENTION DE STAGE</div>
+            </div>
 
             <p style="font-weight:bold; margin-bottom:6px;">ENTRE,</p>
             <p style="margin-bottom:10px;">L'Institut de Recherche pour le développement, établissement public à caractère scientifique et technologique (EPST) ayant son siège 44 boulevard de Dunkerque - CS 9009 - 13572 Marseille France, représenté par M. Pierre MORAND, Représentant de l'IRD au Sénégal, ci-après dénommé «IRD»</p>

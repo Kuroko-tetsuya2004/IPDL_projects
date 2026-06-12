@@ -54,15 +54,31 @@ async function genererPDF() {
 
   y += 20
 
-  // ── TITRE ──
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
-  doc.text("DEMANDE D'ACHAT", pageW / 2, y, { align: 'center' })
-  y += 4
-  doc.setDrawColor(0)
-  doc.setLineWidth(0.5)
-  doc.line(mL, y, mR, y)
-  y += 10
+  // ══ EN-TÊTE 3 COLONNES (fidèle au document Word FI-4) ══
+  autoTable(doc, {
+    startY: y,
+    body: [[
+      {
+        content: 'Représentation\ndu Sénégal\nTél : 00221 33 849 83 30\nBP 1386 - Dakar',
+        styles: { fontSize: 8, cellWidth: 48, valign: 'middle', fontStyle: 'normal' }
+      },
+      {
+        content: 'DEMANDE DE BON D\'ACHAT',
+        styles: { fontSize: 14, fontStyle: 'bold', halign: 'center', valign: 'middle', cellWidth: 104 }
+      },
+      {
+        content: 'Identification : FI - 4\nDate de création : 10/07/08\nDate de Modification : 12/11/08\nVersion : 2\nNombre de pages : 1/1',
+        styles: { fontSize: 7.5, cellWidth: 38, valign: 'middle', halign: 'right', fontStyle: 'normal' }
+      },
+    ]],
+    theme: 'grid',
+    tableLineColor: [0, 0, 0],
+    tableLineWidth: 0.5,
+    styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
+    margin: { left: mL, right: 20 },
+  })
+
+  y = doc.lastAutoTable.finalY + 8
 
   // ── CHAMPS EN-TÊTE ──
   doc.setFontSize(10)
@@ -300,11 +316,26 @@ function imprimer() {
           <!-- Document Bon d'Achat original -->
           <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#000; background:#fff;">
 
-            <!-- Titre -->
-            <div style="text-align:center; margin-bottom:4px;">
-              <div style="font-size:18px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">DEMANDE D'ACHAT</div>
-            </div>
-            <hr style="border:none; border-top:1.5px solid #000; margin-bottom:14px;" />
+            <!-- En-tête 3 colonnes -->
+            <table style="width:100%; border-collapse:collapse; border:1.5px solid #000; margin-bottom:14px;">
+              <tr>
+                <td style="border:1px solid #000; padding:8px; width:30%; vertical-align:middle; font-size:9px; line-height:1.5;">
+                  <strong>Représentation<br>du Sénégal</strong><br>
+                  Tél : 00221 33 849 83 30<br>
+                  BP 1386 - Dakar
+                </td>
+                <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:middle; font-size:14px; font-weight:bold; width:40%;">
+                  DEMANDE DE BON D'ACHAT
+                </td>
+                <td style="border:1px solid #000; padding:8px; text-align:right; vertical-align:middle; font-size:8px; line-height:1.6; width:30%;">
+                  Identification : FI - 4<br>
+                  Date de création : 10/07/08<br>
+                  Date de Modification : 12/11/08<br>
+                  Version : 2<br>
+                  Nombre de pages : 1/1
+                </td>
+              </tr>
+            </table>
 
             <!-- Champs demandeur -->
             <table style="width:100%; border-collapse:collapse; margin-bottom:6px;">
