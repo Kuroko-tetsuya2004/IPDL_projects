@@ -85,11 +85,16 @@ function handleLogout() {
     <nav class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
       <!-- Logo UMMISCO -->
       <Link href="/" class="flex items-center gap-3 group shrink-0">
-        <div class="relative">
+        <div class="relative flex items-center gap-2">
           <img
-            src="/images/logo_UMMISCO.webp"
+            src="/images/logo_ummisco.webp"
             alt="UMMISCO"
             class="h-9 w-auto object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+          />
+          <img
+            src="/images/logo_ucad.webp"
+            alt="UCAD"
+            class="h-7 w-auto object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
           />
           <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
@@ -220,7 +225,7 @@ function handleLogout() {
         class="lg:hidden relative bg-surface-800/95 backdrop-blur-xl border-b border-white/8 px-4 pb-4">
         <!-- Logos mobiles -->
         <div class="flex items-center gap-4 py-3 border-b border-white/5 mb-2">
-          <img src="/images/logo_UMMISCO.webp" alt="UMMISCO" class="h-7 w-auto object-contain" />
+          <img src="/images/logo_ummisco.webp" alt="UMMISCO" class="h-7 w-auto object-contain" />
           <img src="/images/logo_ucad.webp" alt="UCAD" class="h-6 w-auto object-contain opacity-70" />
         </div>
         <nav class="flex flex-col gap-1 pt-2">

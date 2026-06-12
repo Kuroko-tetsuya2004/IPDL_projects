@@ -488,34 +488,13 @@
     <div class="navbar-container">
         <nav class="navbar">
             <a href="{{ route('home') }}" class="navbar-brand">
-                <svg viewBox="0 0 100 100" style="width: 38px; height: 38px;" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="45" stroke="url(#logo-grad-b)" stroke-width="2.5" stroke-dasharray="10 6" />
-                    <circle cx="50" cy="50" r="38" stroke="url(#logo-grad2-b)" stroke-width="1.5" stroke-opacity="0.3" />
-                    <path d="M30 35 V60 C30 71 39 80 50 80 C61 80 70 71 70 60 V35" stroke="url(#logo-grad-b)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M40 40 V60 C40 65 44 70 50 70 C56 70 60 65 60 60 V40" stroke="url(#logo-grad2-b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2" />
-                    <circle cx="30" cy="35" r="4" fill="#0ea5e9" />
-                    <circle cx="70" cy="35" r="4" fill="#0ea5e9" />
-                    <circle cx="50" cy="80" r="5" fill="#1e3a8a" />
-                    <circle cx="40" cy="65" r="3" fill="#ffffff" />
-                    <circle cx="60" cy="65" r="3" fill="#ffffff" />
-                    <circle cx="50" cy="50" r="3.5" fill="#38bdf8" />
-                    <line x1="30" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-                    <line x1="70" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-                    <line x1="50" y1="50" x2="50" y2="80" stroke="#1e3a8a" stroke-width="1.5" stroke-opacity="0.6" />
-                    <defs>
-                        <linearGradient id="logo-grad-b" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#0ea5e9" />
-                            <stop offset="100%" stop-color="#1e3a8a" />
-                        </linearGradient>
-                        <linearGradient id="logo-grad2-b" x1="100" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#38bdf8" />
-                            <stop offset="100%" stop-color="#2563eb" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <div style="display: flex; flex-direction: column; line-height: 1.15;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <img src="{{ asset('images/logo_ummisco.webp') }}" alt="UMMISCO" style="height: 42px; width: auto; object-fit: contain;">
+                    <img src="{{ asset('images/logo_ucad.webp') }}" alt="UCAD" style="height: 38px; width: auto; object-fit: contain; margin-left: 0.25rem;">
+                </div>
+                <div style="display: flex; flex-direction: column; line-height: 1.15; margin-left: 0.5rem;">
                     <span style="font-weight: 800; font-size: 1.15rem; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">UMMISCO</span>
-                    <span style="font-weight: 500; font-size: 0.65rem; color: var(--color-text-muted); letter-spacing: 0.05em; text-transform: uppercase;">Portail de recherche</span>
+                    <span style="font-weight: 500; font-size: 0.65rem; color: var(--color-text-muted); letter-spacing: 0.05em; text-transform: uppercase;">Portail public</span>
                 </div>
             </a>
 
