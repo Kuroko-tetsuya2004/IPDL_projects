@@ -46,6 +46,7 @@ Tous les services doivent être en état `Up` ou `healthy` :
 ## Étape 3 — Générer la clé d'application
 
 ```powershell
+docker compose exec app php artisan key:generate
 ```
 
 ---
