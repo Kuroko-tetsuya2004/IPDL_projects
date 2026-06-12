@@ -8,9 +8,26 @@ use Inertia\Middleware;
 class HandleInertiaRequests extends Middleware
 {
     /**
-     * The root template that is loaded on the first page visit.
+     * Determine the root template that is loaded on the first page visit.
      */
-    protected $rootView = 'app';
+    public function rootView(Request $request): string
+    {
+        if ($request->is('admin*')) {
+            return 'admin';
+        }
+
+        if ($request->is('dashboard') || 
+            $request->is('mes-publications') || 
+            $request->is('publications/soumettre') || 
+            $request->is('mes-datasets') || 
+            $request->is('soumissions') ||
+            $request->is('notifications') ||
+            $request->is('profile')) {
+            return 'dashboard';
+        }
+
+        return 'public';
+    }
 
     /**
      * Determine the current asset version.

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
-    <!-- Prevent theme flash -->
     <script>
         if (localStorage.getItem('theme') === 'light') {
             document.documentElement.classList.remove('dark');
@@ -13,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('app.name', 'Portail UMMISCO') }}</title>
+    <title inertia>{{ config('app.name', 'Portail UMMISCO') }} - Administration</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +21,7 @@
 
     <!-- Scripts -->
     @routes
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app_admin.js'])
     @inertiaHead
 </head>
 <body class="font-sans antialiased bg-slate-950 text-slate-100">

@@ -18,11 +18,11 @@ router.on('finish', (event) => {
   else if (event.detail.visit.cancelled) { NProgress.done(); NProgress.remove() }
 })
 
-// ── Application Inertia ───────────────────────────────────────────────────────
+// ── Application Inertia (PUBLIC) ──────────────────────────────────────────────
 createInertiaApp({
   title: (title) => title ? `${title} — Portail UMMISCO` : 'Portail UMMISCO',
   resolve: (name) =>
-    resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
+    resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/{PublicPortal,Search,Auth}/**/*.vue')),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
@@ -31,5 +31,5 @@ createInertiaApp({
       .component('Link', Link)
       .mount(el)
   },
-  progress: false, // géré par NProgress manuellement
+  progress: false,
 })
