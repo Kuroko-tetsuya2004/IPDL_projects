@@ -1,0 +1,156 @@
+# docker-compose.yml — Fichier unifié (Développement & Production)
+# 
+# En développement : 
+#   docker compose up -d
+# 
+# En production (Railway) :
+#   Railway lit automatiquement ce fichier et provisionne chaque service.
+#   Les variables d'environnement surchargent les valeurs par défaut.
+
+version: '3.8'
+
+# ── Templates réutilisables ──────────────────────────────────────────────
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+  env_file:
+    - ./app/.env
+  networks:
+    - frontend_net
+    - backend_net
+  depends_on:
+    - postgres
+    - redis
+    - minio
+
+services:
+
+  # ── NGINX — Reverse Proxy (Dev/Prod) ──────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: ummisco_nginx
+    restart: always
+    ports:
+      - "${PORT:-8080}:80"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./app/public:/var/www/html/public:ro
+    networks:
+      - frontend_net
+    depends_on:
+      - app
+
+  # ── APP — Laravel PHP-FPM ─────────────────────────────────────────────
+  app:
+    <<: *app-common
+    container_name: ummisco_app
+    restart: always
+    volumes:
+      # En local, on monte le code. Sur Railway, ce volume host est ignoré.
+      - ./app:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+
+  # ── SCHEDULER — Tâches planifiées (Cron) ──────────────────────────────
+  scheduler:
+    <<: *app-common
+    container_name: ummisco_scheduler
+    restart: always
+    command: ["/bin/sh", "-c", "while true; do php artisan schedule:run >> /tmp/scheduler.log 2>&1; sleep 60; done"]
+    volumes:
+      - ./app:/var/www/html
+
+  # ── QUEUE WORKER — Traitements asynchrones ────────────────────────────
+  queue_worker:
+    <<: *app-common
+    container_name: ummisco_queue_worker
+    restart: always
+    command: ["php", "artisan", "horizon"]
+    volumes:
+      - ./app:/var/www/html
+
+  # ── POSTGRESQL 16 ─────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ummisco_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-ummisco_app}
+      POSTGRES_USER: ${DB_USERNAME:-ummisco_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ummisco_secret}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./ummisco_database.sql:/docker-entrypoint-initdb.d/02_schema.sql:ro
+    networks:
+      - backend_net
+    ports:
+      - "${PGPORT:-5432}:5432"
+
+  # ── REDIS 7 ───────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ummisco_redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_ummisco_secret}
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend_net
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  # ── MINIO — Stockage S3 ───────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: ummisco_minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_secret_2024}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - backend_net
+      - frontend_net
+
+  # ── KEYCLOAK 24 — Serveur d'Authentification ──────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: ummisco_keycloak
+    restart: always
+    command: ${KEYCLOAK_COMMAND:-start-dev}
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${DB_DATABASE:-ummisco_app}
+      KC_DB_USERNAME: ${DB_USERNAME:-ummisco_user}
+      KC_DB_PASSWORD: ${DB_PASSWORD:-ummisco_secret}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin_secret}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost}
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+    depends_on:
+      - postgres
+    ports:
+      - "${KC_PORT:-8180}:8080"
+    networks:
+      - backend_net
+      - frontend_net
+
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

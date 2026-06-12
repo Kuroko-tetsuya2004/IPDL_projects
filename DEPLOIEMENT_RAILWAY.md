@@ -1,380 +1,95 @@
-# 🚂 Guide de déploiement — Railway
+# 🚂 Guide de Déploiement Complet — Railway
 
 ## Présentation
 
-[Railway](https://railway.app) est une plateforme cloud qui permet de déployer des applications conteneurisées avec PostgreSQL et Redis intégrés. Ce guide couvre le déploiement complet du portail UMMISCO sur Railway.
+[Railway](https://railway.app) est une plateforme cloud performante. Grâce au fichier `docker-compose.yml` unifié présent à la racine du projet, Railway est capable de déployer et de lier **automatiquement tous les composants** de l'application UMMISCO (Laravel, PostgreSQL, Redis, MinIO, Keycloak).
 
 ---
 
-## Prérequis
+## 🚀 Méthode de Déploiement Automatisée (Recommandée)
 
-- Un compte [Railway](https://railway.app) (plan gratuit ou payant)
-- Le code source du projet dans un dépôt **GitHub** ou **GitLab**
-- Un serveur Keycloak accessible publiquement (ou utiliser le mode Mock pour les tests)
+Puisque nous avons fusionné l'environnement de développement et de production dans un seul fichier `docker-compose.yml`, Railway va lire ce fichier et créer un "Service" pour chaque bloc défini.
 
----
+### Étape 1 : Importer le projet sur Railway
 
-## Architecture sur Railway
+1. Allez sur le [Dashboard Railway](https://railway.app/dashboard).
+2. Cliquez sur **New Project** > **Deploy from GitHub Repo**.
+3. Sélectionnez le dépôt `Portail-UMMISCO`.
+4. Railway va détecter le `docker-compose.yml` et automatiquement créer 8 services :
+   - `nginx` (Le proxy web public)
+   - `app` (L'API Laravel / Frontend)
+   - `scheduler` (Tâches cron)
+   - `queue_worker` (Jobs asynchrones / Horizon)
+   - `postgres` (Base de données)
+   - `redis` (Cache et sessions)
+   - `minio` (Stockage S3)
+   - `keycloak` (Serveur d'authentification SSO)
 
-```
-┌─────────────────────────────────────────────────────┐
-│                    Railway Project                   │
-│                                                     │
-│  ┌─────────────┐  ┌──────────┐  ┌──────────────┐  │
-│  │  Laravel App │  │ PostgreSQL│  │    Redis     │  │
-│  │  (PHP-FPM + │  │    16     │  │      7       │  │
-│  │   Nginx)    │  │           │  │              │  │
-│  └──────┬──────┘  └─────┬────┘  └──────┬───────┘  │
-│         │               │              │           │
-│         └───────────────┴──────────────┘           │
-│                                                     │
-│  ┌─────────────┐  ┌──────────────┐                 │
-│  │ Queue Worker │  │  Keycloak   │ (externe)       │
-│  │  (Horizon)  │  │             │                  │
-│  └─────────────┘  └──────────────┘                 │
-└─────────────────────────────────────────────────────┘
-```
+### Étape 2 : Configuration des Volumes (Stockage Persistant)
 
----
+Railway associera automatiquement des volumes persistants aux services qui en déclarent dans le `docker-compose.yml` (ex: `postgres_data`, `minio_data`). Aucune action n'est requise.
 
-## Étape 1 — Créer le fichier Dockerfile de production
+### Étape 3 : Injection des Variables de Production
 
-Créez un fichier `Dockerfile` à la racine du projet (pas dans `docker/php/`) :
+Par défaut, le fichier utilise des valeurs de "Développement". Sur Railway, allez dans **Settings > Variables** de chaque service ou dans **Shared Variables** (Variables partagées du projet) pour imposer la configuration de production :
 
-```dockerfile
-# Dockerfile — Production Railway
-FROM php:8.3-fpm-alpine AS base
+#### Variables Partagées (Shared Variables)
+Ajoutez ces variables au niveau de l'environnement global Railway pour qu'elles s'appliquent à tous les services :
 
-# Extensions système
-RUN apk add --no-cache \
-    nginx git curl libpng-dev libzip-dev zip unzip \
-    postgresql-dev icu-dev oniguruma-dev supervisor
+| Clé | Valeur (Exemple) |
+|-----|------------------|
+| `APP_ENV` | `production` |
+| `APP_DEBUG` | `false` |
+| `APP_URL` | `https://portail.ummisco.sn` |
+| `DB_PASSWORD` | *(Générez un mot de passe fort)* |
+| `REDIS_PASSWORD` | *(Générez un mot de passe fort)* |
+| `MINIO_ROOT_PASSWORD`| *(Générez un mot de passe fort)* |
+| `KEYCLOAK_ADMIN_PASSWORD` | *(Générez un mot de passe fort)* |
+| `KEYCLOAK_COMMAND` | `start --optimized` *(Active le mode prod de Keycloak)* |
+| `KEYCLOAK_HOSTNAME` | `auth.ummisco.sn` |
 
-# Extensions PHP
-RUN docker-php-ext-install \
-    pdo pdo_pgsql pgsql zip gd mbstring exif \
-    pcntl bcmath intl opcache
+*(Note : Le `docker-compose.yml` reliera automatiquement `app` à `postgres` et `redis` car ils partagent les mêmes variables réseaux internes).*
 
-# Extension Redis
-RUN apk add --no-cache $PHPIZE_DEPS \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del $PHPIZE_DEPS
+### Étape 4 : Exposition des Domaines (Networking)
 
-# Composer
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+Sur Railway, par défaut, tous les services sont privés. Vous devez exposer uniquement les services qui doivent être accessibles depuis l'extérieur.
 
-WORKDIR /var/www/html
+1. Allez dans le service **`nginx`** > **Settings** > **Networking**.
+2. Cliquez sur **Generate Domain** (ex: `ummisco-nginx.up.railway.app`) ou ajoutez votre domaine personnalisé (`portail.ummisco.sn`).
+3. Allez dans le service **`keycloak`** > **Settings** > **Networking**.
+4. Exposez-le sur `auth.ummisco.sn`.
+5. Allez dans le service **`minio`** > **Settings** > **Networking**.
+6. Exposez le port 9000 sur `storage.ummisco.sn` (API S3) et le port 9001 sur `console.storage.ummisco.sn` (Interface Web).
 
-# Copier le code source
-COPY app/ .
+### Étape 5 : Initialisation de la Base de Données
 
-# Installer les dépendances (sans dev)
-RUN composer install \
-    --no-dev --no-interaction --prefer-dist \
-    --optimize-autoloader --ignore-platform-reqs
+Le `docker-compose.yml` inclut déjà le montage du fichier `ummisco_database.sql`. Lors du premier démarrage du service `postgres` sur Railway, la base de données sera **automatiquement initialisée** avec l'intégralité du schéma (tables, types enum, triggers d'audit).
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Configuration Nginx
-COPY docker/nginx/conf.d/prod.conf /etc/nginx/http.d/default.conf
-
-# Configuration Supervisor (Nginx + PHP-FPM)
-COPY docker/railway/supervisord.conf /etc/supervisord.conf
-
-EXPOSE 8080
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
-```
-
----
-
-## Étape 2 — Créer la configuration Supervisor
-
-Créez le fichier `docker/railway/supervisord.conf` :
-
-```ini
-[supervisord]
-nodaemon=true
-logfile=/dev/stdout
-logfile_maxbytes=0
-
-[program:nginx]
-command=nginx -g 'daemon off;'
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-
-[program:php-fpm]
-command=php-fpm --nodaemonize
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-```
-
----
-
-## Étape 3 — Fichier de configuration Nginx pour Railway
-
-Créez le fichier `docker/nginx/conf.d/prod.conf` pour écouter sur le port `8080` (port requis par Railway) :
-
-```nginx
-server {
-    listen 8080;
-    server_name _;
-    root /var/www/html/public;
-    index index.php;
-
-    charset utf-8;
-    client_max_body_size 100M;
-
-    # Gzip
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-```
-
----
-
-## Étape 4 — Créer le projet sur Railway
-
-### a) Depuis le dashboard Railway
-
-1. Allez sur [railway.app/dashboard](https://railway.app/dashboard)
-2. Cliquez sur **« New Project »**
-3. Sélectionnez **« Deploy from GitHub Repo »**
-4. Autorisez Railway à accéder à votre dépôt
-5. Sélectionnez le dépôt du portail UMMISCO
-
-### b) Ajouter PostgreSQL
-
-1. Dans votre projet Railway, cliquez **« + New »** → **« Database »** → **« PostgreSQL »**
-2. Railway provisionne automatiquement une instance PostgreSQL 16
-3. Notez les variables de connexion (elles seront utilisées à l'étape 6)
-
-### c) Ajouter Redis
-
-1. Cliquez **« + New »** → **« Database »** → **« Redis »**
-2. Railway provisionne une instance Redis 7
-
----
-
-## Étape 5 — Importer le schéma SQL
-
-Connectez-vous à la base PostgreSQL Railway et importez le schéma :
-
+Pour forcer les optimisations Laravel au premier lancement, allez dans le service **`app`** > **Deploy** > **Start Command** et insérez :
 ```bash
-# Récupérer l'URL de connexion depuis Railway Dashboard → PostgreSQL → Connect
-# Format : postgresql://user:password@host:port/database
-
-psql "postgresql://USER:PASSWORD@HOST:PORT/DATABASE" < ummisco_database.sql
-```
-
-Ou depuis l'interface Railway :
-1. Allez dans le service **PostgreSQL** → **Data** → **Query**
-2. Collez le contenu de `ummisco_database.sql`
-3. Exécutez
-
----
-
-## Étape 6 — Configurer les variables d'environnement
-
-Dans Railway, allez dans le service **Laravel App** → **Variables** et ajoutez :
-
-### Variables obligatoires
-
-| Variable | Valeur | Source |
-|----------|--------|--------|
-| `APP_NAME` | `Portail UMMISCO` | — |
-| `APP_ENV` | `production` | — |
-| `APP_DEBUG` | `false` | — |
-| `APP_KEY` | `base64:...` | Générer avec `php artisan key:generate --show` |
-| `APP_URL` | `https://votre-domaine.railway.app` | URL Railway |
-| `APP_TIMEZONE` | `Africa/Dakar` | — |
-| `APP_LOCALE` | `fr` | — |
-
-### Base de données (référencer les variables Railway)
-
-| Variable | Valeur |
-|----------|--------|
-| `DB_CONNECTION` | `pgsql` |
-| `DB_HOST` | `${{Postgres.PGHOST}}` |
-| `DB_PORT` | `${{Postgres.PGPORT}}` |
-| `DB_DATABASE` | `${{Postgres.PGDATABASE}}` |
-| `DB_USERNAME` | `${{Postgres.PGUSER}}` |
-| `DB_PASSWORD` | `${{Postgres.PGPASSWORD}}` |
-
-### Redis
-
-| Variable | Valeur |
-|----------|--------|
-| `REDIS_HOST` | `${{Redis.REDIS_HOST}}` |
-| `REDIS_PORT` | `${{Redis.REDIS_PORT}}` |
-| `REDIS_PASSWORD` | `${{Redis.REDIS_PASSWORD}}` |
-
-### Cache et sessions
-
-| Variable | Valeur |
-|----------|--------|
-| `CACHE_STORE` | `redis` |
-| `SESSION_DRIVER` | `redis` |
-| `QUEUE_CONNECTION` | `redis` |
-
-### Keycloak
-
-| Variable | Valeur |
-|----------|--------|
-| `KEYCLOAK_BASE_URL` | `https://votre-keycloak.example.com` |
-| `KEYCLOAK_REALM` | `ummisco` |
-| `KEYCLOAK_CLIENT_ID` | `laravel-app` |
-| `KEYCLOAK_CLIENT_SECRET` | `votre-secret` |
-| `KEYCLOAK_REDIRECT_URI` | `https://votre-domaine.railway.app/auth/callback` |
-| `KEYCLOAK_MOCK` | `false` |
-
-### MinIO (Stockage d'objets S3)
-
-| Variable | Valeur | Description |
-|----------|--------|-------------|
-| `FILESYSTEM_DISK` | `minio` | Configure le disque par défaut sur MinIO |
-| `MINIO_ENDPOINT` | `https://votre-minio-api.up.railway.app` | URL de l'API MinIO (externe ou interne) |
-| `MINIO_KEY` | `votre-access-key` | Clé d'accès générée dans la console MinIO |
-| `MINIO_SECRET` | `votre-secret-key` | Clé secrète générée dans la console MinIO |
-| `MINIO_REGION` | `us-east-1` | Région S3 (garder `us-east-1` pour MinIO) |
-| `MINIO_BUCKET_PUBLIC` | `ummisco-public` | Nom du bucket principal utilisé par le portail |
-| `MINIO_USE_PATH_STYLE` | `true` | Doit être à `true` pour le bon routage avec MinIO |
-
-### Autres
-
-| Variable | Valeur |
-|----------|--------|
-| `LOG_CHANNEL` | `stderr` |
-| `LOG_LEVEL` | `warning` |
-| `SESSION_SECURE_COOKIE` | `true` |
-| `TELESCOPE_ENABLED` | `false` |
-
----
-
-## Étape 7 — Configurer le déploiement automatique
-
-Railway détecte automatiquement le `Dockerfile` à la racine. Vérifiez dans **Settings** :
-
-- **Builder** : `Dockerfile`
-- **Dockerfile Path** : `./Dockerfile`
-- **Watch Paths** : `app/**`, `docker/**`, `Dockerfile`
-
-### Script de démarrage
-
-Ajoutez un script de post-déploiement dans Railway :
-
-**Settings → Deploy → Start Command** (laisser vide si CMD est dans Dockerfile)
-
-Pour exécuter les migrations et optimisations au déploiement, créez `docker/railway/entrypoint.sh` :
-
-```bash
-#!/bin/sh
-set -e
-
-echo "🚀 Démarrage du portail UMMISCO..."
-
-# Optimisation Laravel pour la production
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-echo "✅ Caches optimisés"
-
-# Lancer Supervisor (Nginx + PHP-FPM)
-exec /usr/bin/supervisord -c /etc/supervisord.conf
-```
-
-Mettez à jour le `Dockerfile` :
-```dockerfile
-COPY docker/railway/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-CMD ["/entrypoint.sh"]
+php artisan config:cache && php artisan route:cache && php artisan view:cache && php-fpm
 ```
 
 ---
 
-## Étape 8 — Déployer le Queue Worker
+## 🔧 Architecture de la Configuration Unifiée
 
-Pour le traitement des files d'attente (notifications, emails), créez un **second service** dans Railway :
+### Pourquoi un seul fichier `docker-compose.yml` ?
+1. **Source de vérité unique** : Fini la désynchronisation entre le mode local et la prod.
+2. **Fallback natif** : Nous utilisons la syntaxe `${VARIABLE:-valeur_par_defaut}`.
+   - En local, si aucune variable n'est définie, Laravel démarre avec la base locale `ummisco_app`, le user `ummisco_user`.
+   - Sur Railway, les variables injectées écrasent les valeurs par défaut.
+3. **Optimisation des coûts** : Railway facture à l'usage. En encapsulant le tout dans un seul compose, l'orchestration interne est gérée efficacement.
 
-1. Cliquez **« + New »** → **« GitHub Repo »** → même dépôt
-2. Dans **Settings** :
-   - **Start Command** : `php artisan horizon`
-   - Utilisez les mêmes variables d'environnement
-3. Ce service n'a pas besoin de port exposé
-
----
-
-## Étape 9 — Domaine personnalisé (optionnel)
-
-1. Dans le service Laravel, allez dans **Settings** → **Networking**
-2. Cliquez **« Generate Domain »** → vous obtenez `votre-app.up.railway.app`
-3. Pour un domaine personnalisé :
-   - Cliquez **« Custom Domain »**
-   - Entrez : `portail.ummisco.ucad.sn`
-   - Configurez un enregistrement CNAME dans votre DNS :
-     ```
-     portail.ummisco.ucad.sn → votre-app.up.railway.app
-     ```
+### Spécificités de développement
+En mode développement local, le code source (`./app`) est monté via un volume vers `/var/www/html`. Sur Railway, ce montage de code local est ignoré au profit du code compilé directement dans l'image Docker.
 
 ---
 
-## Étape 10 — Vérification du déploiement
+## ✅ Checklist de Validation en Production
 
-### Checklist de déploiement
-
-- [ ] L'application est accessible via l'URL Railway
-- [ ] La page d'accueil s'affiche correctement
-- [ ] La connexion Keycloak fonctionne (ou mode Mock si test)
-- [ ] Les publications sont chargées depuis PostgreSQL
-- [ ] Les axes thématiques s'affichent
-- [ ] Le workflow de validation fonctionne
-- [ ] Les logs sont visibles dans Railway → **Observability**
-- [ ] `KEYCLOAK_MOCK=false` en production
-- [ ] `APP_DEBUG=false` en production
-
-### Monitoring
-
-Railway fournit des métriques intégrées :
-- **CPU / RAM** : Observability → Metrics
-- **Logs** : Observability → Logs (temps réel)
-- **Redéploiement** : chaque push sur la branche configurée déclenche un redéploiement
-
----
-
-## Coûts estimés (Railway)
-
-| Service | Plan gratuit | Plan Hobby ($5/mois) | Plan Pro ($20/mois) |
-|---------|-------------|----------------------|---------------------|
-| App Laravel | 500h/mois | Illimité | Illimité |
-| PostgreSQL | 1 Go | 10 Go | 50 Go |
-| Redis | 256 Mo | 1 Go | 5 Go |
-| **Total** | **Gratuit** | **~$10/mois** | **~$30/mois** |
-
-> Le plan Hobby est suffisant pour un portail institutionnel à trafic modéré.
+1. [ ] **Accès public** : Le domaine pointe bien vers le conteneur `nginx`.
+2. [ ] **SSO** : Keycloak est fonctionnel en mode `start --optimized` et la page de login s'affiche via `auth.ummisco.sn`.
+3. [ ] **MinIO** : Le stockage d'objets répond sur `storage.ummisco.sn`.
+4. [ ] **Cron** : Le service `scheduler` ne génère pas d'erreur de connexion à la DB.
+5. [ ] **Performances** : Le service `redis` est bien utilisé pour la session (`SESSION_DRIVER=redis`).
