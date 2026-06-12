@@ -35,7 +35,9 @@ Route::get('/datasets/files/{id}/download', [PublicPortalController::class, 'dow
 // ── Publications externes (lecture seule — Semantic Scholar, OpenAlex, arXiv) ──
 Route::get('/publications/externes', [ImportController::class, 'publicIndex'])->name('publications.externes');
 Route::get('/publications/externes/{id}', [ImportController::class, 'publicShow'])->name('publications.externes.show');
-Route::get('/api/publications/externes/search', [ImportController::class, 'search'])->name('api.publications.externes.search');
+Route::get('/api/publications/externes/search', [ImportController::class, 'search'])
+    ->name('api.publications.externes.search')
+    ->middleware('throttle:api-search');
 
 // Nouveaux modules UMMISCO (sans formations, ENT, ni CoFab)
 Route::get('/unite/presentation', [PublicPortalController::class, 'presentation'])->name('unite.presentation');

@@ -136,7 +136,7 @@ class WorkflowValidationController extends Controller
             'mots_cles'          => 'nullable|array',
             'visibilite'         => 'nullable|in:public,partners,internal',
             'commentaire_auteur' => 'nullable|string|max:2000',
-            'fichier'            => 'nullable|file|max:51200',
+            'fichier'            => 'nullable|file|mimetypes:application/pdf|max:51200',
         ]);
 
         $userId = session('user_id');
@@ -457,7 +457,7 @@ class WorkflowValidationController extends Controller
             'mots_cles'          => 'nullable|array',
             'visibilite'         => 'nullable|in:public,partners,internal',
             'commentaire_auteur' => 'nullable|string|max:2000',
-            'fichier'            => 'nullable|file|max:51200',
+            'fichier'            => 'nullable|file|mimetypes:application/pdf|max:51200',
         ]);
 
         $user = User::findOrFail($userId);
