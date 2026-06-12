@@ -25,9 +25,9 @@
 
 ---
 
-## ÉTAPE 1 — Ajouter Keycloak dans docker-compose.dev.yml
+## ÉTAPE 1 — Ajouter Keycloak dans docker-compose.yml
 
-Ouvre `docker-compose.dev.yml` et ajoute ce service à la fin, avant la fermeture du fichier :
+Ouvre `docker-compose.yml` et ajoute ce service à la fin, avant la fermeture du fichier :
 
 ```yaml
   # ── KEYCLOAK 24 — Serveur d'authentification ──────────────────────────────
@@ -53,13 +53,13 @@ Ouvre `docker-compose.dev.yml` et ajoute ce service à la fin, avant la fermetur
 
 ```powershell
 cd C:\Users\USER\Documents\DIC1\Semestre2\IPDL\portail_web
-docker compose -f docker-compose.dev.yml up -d keycloak
+docker compose up -d keycloak
 ```
 
 Attends environ **30 secondes** que Keycloak démarre, puis vérifie :
 
 ```powershell
-docker compose -f docker-compose.dev.yml logs keycloak --tail=20
+docker compose logs keycloak --tail=20
 ```
 
 Tu dois voir une ligne contenant :
@@ -228,11 +228,11 @@ KEYCLOAK_MOCK=false
 
 ```powershell
 # Vider le cache de config Laravel
-docker compose -f docker-compose.dev.yml exec app php artisan config:clear
-docker compose -f docker-compose.dev.yml exec app php artisan cache:clear
+docker compose exec app php artisan config:clear
+docker compose exec app php artisan cache:clear
 
 # Redémarrer l'app
-docker compose -f docker-compose.dev.yml restart app
+docker compose restart app
 ```
 
 ---
@@ -256,7 +256,7 @@ docker compose -f docker-compose.dev.yml restart app
 KEYCLOAK_MOCK=true
 
 # Puis vider le cache
-docker compose -f docker-compose.dev.yml exec app php artisan config:clear
+docker compose exec app php artisan config:clear
 ```
 
 ---
@@ -285,7 +285,7 @@ La valeur dans **Clients → laravel-app → Valid redirect URIs** doit être **
 ### « Client secret is not valid »
 1. **Clients → laravel-app → Credentials → Regenerate**
 2. Copier le nouveau secret dans `app/.env`
-3. `docker compose -f docker-compose.dev.yml exec app php artisan config:clear`
+3. `docker compose exec app php artisan config:clear`
 
 ### « Realm does not exist »
 Vérifier que `KEYCLOAK_REALM=ummisco` correspond exactement au nom du Realm créé à l'étape 4.
@@ -299,6 +299,6 @@ Vérifier que `KEYCLOAK_REALM=ummisco` correspond exactement au nom du Realm cr�
 ### Keycloak inaccessible depuis l'app (connexion refusée)
 Vérifier que Keycloak et l'app sont sur le même réseau Docker :
 ```powershell
-docker compose -f docker-compose.dev.yml exec app curl http://keycloak:8080
+docker compose exec app curl http://keycloak:8080
 ```
 Si erreur → vérifier que `keycloak` est dans `networks: backend_net` ET `frontend_net`.

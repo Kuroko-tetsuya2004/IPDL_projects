@@ -21,12 +21,9 @@ docker --version
 
 > ⚠️ **Important** : exécute ces commandes depuis le dossier du projet, pas depuis `System32`.
 
-> 🚨 **Utilise le fichier `dev` (sans Minio/Ollama)**  
-> Le compose complet échoue car `ollama/ollama:latest` pèse ~4 Go et `minio` est facultatif pour le dev.
-
-```powershell
-cd C:\Users\USER\Documents\DIC1\Semestre2\IPDL\portail_web
-docker compose -f docker-compose.dev.yml up -d
+2. Démarrez les conteneurs en tâche de fond :
+```bash
+docker compose up -d
 ```
 
 Vérifie que tous les conteneurs tournent :
