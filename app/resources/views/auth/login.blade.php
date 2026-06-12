@@ -280,39 +280,7 @@
     <div class="login-glass-card">
         <div class="login-header">
             <div class="login-logo-wrapper">
-                <svg viewBox="0 0 100 100" style="width: 76px; height: 76px; filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.15));" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Outer rings -->
-                  <circle cx="50" cy="50" r="45" stroke="url(#logo-grad-login)" stroke-width="2.5" stroke-dasharray="12 8" />
-                  <circle cx="50" cy="50" r="38" stroke="url(#logo-grad2-login)" stroke-width="1.5" stroke-opacity="0.3" />
-                  
-                  <!-- Complexity U shape -->
-                  <path d="M30 35 V60 C30 71 39 80 50 80 C61 80 70 71 70 60 V35" stroke="url(#logo-grad-login)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M40 40 V60 C40 65 44 70 50 70 C56 70 60 65 60 60 V40" stroke="url(#logo-grad2-login)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2" />
-                  
-                  <!-- Dots -->
-                  <circle cx="30" cy="35" r="4" fill="#0ea5e9" />
-                  <circle cx="70" cy="35" r="4" fill="#0ea5e9" />
-                  <circle cx="50" cy="80" r="5" fill="#1e3a8a" />
-                  <circle cx="40" cy="65" r="3" fill="#ffffff" />
-                  <circle cx="60" cy="65" r="3" fill="#ffffff" />
-                  <circle cx="50" cy="50" r="3.5" fill="#38bdf8" />
-                  
-                  <!-- Links -->
-                  <line x1="30" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-                  <line x1="70" y1="35" x2="50" y2="50" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.6" />
-                  <line x1="50" y1="50" x2="50" y2="80" stroke="#1e3a8a" stroke-width="1.5" stroke-opacity="0.6" />
-
-                  <defs>
-                    <linearGradient id="logo-grad-login" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#0ea5e9" />
-                      <stop offset="100%" stop-color="#1e3a8a" />
-                    </linearGradient>
-                    <linearGradient id="logo-grad2-login" x1="100" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#38bdf8" />
-                      <stop offset="100%" stop-color="#2563eb" />
-                    </linearGradient>
-                  </defs>
-                </svg>
+                <img src="{{ asset('images/logo_ummisco.webp') }}" alt="UMMISCO" style="width: 100px; height: auto; filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.15));" />
             </div>
             <h1 class="login-title">Connexion</h1>
             <p class="login-subtitle">Portail de Recherche UMMISCO</p>

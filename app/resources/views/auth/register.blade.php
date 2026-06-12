@@ -291,8 +291,8 @@
 
     <div class="register-glass-card">
         <div class="register-header">
-            <div class="register-icon-wrapper">
-                🔑
+            <div class="register-icon-wrapper" style="background: none; border: none; box-shadow: none;">
+                <img src="{{ asset('images/logo_ummisco.webp') }}" alt="UMMISCO" style="width: 80px; height: auto; filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.15));" />
             </div>
             <h1 class="register-title">Rejoindre UMMISCO</h1>
             <p class="register-subtitle">Création de compte de recherche & administration</p>
