@@ -179,6 +179,29 @@ portail_web/
 
 ---
 
+## 🛡️ Sécurité & Architecture Frontend
+
+Afin de garantir une sécurité maximale et prévenir toute fuite du code source administrateur :
+- **Séparation en 3 applications Vue.js (Vite)** :
+  - `app_public.js` : Uniquement le portail public
+  - `app_dashboard.js` : Espace connecté (chercheurs, doctorants)
+  - `app_admin.js` : Espace back-office super admin
+- **Sécurité HTTP** : Middleware de Content-Security-Policy (CSP) stricte et en-têtes anti-XSS.
+- **Rate Limiting** : Protection des APIs publiques et de recherche.
+
+---
+
+## 🌐 Intégration Scientifique (APIs)
+
+Le portail synchronise automatiquement la production scientifique via une tâche planifiée (Cron `02:00`) depuis :
+- **Semantic Scholar**
+- **OpenAlex**
+- **arXiv**
+- **CrossRef**
+- **Unpaywall** (Pour l'accès gratuit aux PDF via DOI)
+
+---
+
 ## 🔐 Règles métier importantes
 
 | Règle | Description |

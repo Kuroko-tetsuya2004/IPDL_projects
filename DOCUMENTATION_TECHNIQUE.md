@@ -91,6 +91,7 @@ Le Portail Web UMMISCO est une application institutionnelle destinée à central
 
 - **Pattern MVC** avec Laravel 11
 - **Architecture modulaire** : chaque domaine métier est isolé dans `app/Modules/`
+- **Séparation Frontend 3-Tiers** : Points d'entrée Vite distincts (`app_public.js`, `app_dashboard.js`, `app_admin.js`) pour éviter la fuite du code source admin.
 - **Session-based auth** : Keycloak OAuth2 → session Laravel (pas de JWT côté client)
 - **Recherche full-text** : colonnes `TSVECTOR` PostgreSQL générées automatiquement
 
@@ -184,14 +185,12 @@ portail_web/
 │   ├── config/                   # Fichiers de configuration (en français)
 │   ├── resources/
 │   │   ├── views/
-│   │   │   ├── layouts/app.blade.php
+│   │   │   ├── public.blade.php      # Layout public
+│   │   │   ├── dashboard.blade.php   # Layout chercheur
+│   │   │   ├── admin.blade.php       # Layout back-office
 │   │   │   ├── auth/mock-login.blade.php
-│   │   │   ├── public/
-│   │   │   │   ├── home.blade.php
-│   │   │   │   ├── publications.blade.php
-│   │   │   │   └── axes.blade.php
-│   │   │   └── workflow/
-│   │   │       └── pending.blade.php
+│   │   │   ├── workflow/
+│   │   │   │   └── pending.blade.php
 │   │   └── lang/                 # Fichiers de traduction FR/EN
 │   ├── routes/
 │   │   ├── web.php               # Routes HTTP
@@ -317,6 +316,7 @@ ORDER BY ts_rank(fts_fr, plainto_tsquery('french', 'modélisation épidémie')) 
 | `axes()` | `GET /axes` | Liste des axes de recherche |
 | `subscribeNewsletter()` | `POST /newsletter/subscribe` | Inscription newsletter |
 | `submitContact()` | `POST /contact` | Formulaire de contact |
+| `publicIndex()` | `GET /publications/externes` | Consultation agrégée des articles externes |
 
 ### 6.3 Module Content (`app/Modules/Content/`)
 
@@ -343,6 +343,15 @@ ORDER BY ts_rank(fts_fr, plainto_tsquery('french', 'modélisation épidémie')) 
 - Modèle `User` avec 6 rôles ENUM et soft delete
 - Modèle `AxeThematique` avec responsable, membres et publications
 - Profils spécialisés : `ProfilChercheur`, `ProfilDoctorant`, `ProfilPartenaire`
+
+### 6.6 Module Integration (`app/Modules/Integration/`)
+
+**Responsabilité** : Connexion aux APIs scientifiques externes et génération de PDF.
+
+- **Import Scientifique** : Semantic Scholar, OpenAlex, arXiv, CrossRef, Unpaywall.
+- **Automatisation** : Cron quotidien à 02h00 pour la synchronisation (`publications:import`).
+- **Déduplication** : Basée sur le DOI et le type de source.
+- **Documents PDF** : Fichiers administratifs UMMISCO (jsPDF + jsPDF-AutoTable).
 
 ---
 
@@ -436,18 +445,21 @@ Route::middleware(['role:axe_admin,super_admin'])->group(...)
 | **Authentification** | Keycloak SSO (OAuth2 Authorization Code) |
 | **Autorisation** | Middleware `KeycloakMiddleware` avec vérification de rôle |
 | **CSRF** | Protection automatique Laravel sur toutes les routes POST |
-| **XSS** | Échappement automatique Blade (`{{ }}`) |
+| **XSS / Clickjacking** | Middleware `SecurityHeaders` (CSP stricte, `X-Frame-Options: DENY`) |
+| **Cookies** | Sessions avec `SameSite=Strict`, `HttpOnly` et cryptage natif |
+| **Rate Limiting** | `throttle:api-search` (30 req/min) sur l'agrégation d'API |
 | **Injection SQL** | Query builder Eloquent (requêtes paramétrées) |
 | **Audit** | Journalisation de toutes les actions sensibles |
 | **Soft Delete** | Suppression logique (pas de perte de données) |
-| **Sessions** | Stockage Redis avec chiffrement optionnel |
+| **Séparation Frontend**| 3 builds Vite distincts (`public`, `dashboard`, `admin`) empêchant la fuite du code |
 
 ### 10.2 En-têtes de sécurité
 
-Configurés dans Nginx (`docker/nginx/conf.d/default.conf`) :
+Configurés par le `SecurityHeaders` Middleware :
+- `Content-Security-Policy: default-src 'self' ...`
 - `X-Content-Type-Options: nosniff`
-- `X-Frame-Options: SAMEORIGIN`
-- `X-XSS-Protection: 1; mode=block`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
 
 ### 10.3 Variables sensibles
 
