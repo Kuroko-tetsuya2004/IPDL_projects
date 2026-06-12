@@ -7,8 +7,6 @@
 #   Railway lit automatiquement ce fichier et provisionne chaque service.
 #   Les variables d'environnement surchargent les valeurs par défaut.
 
-version: '3.8'
-
 # ── Templates réutilisables ──────────────────────────────────────────────
 x-app-common: &app-common
   build:
