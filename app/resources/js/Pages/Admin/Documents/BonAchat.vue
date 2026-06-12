@@ -4,6 +4,8 @@ import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
 import { ShoppingCartIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
+import { logoIrd, logoUcad, logoReuUmmisco } from '@/utils/logos.js'
+
 defineOptions({ layout: DashboardLayout })
 
 const form = ref({
@@ -45,7 +47,14 @@ async function genererPDF() {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const mL = 20, mR = 190
   const pageW = 210
-  let y = 20
+  let y = 15
+
+  // ── LOGOS (En-tête) ──
+  if (logoIrd) doc.addImage(logoIrd, 'JPEG', mL, y, 22, 10)
+  if (logoReuUmmisco) doc.addImage(logoReuUmmisco, 'PNG', pageW / 2 - 15, y, 30, 10)
+  if (logoUcad) doc.addImage(logoUcad, 'WEBP', mR - 15, y, 15, 15)
+
+  y += 20
 
   // ── TITRE ──
   doc.setFontSize(16)

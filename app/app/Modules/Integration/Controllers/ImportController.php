@@ -2,7 +2,7 @@
 
 namespace App\Modules\Integration\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\Modules\Integration\Models\ExternalPublication;
 use App\Modules\Integration\Services\PublicationImportService;
 use Illuminate\Http\Request;

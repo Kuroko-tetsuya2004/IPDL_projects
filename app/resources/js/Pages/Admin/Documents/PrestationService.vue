@@ -46,6 +46,12 @@ async function genererPDF() {
   const mL = 15, mR = 195, pageW = 210
   let y = 15
 
+  // ── LOGOS (En-tête) ──
+  if (logoIrd) doc.addImage(logoIrd, 'JPEG', mL, y, 22, 10)
+  if (logoReuUmmisco) doc.addImage(logoReuUmmisco, 'PNG', pageW / 2 - 15, y, 30, 10)
+  if (logoUcad) doc.addImage(logoUcad, 'WEBP', mR - 15, y, 15, 15)
+  y += 20
+
   // ══ EN-TÊTE 3 COLONNES (fidèle au document Excel original) ══
   autoTable(doc, {
     startY: y,
