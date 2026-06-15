@@ -503,17 +503,6 @@
                     <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
                 </li>
                 <li class="has-dropdown">
-                    <span class="nav-link {{ request()->routeIs('unite.*') ? 'active' : '' }}">
-                        Unité
-                        <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none"><path d="m6 9 6 6 6-6"/></svg>
-                    </span>
-                    <div class="dropdown-menu">
-                        <a href="{{ route('unite.presentation') }}" class="{{ request()->routeIs('unite.presentation') ? 'active' : '' }}">Présentation</a>
-                        <a href="{{ route('unite.priorites') }}" class="{{ request()->routeIs('unite.priorites') ? 'active' : '' }}">Priorités scientifiques</a>
-                        <a href="{{ route('unite.membres') }}" class="{{ request()->routeIs('unite.membres') ? 'active' : '' }}">Membres</a>
-                    </div>
-                </li>
-                <li class="has-dropdown">
                     <span class="nav-link {{ request()->routeIs('recherches.*') ? 'active' : '' }}">
                         Recherches
                         <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none"><path d="m6 9 6 6 6-6"/></svg>
@@ -523,16 +512,8 @@
                         <a href="{{ route('recherches.milieux') }}" class="{{ request()->routeIs('recherches.milieux') ? 'active' : '' }}">Milieux & Ressources vivantes</a>
                     </div>
                 </li>
-                <li class="has-dropdown">
-                    <span class="nav-link {{ request()->routeIs('productions.*') || request()->routeIs('publications*') ? 'active' : '' }}">
-                        Productions
-                        <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none"><path d="m6 9 6 6 6-6"/></svg>
-                    </span>
-                    <div class="dropdown-menu">
-                        <a href="{{ route('publications') }}" class="{{ request()->routeIs('publications') ? 'active' : '' }}">Publications</a>
-                        <a href="{{ route('productions.presentations') }}" class="{{ request()->routeIs('productions.presentations') ? 'active' : '' }}">Présentations</a>
-                        <a href="{{ route('productions.autres') }}" class="{{ request()->routeIs('productions.autres') ? 'active' : '' }}">Autres productions</a>
-                    </div>
+                <li>
+                    <a href="{{ route('publications') }}" class="nav-link {{ request()->routeIs('publications*') ? 'active' : '' }}">Publications</a>
                 </li>
                 <li>
                     <a href="{{ route('actualites') }}" class="nav-link {{ request()->routeIs('actualites') ? 'active' : '' }}">Actualités</a>
@@ -610,9 +591,9 @@
                 <h4>Navigation</h4>
                 <ul>
                     <li><a href="{{ route('home') }}">Accueil</a></li>
-                    <li><a href="{{ route('unite.presentation') }}">Présentation</a></li>
                     <li><a href="{{ route('publications') }}">Publications</a></li>
                     <li><a href="{{ route('axes') }}">Axes de recherche</a></li>
+                    <li><a href="{{ route('projets') }}">Projets en cours</a></li>
                     <li><a href="{{ route('contact') }}">Contact</a></li>
                 </ul>
             </div>

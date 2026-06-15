@@ -34,7 +34,7 @@ const totalGeneral = computed(() =>
   articles.value.reduce((s, a) => s + (prixTotal(a) || 0), 0)
 )
 
-const fmt = (v) => v != null && v !== '' ? new Intl.NumberFormat('fr-FR').format(v) : ''
+const fmt = (v) => v != null && v !== '' ? Number(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : ''
 
 const generating = ref(false)
 
@@ -49,26 +49,21 @@ async function genererPDF() {
   const pageW = 210
   let y = 15
 
-  // ── LOGOS (En-tête) ──
-  if (logoIrd) doc.addImage(logoIrd, 'JPEG', mL, y, 22, 10)
-
-  y += 20
-
   // ══ EN-TÊTE 3 COLONNES (fidèle au document Word FI-4) ══
   autoTable(doc, {
     startY: y,
     body: [[
       {
-        content: 'Représentation\ndu Sénégal\nTél : 00221 33 849 83 30\nBP 1386 - Dakar',
-        styles: { fontSize: 8, cellWidth: 48, valign: 'middle', fontStyle: 'normal' }
+        content: '\n\n\n\n\nReprésentation\ndu Sénégal\nTél : 00221 33 849 83 30\nBP 1386 - Dakar',
+        styles: { fontSize: 8, cellWidth: 40, valign: 'middle', fontStyle: 'normal' }
       },
       {
         content: 'DEMANDE DE BON D\'ACHAT',
-        styles: { fontSize: 14, fontStyle: 'bold', halign: 'center', valign: 'middle', cellWidth: 104 }
+        styles: { fontSize: 14, fontStyle: 'bold', halign: 'center', valign: 'middle', cellWidth: 90 }
       },
       {
         content: 'Identification : FI - 4\nDate de création : 10/07/08\nDate de Modification : 12/11/08\nVersion : 2\nNombre de pages : 1/1',
-        styles: { fontSize: 7.5, cellWidth: 38, valign: 'middle', halign: 'right', fontStyle: 'normal' }
+        styles: { fontSize: 7.5, cellWidth: 40, valign: 'middle', halign: 'right', fontStyle: 'normal' }
       },
     ]],
     theme: 'grid',
@@ -78,17 +73,27 @@ async function genererPDF() {
     margin: { left: mL, right: 20 },
   })
 
+  if (logoIrd) {
+    const imgX = mL + (40 - 22) / 2
+    const imgY = 15 + 3
+    doc.addImage(logoIrd, 'PNG', imgX, imgY, 22, 10)
+  }
+
   y = doc.lastAutoTable.finalY + 8
 
   // ── CHAMPS EN-TÊTE ──
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
 
-  const fieldLine = (label, val) => {
+  const fieldLine = (label, valStr) => {
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(0, 0, 0)
     doc.text(label, mL, y)
-    doc.setFont('helvetica', 'bold')
-    doc.text(val || '', mL + doc.getTextWidth(label) + 1, y)
-    doc.setFont('helvetica', 'normal')
+    if (valStr) {
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(0, 0, 0)
+      doc.text(valStr, mL + doc.getTextWidth(label) + 1, y)
+      doc.setTextColor(0, 0, 0)
+    }
     y += 7
   }
 
@@ -105,11 +110,11 @@ async function genererPDF() {
   const tableBody = rows.map(a => {
     const total = prixTotal(a)
     return [
-      a.objet || '',
-      a.fournisseur || '',
-      a.prix_unitaire ? fmt(a.prix_unitaire) : '',
-      a.quantite || '',
-      total != null ? fmt(total) : '',
+      { content: a.objet || '', styles: { fontStyle: 'bold', textColor: a.objet ? [0, 0, 0] : [0,0,0] } },
+      { content: a.fournisseur || '', styles: { fontStyle: 'bold', textColor: a.fournisseur ? [0, 0, 0] : [0,0,0] } },
+      { content: a.prix_unitaire ? fmt(a.prix_unitaire) : '', styles: { fontStyle: 'bold', textColor: a.prix_unitaire ? [0, 0, 0] : [0,0,0] } },
+      { content: a.quantite || '', styles: { fontStyle: 'bold', textColor: a.quantite ? [0, 0, 0] : [0,0,0] } },
+      { content: total != null ? fmt(total) : '', styles: { fontStyle: 'bold', textColor: total != null ? [0, 0, 0] : [0,0,0] } },
     ]
   })
 
@@ -125,10 +130,10 @@ async function genererPDF() {
     body: tableBody,
     theme: 'grid',
     headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold', fontSize: 9, halign: 'center' },
-    bodyStyles: { fontSize: 9, minCellHeight: 8 },
+    bodyStyles: { fontSize: 9, minCellHeight: 10 },
     columnStyles: {
-      0: { cellWidth: 55 },
-      1: { cellWidth: 45 },
+      0: { cellWidth: 50 },
+      1: { cellWidth: 40 },
       2: { cellWidth: 30, halign: 'right' },
       3: { cellWidth: 20, halign: 'center' },
       4: { cellWidth: 30, halign: 'right' },
@@ -138,12 +143,16 @@ async function genererPDF() {
 
   y = doc.lastAutoTable.finalY + 8
 
-  // ── ADRESSE LIVRAISON ──
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
+  doc.setTextColor(0, 0, 0)
   doc.text('Adresse de Livraison : ', mL, y)
-  doc.setFont('helvetica', 'bold')
-  doc.text(form.value.adresse_livraison || '', mL + doc.getTextWidth('Adresse de Livraison : '), y)
+  if (form.value.adresse_livraison) {
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(0, 0, 0)
+    doc.text(form.value.adresse_livraison, mL + doc.getTextWidth('Adresse de Livraison : '), y)
+    doc.setTextColor(0, 0, 0)
+  }
   y += 12
 
   // ── NOTE ATTENTION ──
@@ -158,11 +167,17 @@ async function genererPDF() {
   // ── DATE ──
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
-  doc.text(`Dakar le\u00a0: ${form.value.date_dakar}`, mL, y)
+  doc.text(`Dakar le\u00a0: `, mL, y)
+  if (form.value.date_dakar) {
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(0, 0, 0)
+    doc.text(form.value.date_dakar, mL + doc.getTextWidth(`Dakar le\u00a0: `), y)
+    doc.setTextColor(0, 0, 0)
+  }
   y += 18
 
   // ── SIGNATURES ──
-  const colLeft = mL + 10
+  const colLeft = mL + 25
   const colRight = 125
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(10)
@@ -170,10 +185,12 @@ async function genererPDF() {
   doc.text("SIGNATURE DU\nRESPONSABLE D\u2019ENVELOPPE", colRight + 25, y, { align: 'center' })
   y += 25
   doc.setLineWidth(0.3)
-  doc.line(mL, y, mL + 70, y)
+  doc.line(colLeft - 25, y, colLeft + 25, y)
   doc.line(colRight, y, colRight + 55, y)
 
-  doc.save(`Demande_Achat_${form.value.demandeur_nom_prenom || 'demandeur'}.pdf`)
+  const pdfBlob = doc.output('blob')
+  const blobUrl = URL.createObjectURL(pdfBlob)
+  window.open(blobUrl, '_blank')
   generating.value = false
 }
 
@@ -256,12 +273,12 @@ function imprimer() {
               <div class="grid grid-cols-3 gap-2">
                 <div>
                   <label class="block text-[10px] text-slate-500 mb-1">Prix unitaire (F CFA)</label>
-                  <input v-model="art.prix_unitaire" type="number" placeholder="0"
+                  <input :value="art.prix_unitaire" @input="art.prix_unitaire = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="0"
                     class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
                   <label class="block text-[10px] text-slate-500 mb-1">Quantité</label>
-                  <input v-model="art.quantite" type="number" placeholder="0"
+                  <input :value="art.quantite" @input="art.quantite = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="0"
                     class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
@@ -319,7 +336,8 @@ function imprimer() {
             <!-- En-tête 3 colonnes -->
             <table style="width:100%; border-collapse:collapse; border:1.5px solid #000; margin-bottom:14px;">
               <tr>
-                <td style="border:1px solid #000; padding:8px; width:30%; vertical-align:middle; font-size:9px; line-height:1.5;">
+                <td style="border:1px solid #000; padding:8px; width:30%; text-align:center; vertical-align:top; font-size:9px; line-height:1.5;">
+                  <img v-if="logoIrd" :src="logoIrd" alt="Logo IRD" style="height:35px; margin:0 auto 10px; display:block;" />
                   <strong>Représentation<br>du Sénégal</strong><br>
                   Tél : 00221 33 849 83 30<br>
                   BP 1386 - Dakar
@@ -373,8 +391,8 @@ function imprimer() {
               <tbody>
                 <template v-for="(art, idx) in articles" :key="idx">
                   <tr>
-                    <td style="border:1px solid #999; padding:6px 8px; min-height:22px;">{{ art.objet }}</td>
-                    <td style="border:1px solid #999; padding:6px 8px;">{{ art.fournisseur }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px; min-height:22px; white-space:pre-wrap; word-break:break-word;">{{ art.objet }}</td>
+                    <td style="border:1px solid #999; padding:6px 8px; white-space:pre-wrap; word-break:break-word;">{{ art.fournisseur }}</td>
                     <td style="border:1px solid #999; padding:6px 8px; text-align:right;">{{ art.prix_unitaire ? fmt(art.prix_unitaire) : '' }}</td>
                     <td style="border:1px solid #999; padding:6px 8px; text-align:center;">{{ art.quantite }}</td>
                     <td style="border:1px solid #999; padding:6px 8px; text-align:right; font-weight:bold;">{{ prixTotal(art) != null ? fmt(prixTotal(art)) : '' }}</td>

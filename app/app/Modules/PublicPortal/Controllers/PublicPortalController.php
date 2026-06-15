@@ -103,6 +103,10 @@ class PublicPortalController extends Controller
             Publication::TYPE_DOCUMENT     => 'Recherches en cours',
         ];
 
+        if ($request->ajax()) {
+            return view('public.partials.publications_list', compact('publications'))->render();
+        }
+
         return view('public.publications', compact('publications', 'axes', 'types'));
     }
 
@@ -124,6 +128,17 @@ class PublicPortalController extends Controller
             ->get();
 
         return view('public.axes', compact('axes'));
+    }
+
+    // ── Projets de recherche ────────────────────────────────────────────────
+
+    /**
+     * Affiche la liste des projets de recherche UMMISCO en cours.
+     */
+    public function projets()
+    {
+        $projets = DB::table('projets_ummisco')->orderBy('titre')->get();
+        return view('public.projets', compact('projets'));
     }
 
     // ── Détail d'une publication ──────────────────────────────────────
@@ -369,42 +384,6 @@ class PublicPortalController extends Controller
     // ── Nouveaux Modules UMMISCO ─────────────────────────────────────────────
 
     /**
-     * Présentation de l'unité.
-     */
-    public function presentation()
-    {
-        return view('public.presentation');
-    }
-
-    /**
-     * Priorités scientifiques.
-     */
-    public function priorites()
-    {
-        return view('public.priorites');
-    }
-
-    /**
-     * Annuaire des membres.
-     */
-    public function membres()
-    {
-        $chercheurs = \App\Modules\User\Models\User::where('role', 'researcher')
-            ->where('statut', 'active')
-            ->orderBy('nom')
-            ->orderBy('prenom')
-            ->get();
-
-        $doctorants = \App\Modules\User\Models\User::where('role', 'doctoral_student')
-            ->where('statut', 'active')
-            ->orderBy('nom')
-            ->orderBy('prenom')
-            ->get();
-
-        return view('public.membres', compact('chercheurs', 'doctorants'));
-    }
-
-    /**
      * Thématique : Modélisation à base d'agents.
      */
     public function modelisation()
@@ -418,22 +397,6 @@ class PublicPortalController extends Controller
     public function milieux()
     {
         return view('public.recherches_milieux');
-    }
-
-    /**
-     * Productions : Présentations.
-     */
-    public function presentations()
-    {
-        return view('public.productions_presentations');
-    }
-
-    /**
-     * Productions : Autres productions.
-     */
-    public function autres()
-    {
-        return view('public.productions_autres');
     }
 
     /**
@@ -460,6 +423,14 @@ class PublicPortalController extends Controller
     {
         $axes = AxeThematique::actif()->get();
         return view('public.contact', compact('axes'));
+    }
+
+    /**
+     * Page de recherche académique dynamique (API).
+     */
+    public function rechercheAcademique()
+    {
+        return view('public.recherche_academique');
     }
 
     /**

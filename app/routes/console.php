@@ -25,3 +25,16 @@ Schedule::command(ImportPublications::class, [
   })
   ->appendOutputTo(storage_path('logs/publications-import.log'));
 
+// ── Cron automatique : synchronisation des publications via ORCID ──────────────
+// Exécuté chaque nuit à 03h00
+Schedule::command(\App\Console\Commands\SyncOrcidPublications::class)
+  ->dailyAt('03:00')
+  ->withoutOverlapping()
+  ->runInBackground()
+  ->onSuccess(function () {
+      \Illuminate\Support\Facades\Log::info('[Scheduler] Synchronisation ORCID terminée avec succès');
+  })
+  ->onFailure(function () {
+      \Illuminate\Support\Facades\Log::error('[Scheduler] Synchronisation ORCID ÉCHOUÉE');
+  })
+  ->appendOutputTo(storage_path('logs/orcid-sync.log'));

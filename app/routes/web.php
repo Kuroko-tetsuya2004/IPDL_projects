@@ -26,6 +26,7 @@ Route::get('/', [PublicPortalController::class, 'home'])->name('home');
 Route::get('/publications', [PublicPortalController::class, 'publications'])->name('publications');
 Route::get('/publications/{id}', [PublicPortalController::class, 'show'])->name('publications.show')->whereUuid('id');
 Route::get('/axes', [PublicPortalController::class, 'axes'])->name('axes');
+Route::get('/projets', [PublicPortalController::class, 'projets'])->name('projets');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/recherche', [SearchController::class, 'index'])->name('recherche');
 Route::get('/documents/{id}/download', [PublicPortalController::class, 'downloadDocument'])->name('documents.download')->whereUuid('id');
@@ -39,14 +40,15 @@ Route::get('/api/publications/externes/search', [ImportController::class, 'searc
     ->name('api.publications.externes.search')
     ->middleware('throttle:api-search');
 
+// Agrégateur de recherche académique (API + UI)
+Route::get('/api/search', [\App\Modules\Integration\Controllers\ApiSearchController::class, 'search'])
+    ->name('api.search')
+    ->middleware('throttle:api-search');
+Route::get('/recherche-academique', [PublicPortalController::class, 'rechercheAcademique'])->name('recherche.academique');
+
 // Nouveaux modules UMMISCO (sans formations, ENT, ni CoFab)
-Route::get('/unite/presentation', [PublicPortalController::class, 'presentation'])->name('unite.presentation');
-Route::get('/unite/priorites', [PublicPortalController::class, 'priorites'])->name('unite.priorites');
-Route::get('/unite/membres', [PublicPortalController::class, 'membres'])->name('unite.membres');
 Route::get('/recherches/modelisation', [PublicPortalController::class, 'modelisation'])->name('recherches.modelisation');
 Route::get('/recherches/milieux', [PublicPortalController::class, 'milieux'])->name('recherches.milieux');
-Route::get('/productions/presentations', [PublicPortalController::class, 'presentations'])->name('productions.presentations');
-Route::get('/productions/autres', [PublicPortalController::class, 'autres'])->name('productions.autres');
 Route::get('/actualites', [PublicPortalController::class, 'actualites'])->name('actualites');
 Route::get('/contact', [PublicPortalController::class, 'contact'])->name('contact');
 
@@ -76,6 +78,18 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->name('logout');
 // ── Routes sécurisées (authentification requise) ────────────────────────────
 
 Route::middleware([KeycloakMiddleware::class])->group(function () {
+    Route::get('/run-delete', function () {
+        $start = \Carbon\Carbon::now()->subWeek()->startOfWeek();
+        $end = \Carbon\Carbon::now()->subWeek()->endOfWeek();
+        $count = \App\Modules\Content\Models\Publication::whereBetween('created_at', [$start, $end])->count();
+        \App\Modules\Content\Models\Publication::whereBetween('created_at', [$start, $end])->delete();
+        return "Opération terminée : {$count} publications supprimées de la base de données (semaine dernière).";
+    });
+
+    Route::get('/run-import-json', function () {
+        \Illuminate\Support\Facades\Artisan::call('publications:import-json');
+        return \Illuminate\Support\Facades\Artisan::output() ?: 'Importation terminée. Vérifiez les publications dans l\'application.';
+    });
 
     // ── Dashboard ─────────────────────────────────────────────────────────
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -88,6 +102,7 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
     Route::get('/mes-publications', [WorkflowValidationController::class, 'mesPublications'])->name('mes-publications');
     Route::get('/publications/soumettre', [WorkflowValidationController::class, 'create'])->name('publications.create');
     Route::post('/publications/submit', [WorkflowValidationController::class, 'submit'])->name('publications.submit');
+    Route::post('/publications/sync-orcid', [WorkflowValidationController::class, 'syncOrcid'])->name('publications.sync-orcid');
     Route::get('/publications/{id}/modifier', [WorkflowValidationController::class, 'edit'])->name('publications.edit')->whereUuid('id');
     Route::put('/publications/{id}', [WorkflowValidationController::class, 'update'])->name('publications.update')->whereUuid('id');
     Route::delete('/publications/{id}', [WorkflowValidationController::class, 'destroy'])->name('publications.destroy')->whereUuid('id');
@@ -141,4 +156,8 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
             Route::post('/run', [ImportController::class, 'adminRun'])->name('run');
         });
     });
+
+    // ── Publications externes — Actions Utilisateur (chercheurs/doctorants) ──
+    Route::post('/publications/externes/fetch-live', [ImportController::class, 'userLiveFetch'])->name('publications.externes.fetch-live');
+    Route::post('/publications/externes/{id}/import', [ImportController::class, 'importToProfile'])->name('publications.externes.import');
 });

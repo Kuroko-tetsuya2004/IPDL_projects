@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
 import { ClipboardDocumentListIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
+import { logoIrd } from '@/utils/logos.js'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -31,7 +32,7 @@ const montantBrut = computed(() => parseFloat(form.value.montant_brut) || 0)
 const impot       = computed(() => Math.round(montantBrut.value * 0.05))
 const montantNet  = computed(() => montantBrut.value - impot.value)
 
-const fmt = (v) => v ? new Intl.NumberFormat('fr-FR').format(v) : ''
+const fmt = (v) => v ? Number(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : ''
 const fmtCFA = (v) => v ? fmt(v) + ' F CFA' : ''
 
 const generating = ref(false)
@@ -46,25 +47,21 @@ async function genererPDF() {
   const mL = 15, mR = 195, pageW = 210
   let y = 15
 
-  // ── LOGOS (En-tête) ──
-  if (logoIrd) doc.addImage(logoIrd, 'JPEG', mL, y, 22, 10)
-  y += 20
-
   // ══ EN-TÊTE 3 COLONNES (fidèle au document Excel original) ══
   autoTable(doc, {
     startY: y,
     body: [[
       {
-        content: 'Représentation de l\'IRD\nau Sénégal\nTél : 00221 33 849 35 35\nBP 1386 - Dakar',
-        styles: { fontSize: 8, cellWidth: 48, valign: 'middle', fontStyle: 'normal' }
+        content: '\n\n\n\n\nReprésentation de l\'IRD\nau Sénégal\nTél : 00221 33 849 35 35\nBP 1386 - Dakar',
+        styles: { fontSize: 8, cellWidth: 40, valign: 'middle', fontStyle: 'normal' }
       },
       {
         content: 'RECU DE PRESTATION DE SERVICE',
-        styles: { fontSize: 14, fontStyle: 'bold', halign: 'center', valign: 'middle', cellWidth: 104 }
+        styles: { fontSize: 14, fontStyle: 'bold', halign: 'center', valign: 'middle', cellWidth: 100 }
       },
       {
         content: 'Identification : FI - 8\nDate de création : 10/07/08\nDate de Modification : 24/08/2011\nVersion : V5',
-        styles: { fontSize: 7.5, cellWidth: 38, valign: 'middle', halign: 'right', fontStyle: 'normal' }
+        styles: { fontSize: 7.5, cellWidth: 40, valign: 'middle', halign: 'right', fontStyle: 'normal' }
       },
     ]],
     theme: 'grid',
@@ -74,19 +71,25 @@ async function genererPDF() {
     margin: { left: mL, right: 15 },
   })
 
+  if (logoIrd) {
+    const imgX = mL + (40 - 22) / 2
+    const imgY = 15 + 3
+    doc.addImage(logoIrd, 'PNG', imgX, imgY, 22, 10)
+  }
+
   y = doc.lastAutoTable.finalY + 2
 
   // ══ SECTION INFORMATIONS PRESTATAIRE ══
   const row = (label, val, bold = false) => [
-    { content: label, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 72 } },
-    { content: val || '', styles: { fontSize: 9, fontStyle: bold ? 'bold' : 'normal', cellWidth: 118 } },
+    { content: label, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
+    { content: val || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val ? [0, 0, 0] : [0, 0, 0], cellWidth: 110 } },
   ]
 
   const rowDouble = (label1, val1, label2, val2) => [
-    { content: label1, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 32 } },
-    { content: val1 || '', styles: { fontSize: 9, cellWidth: 52 } },
-    { content: label2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 28 } },
-    { content: val2 || '', styles: { fontSize: 9, cellWidth: 78 } },
+    { content: label1, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
+    { content: val1 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val1 ? [0, 0, 0] : [0, 0, 0], cellWidth: 50 } },
+    { content: label2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
+    { content: val2 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val2 ? [0, 0, 0] : [0, 0, 0], cellWidth: 70 } },
   ]
 
   autoTable(doc, {
@@ -99,15 +102,15 @@ async function genererPDF() {
       row('Objet de la prestation :', form.value.objet),
       row('Produits attendus :', form.value.produits_attendus),
       [
-        { content: 'Durée (maximum 9 jours consécutifs) :', styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 72 } },
-        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), styles: { fontSize: 9, cellWidth: 118 } },
+        { content: 'Durée (maximum 9 jours consécutifs) :', styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
+        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), styles: { fontSize: 9, fontStyle: 'bold', textColor: [0, 0, 0], cellWidth: 110 } },
       ],
       row('Nom du responsable du suivi :', form.value.responsable_suivi),
     ],
     theme: 'grid',
     tableLineColor: [0, 0, 0],
     tableLineWidth: 0.5,
-    styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 7 },
+    styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 9 },
     margin: { left: mL, right: 15 },
     columnStyles: {},
   })
@@ -121,11 +124,11 @@ async function genererPDF() {
       [
         {
           content: 'Montant net à percevoir soit 95% du montant brut (en chiffres) (**) :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 130 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
         },
         {
           content: montantNet.value > 0 ? fmt(montantNet.value) : '',
-          styles: { fontSize: 9, cellWidth: 40, halign: 'right' }
+          styles: { fontSize: 9, cellWidth: 40, halign: 'right', fontStyle: 'bold', textColor: montantNet.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
@@ -134,9 +137,13 @@ async function genererPDF() {
       ],
       [
         {
-          content: `Montant net à percevoir (en lettres) (**) :     ${form.value.montant_net_lettres || ''}`,
-          colSpan: 3,
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
+          content: 'Montant net à percevoir (en lettres) (**) : ',
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 80 }
+        },
+        {
+          content: form.value.montant_net_lettres || '',
+          colSpan: 2,
+          styles: { fontSize: 9, fontStyle: 'bold', textColor: form.value.montant_net_lettres ? [0, 0, 0] : [0, 0, 0], fillColor: [245, 245, 245] }
         },
       ],
       // --- Admin section ---
@@ -150,11 +157,11 @@ async function genererPDF() {
       [
         {
           content: 'Impôt sur le revenu : 5% du montant brut (*) :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 130 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
         },
         {
           content: impot.value > 0 ? fmt(impot.value) : '',
-          styles: { fontSize: 9, halign: 'right', cellWidth: 40 }
+          styles: { fontSize: 9, halign: 'right', cellWidth: 40, fontStyle: 'bold', textColor: impot.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
@@ -164,11 +171,11 @@ async function genererPDF() {
       [
         {
           content: 'Montant brut de la prestation :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 130 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
         },
         {
           content: montantBrut.value > 0 ? fmt(montantBrut.value) : '',
-          styles: { fontSize: 9, halign: 'right', cellWidth: 40 }
+          styles: { fontSize: 9, halign: 'right', cellWidth: 40, fontStyle: 'bold', textColor: montantBrut.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
@@ -183,7 +190,7 @@ async function genererPDF() {
         {
           content: form.value.service || '',
           colSpan: 2,
-          styles: { fontSize: 9 }
+          styles: { fontSize: 9, fontStyle: 'bold', textColor: form.value.service ? [0, 0, 0] : [0, 0, 0] }
         },
       ],
       [
@@ -194,14 +201,14 @@ async function genererPDF() {
         {
           content: form.value.imputation || '',
           colSpan: 2,
-          styles: { fontSize: 9 }
+          styles: { fontSize: 9, fontStyle: 'bold', textColor: form.value.imputation ? [0, 0, 0] : [0, 0, 0] }
         },
       ],
     ],
     theme: 'grid',
     tableLineColor: [0, 0, 0],
     tableLineWidth: 0.5,
-    styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 8 },
+    styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 9 },
     margin: { left: mL, right: 15 },
   })
 
@@ -235,11 +242,11 @@ async function genererPDF() {
     body: [[
       {
         content: 'POUR ACQUIT :',
-        styles: { fontStyle: 'bold', fontSize: 9, cellWidth: 120, minCellHeight: 20 }
+        styles: { fontStyle: 'bold', fontSize: 9, cellWidth: 110, minCellHeight: 20 }
       },
       {
         content: `Date :  ${form.value.date_acquit}`,
-        styles: { fontSize: 9, cellWidth: 70 }
+        styles: { fontSize: 9, cellWidth: 70, fontStyle: 'bold', textColor: form.value.date_acquit ? [0, 0, 0] : [0, 0, 0] }
       },
     ]],
     theme: 'grid',
@@ -260,7 +267,9 @@ async function genererPDF() {
   y += 4
   doc.text('(**) Montant maximum autorisé : 100.000 F CFA/prestation.', mL, y)
 
-  doc.save(`Recu_Prestation_Service_${form.value.nom || 'prestataire'}.pdf`)
+  const pdfBlob = doc.output('blob')
+  const blobUrl = URL.createObjectURL(pdfBlob)
+  window.open(blobUrl, '_blank')
   generating.value = false
 }
 
@@ -384,7 +393,7 @@ function imprimer() {
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-400 mb-1.5">Montant brut de la prestation (F CFA) *</label>
-            <input v-model="form.montant_brut" type="number" placeholder="Ex: 50000"
+            <input :value="form.montant_brut" @input="form.montant_brut = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="Ex: 50000"
               class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -449,7 +458,8 @@ function imprimer() {
             <!-- En-tête 3 colonnes -->
             <table style="width:100%; border-collapse:collapse; border:1.5px solid #000; margin-bottom:0;">
               <tr>
-                <td style="border:1px solid #000; padding:8px; width:30%; vertical-align:middle; font-size:9px; line-height:1.5;">
+                <td style="border:1px solid #000; padding:8px; width:30%; text-align:center; vertical-align:top; font-size:9px; line-height:1.5;">
+                  <img v-if="logoIrd" :src="logoIrd" alt="Logo IRD" style="height:35px; margin:0 auto 10px; display:block;" />
                   <strong>Représentation de l'IRD<br>au Sénégal</strong><br>
                   Tél : 00221 33 849 35 35<br>
                   BP 1386 - Dakar
@@ -482,7 +492,7 @@ function imprimer() {
               </tr>
               <tr>
                 <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="1">Adresse :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.adresse }}</td>
+                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.adresse }}</td>
               </tr>
               <tr>
                 <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Tél :</td>
@@ -492,11 +502,11 @@ function imprimer() {
               </tr>
               <tr>
                 <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Objet de la prestation :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.objet }}</td>
+                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.objet }}</td>
               </tr>
               <tr>
                 <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Produits attendus :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.produits_attendus }}</td>
+                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.produits_attendus }}</td>
               </tr>
               <tr>
                 <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Durée (maximum 9 jours consécutifs) :</td>

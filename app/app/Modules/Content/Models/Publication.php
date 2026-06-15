@@ -62,10 +62,15 @@ class Publication extends Model
         'nb_telechargements',
         'date_publication',
         'date_soumission',
+        'doi',
+        'url_externe',
+        'pdf_url',
+        'auteurs_externes',
     ];
 
     protected $casts = [
         'mots_cles'            => PgArrayCast::class,    // TEXT[] PostgreSQL ⇆ array PHP
+        'auteurs_externes'     => 'array',
         'nb_vues'              => 'integer',
         'nb_telechargements'   => 'integer',
         'date_publication'     => 'datetime',

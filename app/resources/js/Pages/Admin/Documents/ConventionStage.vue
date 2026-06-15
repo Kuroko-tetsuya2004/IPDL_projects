@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
-import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
+import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { logoIrd, logoUcad, logoReuUmmisco } from '@/utils/logos.js'
 
 defineOptions({ layout: DashboardLayout })
@@ -37,6 +37,9 @@ const form = ref({
 
 const generating = ref(false)
 
+const ajouterActivite = () => form.value.activites.push('')
+const supprimerActivite = (i) => { if (form.value.activites.length > 1) form.value.activites.splice(i, 1) }
+
 // ── Génération PDF multi-pages fidèle au document Convention de Stage ───────
 async function genererPDF() {
   generating.value = true
@@ -48,8 +51,8 @@ async function genererPDF() {
   let y = 15
 
   // ── LOGOS (En-tête) ──
-  if (logoIrd) doc.addImage(logoIrd, 'JPEG', mL, y, 22, 10)
-  if (logoUcad) doc.addImage(logoUcad, 'WEBP', mR - 15, y, 15, 15)
+  if (logoIrd) doc.addImage(logoIrd, 'PNG', mL, y, 22, 10)
+  if (logoUcad) doc.addImage(logoUcad, 'PNG', mR - 15, y, 15, 15)
   y += 20
 
   const f = form.value
@@ -113,20 +116,34 @@ async function genererPDF() {
 
   // Bloc établissement (encadré)
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  const etabLines = [
-    `Nom de l'organisme de formation : ${val(f.etablissement_nom)}`,
-    `Statut juridique : ${val(f.etablissement_statut)}`,
-    `Siège social : ${val(f.etablissement_siege)}`,
-    `Représenté par : ${val(f.etablissement_representant)}`,
-    `Ci-après dénommé «Etablissement»`,
+  const etabFields = [
+    { l: "Nom de l'organisme de formation : ", v: val(f.etablissement_nom) },
+    { l: "Statut juridique : ", v: val(f.etablissement_statut) },
+    { l: "Siège social : ", v: val(f.etablissement_siege) },
+    { l: "Représenté par : ", v: val(f.etablissement_representant) },
+    { l: "Ci-après dénommé ", v: "«Etablissement»" },
   ]
-  const etabH = etabLines.length * 5.5 + 6
+  const etabH = etabFields.length * 5.5 + 6
   y = checkPage(y, etabH + 5)
   doc.setFillColor(249, 249, 249)
   doc.setDrawColor(180, 180, 180)
   doc.rect(mL, y - 3, 170, etabH, 'FD')
-  etabLines.forEach(line => { doc.text(line, mL + 3, y); y += 5.5 })
+  
+  const writeFieldLine = (lbl, valStr, x, currentY, highlight = true) => {
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(0, 0, 0)
+    doc.text(lbl, x, currentY)
+    if (valStr) {
+      doc.setFont('helvetica', 'bold')
+      if (highlight && !valStr.startsWith('.')) doc.setTextColor(0, 0, 0)
+      doc.text(valStr, x + doc.getTextWidth(lbl), currentY)
+      doc.setTextColor(0, 0, 0)
+    }
+  }
+
+  etabFields.forEach(field => {
+    writeFieldLine(field.l, field.v, mL + 3, y, field.l !== 'Ci-après dénommé ')
+    y += 5.5
+  })
   y += 5
 
   doc.setFontSize(10)
@@ -135,22 +152,24 @@ async function genererPDF() {
 
   // Bloc stagiaire
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  const stagLines = [
-    `Nom, Prénom : ${val(f.stagiaire_nom + ' ' + f.stagiaire_prenom)}`,
-    `Adresse : ${val(f.stagiaire_adresse)}`,
-    `Tel : ${val(f.stagiaire_tel)}`,
-    `Email : ${val(f.stagiaire_email)}`,
-    `Etudiant pour l'année universitaire : ${valShort(f.stagiaire_annee_univ)}`,
-    `Diplôme préparé : ${val(f.stagiaire_diplome)}`,
-    `Spécialité : ${val(f.stagiaire_specialite)}`,
+  const stagFields = [
+    { l: "Nom, Prénom : ", v: val(f.stagiaire_nom + ' ' + f.stagiaire_prenom) },
+    { l: "Adresse : ", v: val(f.stagiaire_adresse) },
+    { l: "Tel : ", v: val(f.stagiaire_tel) },
+    { l: "Email : ", v: val(f.stagiaire_email) },
+    { l: "Etudiant pour l'année universitaire : ", v: valShort(f.stagiaire_annee_univ) },
+    { l: "Diplôme préparé : ", v: val(f.stagiaire_diplome) },
+    { l: "Spécialité : ", v: val(f.stagiaire_specialite) },
   ]
-  const stagH = stagLines.length * 5.5 + 6
+  const stagH = stagFields.length * 5.5 + 6
   y = checkPage(y, stagH + 5)
   doc.setFillColor(249, 249, 249)
   doc.setDrawColor(180, 180, 180)
   doc.rect(mL, y - 3, 170, stagH, 'FD')
-  stagLines.forEach(line => { doc.text(line, mL + 3, y); y += 5.5 })
+  stagFields.forEach(field => {
+    writeFieldLine(field.l, field.v, mL + 3, y)
+    y += 5.5
+  })
   y += 5
 
   // CONSIDÉRANT
@@ -188,8 +207,10 @@ async function genererPDF() {
   )
 
   article('2', 'champ d\'application',
-    `Le stage a pour objet de permettre à l'étudiant de mettre en pratique les outils théoriques et méthodologiques acquis au cours de sa formation universitaire, d'identifier ses compétences et découvrir un milieu professionnel.\n\nLe stagiaire n'effectue pas une prestation de service mais une étude qui s'inscrit dans le cadre de la formation et du projet de l'étudiant en accord avec l'IRD sur le thème : ${val(f.theme)}`
+    `Le stage a pour objet de permettre à l'étudiant de mettre en pratique les outils théoriques et méthodologiques acquis au cours de sa formation universitaire, d'identifier ses compétences et découvrir un milieu professionnel.\n\nLe stagiaire n'effectue pas une prestation de service mais une étude qui s'inscrit dans le cadre de la formation et du projet de l'étudiant en accord avec l'IRD sur le thème :`
   )
+  writeFieldLine("", val(f.theme), mL, y - 1)
+  y += 4
 
   // Article 3 avec activités
   y = checkPage(y, 25)
@@ -199,10 +220,14 @@ async function genererPDF() {
   doc.setFont('helvetica', 'normal')
   y = writeText("Les responsables scientifiques ou administratifs s'engagent à ne faire exécuter au stagiaire que des travaux ou activités qui concourent à sa formation.", mL, y, 170, 10)
   y = writeText("Les activités confiées porteront sur les aspects suivants :", mL, y, 170, 10)
-  f.activites.forEach(act => {
-    if (act && act.trim()) { y = writeText(`- ${act}`, mL + 5, y, 160, 10) }
-    else { y = writeText('- .............................................................................', mL + 5, y, 160, 10) }
-  })
+  const filledActivites = f.activites.filter(act => act && act.trim() !== '')
+  if (filledActivites.length > 0) {
+    filledActivites.forEach(act => {
+      writeFieldLine("- ", act, mL + 5, y); y += lineH
+    })
+  } else {
+    y = writeText('- .............................................................................', mL + 5, y, 160, 10)
+  }
   y += 2
 
   // Article 4 avec dates et lieux
@@ -210,13 +235,19 @@ async function genererPDF() {
   doc.setFontSize(10)
   doc.setFont('helvetica', 'bold')
   doc.text("Article 4 : modalités", mL, y); y += lineH
+  doc.setFontSize(10)
+  writeFieldLine("Le stage s'effectue du ", val(f.date_debut), mL, y, true)
+  const offset1 = doc.getTextWidth("Le stage s'effectue du " + val(f.date_debut))
   doc.setFont('helvetica', 'normal')
-  y = writeText(`Le stage s'effectue du ${val(f.date_debut)} au ${val(f.date_fin)}`, mL, y, 170, 10)
-  y = writeText(`Lieu du stage : ${val(f.lieu_stage)}`, mL, y, 170, 10)
-  y = writeText(`Structure d'accueil : ${val(f.structure_accueil)}`, mL, y, 170, 10)
-  y = writeText("Encadrement :", mL, y, 170, 10)
-  y = writeText(`Responsable scientifique/administratif pour l'IRD : ${val(f.responsable_ird)}`, mL + 5, y, 165, 10)
-  y = writeText(`Responsable pédagogique pour l'établissement d'enseignement : ${val(f.responsable_etablissement)}`, mL + 5, y, 165, 10)
+  doc.text(" au ", mL + offset1, y)
+  writeFieldLine("", val(f.date_fin), mL + offset1 + doc.getTextWidth(" au "), y, true)
+  y += lineH
+  writeFieldLine("Lieu du stage : ", val(f.lieu_stage), mL, y); y += lineH
+  writeFieldLine("Structure d'accueil : ", val(f.structure_accueil), mL, y); y += lineH
+  doc.setFont('helvetica', 'normal')
+  doc.text("Encadrement :", mL, y); y += lineH
+  writeFieldLine("Responsable scientifique/administratif pour l'IRD : ", val(f.responsable_ird), mL + 5, y); y += lineH
+  writeFieldLine("Responsable pédagogique pour l'établissement d'enseignement : ", val(f.responsable_etablissement), mL + 5, y); y += lineH
   y += 2
 
   // Article 5 gratification
@@ -224,11 +255,14 @@ async function genererPDF() {
   doc.setFontSize(10)
   doc.setFont('helvetica', 'bold')
   doc.text("Article 5 : gratification", mL, y); y += lineH
-  doc.setFont('helvetica', 'normal')
-  y = writeText(`La gratification est fixée à ${val(f.gratification_montant)} par mois, à ce montant s'ajoute :`, mL, y, 170, 10)
-  y = writeText(`une indemnité de transport de ${val(f.indemnite_transport)} par mois,`, mL + 5, y, 165, 10)
-  y = writeText(`une indemnité de restauration de ${val(f.indemnite_restauration)} par mois.`, mL + 5, y, 165, 10)
-  y = writeText(`Le montant de cette gratification est imputé sur : ${val(f.imputation)}`, mL, y, 170, 10)
+  doc.setFontSize(10)
+  writeFieldLine("La gratification est fixée à ", val(f.gratification_montant), mL, y)
+  doc.setFont('helvetica', 'normal'); doc.text(" par mois, à ce montant s'ajoute :", mL + doc.getTextWidth("La gratification est fixée à " + val(f.gratification_montant)), y); y += lineH
+  writeFieldLine("une indemnité de transport de ", val(f.indemnite_transport), mL + 5, y)
+  doc.setFont('helvetica', 'normal'); doc.text(" par mois,", mL + 5 + doc.getTextWidth("une indemnité de transport de " + val(f.indemnite_transport)), y); y += lineH
+  writeFieldLine("une indemnité de restauration de ", val(f.indemnite_restauration), mL + 5, y)
+  doc.setFont('helvetica', 'normal'); doc.text(" par mois.", mL + 5 + doc.getTextWidth("une indemnité de restauration de " + val(f.indemnite_restauration)), y); y += lineH
+  writeFieldLine("Le montant de cette gratification est imputé sur : ", val(f.imputation), mL, y); y += lineH
   y += 2
 
   article('6', 'statut',
@@ -298,7 +332,9 @@ async function genererPDF() {
   doc.line(col2, y, col2 + sigW, y)
   doc.line(col3, y, col3 + sigW, y)
 
-  doc.save(`Convention_Stage_${f.stagiaire_nom || 'stagiaire'}.pdf`)
+  const pdfBlob = doc.output('blob')
+  const blobUrl = URL.createObjectURL(pdfBlob)
+  window.open(blobUrl, '_blank')
   generating.value = false
 }
 
@@ -417,12 +453,20 @@ function imprimer() {
               class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Activités confiées (Article 3)</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-medium text-slate-400">Activités confiées (Article 3)</label>
+              <button @click="ajouterActivite" class="flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded transition-all border border-blue-500/20">
+                <PlusIcon class="w-3 h-3" />Ajouter
+              </button>
+            </div>
             <div class="space-y-2">
               <div v-for="(_, idx) in form.activites" :key="idx" class="flex items-center gap-2">
                 <span class="text-slate-500 text-xs w-4">-</span>
                 <input v-model="form.activites[idx]" type="text" :placeholder="`Activité ${idx + 1}`"
                   class="flex-1 bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                <button v-if="form.activites.length > 1" @click="supprimerActivite(idx)" class="p-1.5 rounded-lg border border-white/5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                  <TrashIcon class="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -517,6 +561,12 @@ function imprimer() {
         <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
           <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#000; background:#fff; line-height:1.6;">
 
+            <!-- Logos En-tête -->
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+              <img v-if="logoIrd" :src="logoIrd" alt="Logo IRD" style="height:35px;" />
+              <img v-if="logoUcad" :src="logoUcad" alt="Logo UCAD" style="height:45px;" />
+            </div>
+
             <!-- Titre -->
             <div style="background-color:#F2F2F2; border:1px solid #000; padding:10px; margin-bottom:20px; text-align:center;">
               <div style="font-size:16px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">CONVENTION DE STAGE</div>
@@ -559,13 +609,13 @@ function imprimer() {
 
             <p style="font-weight:bold; margin-bottom:2px;">Article 2 : champ d'application</p>
             <p style="margin-bottom:4px;">Le stage a pour objet de permettre à l'étudiant de mettre en pratique les outils théoriques et méthodologiques acquis au cours de sa formation universitaire, d'identifier ses compétences et découvrir un milieu professionnel.</p>
-            <p style="margin-bottom:8px;">Le stagiaire n'effectue pas une prestation de service mais une étude qui s'inscrit dans le cadre de la formation et du projet de l'étudiant en accord avec l'IRD sur le thème : <strong>{{ form.theme || '.....................................' }}</strong></p>
+            <p style="margin-bottom:8px;">Le stagiaire n'effectue pas une prestation de service mais une étude qui s'inscrit dans le cadre de la formation et du projet de l'étudiant en accord avec l'IRD sur le thème : <strong style="white-space:pre-wrap; word-break:break-word;">{{ form.theme || '.....................................' }}</strong></p>
 
             <p style="font-weight:bold; margin-bottom:2px;">Article 3 : activités du stagiaire</p>
             <p style="margin-bottom:3px;">Les responsables scientifiques ou administratifs s'engagent à ne faire exécuter au stagiaire que des travaux ou activités qui concourent à sa formation.</p>
             <p style="margin-bottom:3px;">Les activités confiées porteront sur les aspects suivants :</p>
             <ul style="margin-left:16px; margin-bottom:8px; line-height:1.9;">
-              <li v-for="(act, i) in form.activites" :key="i">- {{ act || '.......................................................................' }}</li>
+              <li v-for="(act, i) in form.activites" :key="i" style="white-space:pre-wrap; word-break:break-word;">- {{ act || '.......................................................................' }}</li>
             </ul>
 
             <p style="font-weight:bold; margin-bottom:2px;">Article 4 : modalités</p>

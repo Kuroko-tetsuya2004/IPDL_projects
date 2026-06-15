@@ -39,7 +39,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, \App\Modules\Integration\Services\PublicationImportService $importService)
     {
         $userId = session('user_id');
         $user   = User::findOrFail($userId);
@@ -58,8 +58,21 @@ class ProfileController extends Controller
             'email_notifications' => 'boolean',
         ]);
 
+        $oldOrcid = $user->orcid_id;
         $user->update($validated);
 
-        return back()->with('success', 'Profil mis à jour avec succès.');
+        $msg = 'Profil mis à jour avec succès.';
+
+        // Lancer la synchro si l'ORCID a été ajouté ou modifié
+        if ($user->orcid_id && $user->orcid_id !== $oldOrcid) {
+            try {
+                $stats = $importService->syncUserOrcid($user);
+                $msg .= " La synchronisation ORCID a récupéré {$stats['new']} nouvelle(s) publication(s).";
+            } catch (\Exception $e) {
+                Log::error("[ORCID Sync] Erreur profil", ['error' => $e->getMessage()]);
+            }
+        }
+
+        return back()->with('success', $msg);
     }
 }

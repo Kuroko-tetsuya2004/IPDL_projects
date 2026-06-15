@@ -66,8 +66,8 @@ class ArxivService
     private function parseAtom(string $xml): array
     {
         try {
-            // Supprime les namespaces pour simplifier le parsing
-            $xml = str_replace(['xmlns=', 'xmlns:arxiv='], ['xns=', 'xnsarxiv='], $xml);
+            // Supprime uniquement le namespace par défaut (Atom) pour simplifier le parsing des tags standards
+            $xml = preg_replace('/xmlns="[^"]+"/', '', $xml);
             $feed = new SimpleXMLElement($xml);
 
             $results = [];

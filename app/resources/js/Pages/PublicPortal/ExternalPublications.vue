@@ -33,6 +33,58 @@ function applyFilters() {
   }, { preserveScroll: true, replace: true })
 }
 
+import { usePage } from '@inertiajs/vue3'
+const page = usePage()
+const isAuthenticated = computed(() => page.props.auth?.authenticated)
+
+const isLiveFetching = ref(false)
+function triggerLiveFetch() {
+  if (!searchInput.value || searchInput.value.length < 2) {
+    alert('Veuillez entrer au moins 2 caractères pour la recherche mondiale.')
+    return
+  }
+  isLiveFetching.value = true
+  router.post('/publications/externes/fetch-live', {
+    q: searchInput.value
+  }, {
+    preserveScroll: true,
+    onFinish: () => isLiveFetching.value = false
+  })
+}
+
+// Import Modal State
+const isImportModalOpen = ref(false)
+const articleToImport = ref(null)
+const importAxeId = ref('')
+const importType = ref('article')
+const isImporting = ref(false)
+
+function openImportModal(article) {
+  articleToImport.value = article
+  importAxeId.value = ''
+  // Try to default to user's main axe if available in props (we don't have it directly, but user can pick)
+  isImportModalOpen.value = true
+}
+
+function confirmImport() {
+  if (!importAxeId.value) {
+    alert('Veuillez sélectionner un axe thématique.')
+    return
+  }
+  isImporting.value = true
+  router.post(`/publications/externes/${articleToImport.value.id}/import`, {
+    axe_id: importAxeId.value,
+    type: importType.value
+  }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      isImportModalOpen.value = false
+      articleToImport.value = null
+    },
+    onFinish: () => isImporting.value = false
+  })
+}
+
 const sourceColors = {
   semantic_scholar: { bg: 'bg-blue-500/10 border-blue-500/20',  text: 'text-blue-400',  label: 'Semantic Scholar' },
   openalex:         { bg: 'bg-violet-500/10 border-violet-500/20', text: 'text-violet-400', label: 'OpenAlex' },
@@ -103,8 +155,25 @@ function parseAuteurs(auteurs) {
             </label>
             <div class="relative">
               <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-              <input v-model="searchInput" type="text" placeholder="Titre, auteur, mot-clé…"
+              <input v-model="searchInput" @keyup.enter="applyFilters" type="text" placeholder="Titre, auteur, mot-clé…"
                 class="w-full bg-slate-800/60 border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+            </div>
+
+            <!-- Bouton Recherche Mondiale (Connectés uniquement) -->
+            <div v-if="isAuthenticated" class="mt-4 border-t border-white/10 pt-4">
+              <button @click="triggerLiveFetch" :disabled="isLiveFetching || !searchInput"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg transition-all"
+                :class="isLiveFetching ? 'bg-blue-600/50 text-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'">
+                <GlobeAltIcon v-if="!isLiveFetching" class="w-4 h-4" />
+                <svg v-else class="animate-spin w-4 h-4 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isLiveFetching ? 'Recherche en cours...' : 'Recherche Mondiale' }}
+              </button>
+              <p class="text-[10px] text-slate-500 mt-2 leading-tight">
+                Interroge Semantic Scholar, OpenAlex et arXiv en direct si vous ne trouvez pas votre article localement.
+              </p>
             </div>
           </div>
 
@@ -205,6 +274,12 @@ function parseAuteurs(auteurs) {
                     <DocumentArrowDownIcon class="w-3.5 h-3.5" />
                     PDF gratuit
                   </a>
+                  <!-- Bouton d'importation (Connectés uniquement) -->
+                  <button v-if="isAuthenticated" @click="openImportModal(article)"
+                    class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-violet-600/20 hover:bg-violet-600/40 text-violet-300 border border-violet-500/20 rounded-lg transition-all whitespace-nowrap mt-1">
+                    <ArrowTopRightOnSquareIcon class="w-3.5 h-3.5 rotate-180" />
+                    Importer
+                  </button>
                 </div>
               </div>
 
@@ -239,5 +314,52 @@ function parseAuteurs(auteurs) {
         </div>
       </div>
     </div>
+
+    <!-- Modale d'importation -->
+    <div v-if="isImportModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+      <div class="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+        <h3 class="text-xl font-bold text-white mb-2">Importer la publication</h3>
+        <p class="text-sm text-slate-400 mb-6 line-clamp-2 italic">« {{ articleToImport?.titre }} »</p>
+        
+        <div class="space-y-4 mb-8">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1.5">Axe Thématique *</label>
+            <select v-model="importAxeId" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+              <option value="" disabled>Sélectionnez un axe thématique</option>
+              <option v-for="axe in $page.props.axes" :key="axe.id" :value="axe.id">
+                {{ axe.code }} - {{ axe.nom_fr }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1.5">Type de document</label>
+            <select v-model="importType" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+              <option value="article">Article de revue</option>
+              <option value="document">Recherche en cours / Working paper</option>
+              <option value="event">Conférence / Actes</option>
+              <option value="dataset">Jeu de données</option>
+              <option value="thesis">Thèse</option>
+              <option value="report">Rapport scientifique</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3">
+          <button @click="isImportModalOpen = false" :disabled="isImporting"
+            class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors disabled:opacity-50">
+            Annuler
+          </button>
+          <button @click="confirmImport" :disabled="isImporting || !importAxeId"
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white text-sm font-semibold rounded-lg transition-colors">
+            <svg v-if="isImporting" class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isImporting ? 'Importation...' : 'Confirmer l\'importation' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>

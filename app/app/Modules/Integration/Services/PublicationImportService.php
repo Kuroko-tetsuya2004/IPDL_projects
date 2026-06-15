@@ -165,4 +165,148 @@ class PublicationImportService
 
         return $stats;
     }
+
+    /**
+     * Synchronise les publications d'un utilisateur via son ORCID
+     * Import direct dans la table `publications`
+     */
+    public function syncUserOrcid(\App\Modules\User\Models\User $user): array
+    {
+        if (empty($user->orcid_id)) {
+            return ['fetched' => 0, 'new' => 0];
+        }
+
+        $articles = $this->openAlex->searchByOrcid($user->orcid_id, 100);
+        $articles = $this->unpaywall->enrichWithPdfUrls($articles);
+
+        $stats = ['fetched' => count($articles), 'new' => 0];
+
+        foreach ($articles as $article) {
+            // Sauvegarder d'abord en tant que publication externe pour garder l'historique
+            $this->upsert($article);
+
+            // Vérifier si cette publication est déjà dans le profil du chercheur (via doi ou titre)
+            $exists = \App\Modules\Content\Models\Publication::where('auteur_id', $user->id)
+                ->where(function ($q) use ($article) {
+                    $q->where('titre_fr', 'ilike', $article['titre'])
+                      ->orWhere('resume_fr', 'like', '%' . ($article['doi'] ?? 'NO_DOI') . '%');
+                })->exists();
+
+            if (!$exists) {
+                // Créer la publication interne
+                $motsCles = null;
+                if (isset($article['raw_data']['concepts'])) {
+                    $motsCles = collect($article['raw_data']['concepts'])->pluck('display_name')->take(5)->toArray();
+                }
+
+                \DB::transaction(function () use ($user, $article, $motsCles) {
+                    $publication = \App\Modules\Content\Models\Publication::create([
+                        'titre_fr'           => mb_substr($article['titre'] ?? 'Sans titre', 0, 500),
+                        'resume_fr'          => $article['resume'] ?? 'Résumé non disponible.',
+                        'doi'                => $article['doi'] ?? null,
+                        'pdf_url'            => $article['pdf_url'] ?? null,
+                        'url_externe'        => $article['doi'] ? 'https://doi.org/' . $article['doi'] : null,
+                        'auteurs_externes'   => isset($article['auteurs']) ? json_decode($article['auteurs'], true) : null,
+                        'type'               => 'article', // OpenAlex renvoie souvent 'article'
+                        'statut'             => $user->requiresWorkflow() ? \App\Modules\Content\Models\Publication::STATUS_SUBMITTED : \App\Modules\Content\Models\Publication::STATUS_PUBLISHED,
+                        'visibilite'         => 'public',
+                        'langue_principale'  => 'fr',
+                        'auteur_id'          => $user->id,
+                        'axe_id'             => $user->axe_principal_id, // Par défaut sur l'axe du chercheur
+                        'mots_cles'          => $motsCles,
+                        'date_soumission'    => now(),
+                        'date_publication'   => $user->canPublishDirectly() ? ($article['annee'] ? $article['annee'].'-01-01' : now()) : null,
+                        'commentaire_auteur' => 'Import automatique via ORCID (' . $user->orcid_id . ')',
+                    ]);
+
+                    if ($user->requiresWorkflow()) {
+                        $delaiJours = (int) \DB::table('parametres_systeme')->where('cle', 'workflow_delai_jours')->value('valeur') ?: 14;
+                        \App\Modules\Content\Models\WorkflowValidation::create([
+                            'publication_id'     => $publication->id,
+                            'soumetteur_id'      => $user->id,
+                            'statut'             => \App\Modules\Content\Models\WorkflowValidation::STATUS_PENDING,
+                            'version'            => 1,
+                            'date_soumission'    => now(),
+                            'date_limite'        => now()->addDays($delaiJours),
+                        ]);
+                    }
+                });
+                $stats['new']++;
+            }
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Importe une publication spécifique via son DOI
+     */
+    public function fetchAndImportByDoi(string $doi, \App\Modules\User\Models\User $user): ?\App\Modules\Content\Models\Publication
+    {
+        $article = $this->openAlex->searchByDoi($doi);
+        
+        if (!$article) {
+            return null;
+        }
+
+        // Unpaywall enrich
+        $articles = $this->unpaywall->enrichWithPdfUrls([$article]);
+        $article = $articles[0];
+
+        // Sauvegarde historique
+        $this->upsert($article);
+
+        // Vérifier si elle existe déjà dans le portail
+        $existingPub = \App\Modules\Content\Models\Publication::where('auteur_id', $user->id)
+            ->where(function ($q) use ($article) {
+                $q->where('titre_fr', 'ilike', $article['titre'])
+                  ->orWhere('resume_fr', 'like', '%' . ($article['doi'] ?? 'NO_DOI') . '%');
+            })->first();
+
+        if ($existingPub) {
+            return $existingPub; // Déjà importée
+        }
+
+        $motsCles = null;
+        if (isset($article['raw_data']['concepts'])) {
+            $motsCles = collect($article['raw_data']['concepts'])->pluck('display_name')->take(5)->toArray();
+        }
+
+        $publication = null;
+
+        \DB::transaction(function () use ($user, $article, $motsCles, &$publication) {
+            $publication = \App\Modules\Content\Models\Publication::create([
+                'titre_fr'           => mb_substr($article['titre'] ?? 'Sans titre', 0, 500),
+                'resume_fr'          => $article['resume'] ?? 'Résumé non disponible.',
+                'doi'                => $article['doi'] ?? null,
+                'pdf_url'            => $article['pdf_url'] ?? null,
+                'url_externe'        => $article['doi'] ? 'https://doi.org/' . $article['doi'] : null,
+                'auteurs_externes'   => isset($article['auteurs']) ? json_decode($article['auteurs'], true) : null,
+                'type'               => 'article',
+                'statut'             => $user->requiresWorkflow() ? \App\Modules\Content\Models\Publication::STATUS_SUBMITTED : \App\Modules\Content\Models\Publication::STATUS_PUBLISHED,
+                'visibilite'         => 'public',
+                'langue_principale'  => 'fr',
+                'auteur_id'          => $user->id,
+                'axe_id'             => $user->axe_principal_id,
+                'mots_cles'          => $motsCles,
+                'date_soumission'    => now(),
+                'date_publication'   => $user->canPublishDirectly() ? ($article['annee'] ? $article['annee'].'-01-01' : now()) : null,
+                'commentaire_auteur' => 'Import via DOI (' . ($article['doi'] ?? 'N/A') . ')',
+            ]);
+
+            if ($user->requiresWorkflow()) {
+                $delaiJours = (int) \DB::table('parametres_systeme')->where('cle', 'workflow_delai_jours')->value('valeur') ?: 14;
+                \App\Modules\Content\Models\WorkflowValidation::create([
+                    'publication_id'     => $publication->id,
+                    'soumetteur_id'      => $user->id,
+                    'statut'             => \App\Modules\Content\Models\WorkflowValidation::STATUS_PENDING,
+                    'version'            => 1,
+                    'date_soumission'    => now(),
+                    'date_limite'        => now()->addDays($delaiJours),
+                ]);
+            }
+        });
+
+        return $publication;
+    }
 }

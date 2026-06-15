@@ -66,6 +66,27 @@ class WorkflowValidationController extends Controller
         ]);
     }
 
+    /**
+     * Synchronise manuellement les publications via ORCID pour l'utilisateur connecté.
+     */
+    public function syncOrcid(\App\Modules\Integration\Services\PublicationImportService $importService): RedirectResponse
+    {
+        $userId = session('user_id');
+        $user = User::findOrFail($userId);
+
+        if (empty($user->orcid_id)) {
+            return back()->withErrors(['orcid' => 'Veuillez renseigner votre ORCID dans votre profil avant de lancer la synchronisation.']);
+        }
+
+        try {
+            $stats = $importService->syncUserOrcid($user);
+            return back()->with('success', "Synchronisation ORCID terminée : {$stats['new']} nouvelle(s) publication(s) ajoutée(s).");
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("[ORCID Sync] Erreur pour l'utilisateur {$userId}", ['error' => $e->getMessage()]);
+            return back()->withErrors(['orcid' => 'Une erreur est survenue lors de la synchronisation avec ORCID.']);
+        }
+    }
+
     // ── Soumissions en attente (Admin) ────────────────────────────────────────
 
     /**
@@ -115,96 +136,25 @@ class WorkflowValidationController extends Controller
     // ── Soumission d'un contenu (Doctorant) ─────────────────────────────────
 
     /**
-     * Soumet une publication à validation.
-     * Crée une entrée dans workflow_validations et passe le statut à 'submitted'.
+     * Soumet une publication à validation (Import Express par DOI).
      */
-    public function submit(Request $request): RedirectResponse
+    public function submit(Request $request, \App\Modules\Integration\Services\PublicationImportService $importService): RedirectResponse
     {
-        // Prétraitement de mots_cles s'il est envoyé sous forme de chaîne de caractères
-        if ($request->has('mots_cles') && is_string($request->input('mots_cles'))) {
-            $motsCles = array_filter(array_map('trim', explode(',', $request->input('mots_cles'))));
-            $request->merge(['mots_cles' => $motsCles]);
-        }
-
         $validated = $request->validate([
-            'titre_fr'           => 'required|string|max:500',
-            'titre_en'           => 'nullable|string|max:500',
-            'resume_fr'          => 'required|string',
-            'resume_en'          => 'nullable|string',
-            'type'               => 'required|in:article,document,event,dataset,news,thesis,report,presentation',
-            'axe_id'             => 'required|uuid|exists:axes_thematiques,id',
-            'mots_cles'          => 'nullable|array',
-            'visibilite'         => 'nullable|in:public,partners,internal',
-            'commentaire_auteur' => 'nullable|string|max:2000',
-            'fichier'            => 'nullable|file|mimetypes:application/pdf|max:51200',
+            'doi' => 'required|string|max:255',
         ]);
 
         $userId = session('user_id');
         $user = User::findOrFail($userId);
-        $userRole = session('user_role');
 
-        // Seul l'administrateur d'axe (ou super_admin) peut créer un événement
-        if ($validated['type'] === 'event' && !in_array($userRole, ['axe_admin', 'super_admin'])) {
-            return back()->withErrors(['type' => 'Seuls les responsables d\'axes peuvent créer des événements.']);
-        }
+        try {
+            $publication = $importService->fetchAndImportByDoi($validated['doi'], $user);
 
-        // Seul l'administrateur d'axe (ou super_admin) peut définir le public cible (visibilité restreinte)
-        $visibilite = $validated['visibilite'] ?? 'public';
-        if ($visibilite !== 'public' && !in_array($userRole, ['axe_admin', 'super_admin'])) {
-            $visibilite = 'public';
-        }
-
-        return DB::transaction(function () use ($validated, $user, $request, $visibilite) {
-            // Créer la publication en statut 'submitted'
-            $publication = Publication::create([
-                'titre_fr'           => $validated['titre_fr'],
-                'titre_en'           => $validated['titre_en'] ?? null,
-                'resume_fr'          => $validated['resume_fr'],
-                'resume_en'          => $validated['resume_en'] ?? null,
-                'type'               => $validated['type'],
-                'statut'             => $user->requiresWorkflow()
-                    ? Publication::STATUS_SUBMITTED
-                    : Publication::STATUS_PUBLISHED,
-                'visibilite'         => $visibilite,
-                'langue_principale'  => 'fr',
-                'auteur_id'          => $user->id,
-                'axe_id'             => $validated['axe_id'],
-                'mots_cles'          => $validated['mots_cles'] ?? null,
-                'date_soumission'    => now(),
-                'date_publication'   => $user->canPublishDirectly() ? now() : null,
-            ]);
-
-            // Enregistrement du document s'il y en a un
-            if ($request->hasFile('fichier')) {
-                $file = $request->file('fichier');
-                $path = $file->store('documents', 'minio');
-
-                DB::table('documents')->insert([
-                    'publication_id'  => $publication->id,
-                    'fichier_url'     => $path,
-                    'fichier_nom'     => $file->getClientOriginalName(),
-                    'fichier_taille'  => $file->getSize(),
-                    'fichier_mime'    => $file->getMimeType(),
-                    'these_soutenue'  => false,
-                ]);
+            if (!$publication) {
+                return back()->withErrors(['doi' => 'Impossible de trouver cette publication (DOI introuvable ou erreur de service).']);
             }
 
-            // Si le doctorant requiert un workflow (RG-009), créer la validation
             if ($user->requiresWorkflow()) {
-                // Calcul de la date limite de validation (paramètre système)
-                $delaiJours = (int) DB::table('parametres_systeme')
-                    ->where('cle', 'workflow_delai_jours')
-                    ->value('valeur') ?: 14;
-
-                WorkflowValidation::create([
-                    'publication_id'     => $publication->id,
-                    'soumetteur_id'      => $user->id,
-                    'statut'             => WorkflowValidation::STATUS_PENDING,
-                    'commentaire_auteur' => $validated['commentaire_auteur'] ?? null,
-                    'version'            => 1,
-                    'date_soumission'    => now(),
-                    'date_limite'        => now()->addDays($delaiJours),
-                ]);
 
                 // Log d'audit
                 AuditLog::log(
@@ -230,7 +180,10 @@ class WorkflowValidationController extends Controller
 
             return redirect()->route('mes-publications')
                 ->with('success', 'Votre contenu a été publié avec succès.');
-        });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[DOI Import] Erreur', ['error' => $e->getMessage()]);
+            return back()->withErrors(['doi' => 'Une erreur est survenue lors de l\'importation.']);
+        }
     }
 
     // ── Approbation d'une soumission (Admin d'axe) ──────────────────────────

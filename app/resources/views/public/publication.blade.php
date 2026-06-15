@@ -51,12 +51,24 @@
 
         {{-- Infos Auteurs & Date --}}
         <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); margin-bottom: 2rem; flex-wrap: wrap;">
-            @if($publication->auteur)
+            @if($publication->auteur || !empty($publication->auteurs_externes))
             <div>
                 <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-text);">
-                    👤 {{ $publication->auteur->titre_academique ? $publication->auteur->titre_academique . ' ' : '' }}{{ $publication->auteur->prenom }} {{ $publication->auteur->nom }}
+                    👤 
+                    @if($publication->auteur)
+                        {{ $publication->auteur->titre_academique ? $publication->auteur->titre_academique . ' ' : '' }}{{ $publication->auteur->prenom }} {{ $publication->auteur->nom }}
+                    @endif
+                    @if(!empty($publication->auteurs_externes))
+                        @if($publication->auteur)
+                            <span style="color: var(--color-text-muted); font-weight: normal; font-size: 0.85rem;">
+                                et {{ count($publication->auteurs_externes) }} co-auteur(s) ({{ implode(', ', array_slice($publication->auteurs_externes, 0, 5)) }}{{ count($publication->auteurs_externes) > 5 ? '...' : '' }})
+                            </span>
+                        @else
+                            {{ implode(', ', array_slice($publication->auteurs_externes, 0, 10)) }}{{ count($publication->auteurs_externes) > 10 ? '...' : '' }}
+                        @endif
+                    @endif
                 </div>
-                @if($publication->auteur->orcid_id)
+                @if($publication->auteur && $publication->auteur->orcid_id)
                     <a href="https://orcid.org/{{ $publication->auteur->orcid_id }}" target="_blank" rel="noopener"
                         style="font-size: 0.775rem; color: #a6d042; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;">
                         <span style="font-weight: 800; border: 1px solid #a6d042; border-radius: 4px; padding: 0px 2px; font-size: 0.6rem;">iD</span> https://orcid.org/{{ $publication->auteur->orcid_id }}
@@ -178,6 +190,20 @@
             });
         </script>
         @endif
+        @elseif($publication->pdf_url)
+        <div style="margin-top: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: var(--radius); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #a6d042; margin: 0;">🔓 Version Open Access (Accès Libre)</h3>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0.25rem 0 0 0; font-weight: 500;">
+                    Le document complet est librement accessible via Unpaywall.
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <a href="{{ $publication->pdf_url }}" target="_blank" rel="noopener" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.55rem 1.2rem; font-size: 0.85rem; background-color: #a6d042; color: #000; border: none;">
+                    📄 Lire le document PDF
+                </a>
+            </div>
+        </div>
         @endif
 
         {{-- Dataset files --}}

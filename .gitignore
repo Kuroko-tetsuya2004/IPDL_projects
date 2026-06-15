@@ -30,3 +30,25 @@ Thumbs.db
 KEYCLOAK_PROD.md
 RAILWAY_ENV.txt
 MINIO_RAILWAY.md
+
+# Dossier Fonctionnalités clé — garder uniquement les images
+Fonctionnalités clé/*.doc
+Fonctionnalités clé/*.xls
+Fonctionnalités clé/*.html
+Fonctionnalités clé/~$*
+Fonctionnalités clé/*_fichiers/filelist.xml
+Fonctionnalités clé/*_fichiers/colorschememapping.xml
+Fonctionnalités clé/*_fichiers/themedata.thmx
+Fonctionnalités clé/*_fichiers/stylesheet.css
+Fonctionnalités clé/*_fichiers/tabstrip.html
+Fonctionnalités clé/*_fichiers/header.html
+Fonctionnalités clé/*_fichiers/sheet*.html
+
+# Scripts temporaires
+cleanup_keycloak.sql
+configure_keycloak.sh
+inspect_docs.py
+read_docs.ps1
+read_docs2.ps1
+read_docs3.ps1
+read_docx.py

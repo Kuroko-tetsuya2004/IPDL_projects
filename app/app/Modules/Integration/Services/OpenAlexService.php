@@ -81,6 +81,67 @@ class OpenAlexService
     }
 
     /**
+     * Recherche par ORCID d'un auteur
+     */
+    public function searchByOrcid(string $orcid, int $limit = 100): array
+    {
+        // Nettoyage de l'ORCID (OpenAlex s'attend souvent à https://orcid.org/XXXX)
+        if (!str_starts_with($orcid, 'https://orcid.org/')) {
+            $orcid = 'https://orcid.org/' . $orcid;
+        }
+
+        try {
+            $response = Http::timeout(15)
+                ->get(self::BASE_URL . '/works', [
+                    'filter'   => "author.orcid:{$orcid},is_retracted:false",
+                    'per-page' => min($limit, 200),
+                    'select'   => 'id,doi,title,abstract_inverted_index,publication_year,authorships,primary_location,open_access,type',
+                    'mailto'   => $this->email,
+                    'sort'     => 'publication_year:desc',
+                ]);
+
+            if (!$response->successful()) {
+                Log::warning('[OpenAlex] Réponse non-200 pour ORCID', ['status' => $response->status()]);
+                return [];
+            }
+
+            return $this->normalizeMany($response->json('results', []));
+
+        } catch (ConnectionException $e) {
+            Log::error('[OpenAlex] Erreur searchByOrcid', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Recherche une œuvre spécifique par DOI
+     */
+    public function searchByDoi(string $doi): ?array
+    {
+        // Nettoyer le DOI
+        $doi = str_replace(['https://doi.org/', 'http://doi.org/'], '', $doi);
+        $doiUrl = 'https://doi.org/' . $doi;
+
+        try {
+            $response = Http::timeout(15)
+                ->get(self::BASE_URL . '/works/' . urlencode($doiUrl), [
+                    'mailto' => $this->email,
+                ]);
+
+            if (!$response->successful()) {
+                Log::warning('[OpenAlex] DOI introuvable ou erreur', ['doi' => $doi, 'status' => $response->status()]);
+                return null;
+            }
+
+            return $this->normalize($response->json());
+
+        } catch (ConnectionException $e) {
+            Log::error('[OpenAlex] Erreur searchByDoi', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
      * Normalise un tableau d'articles
      */
     private function normalizeMany(array $works): array
