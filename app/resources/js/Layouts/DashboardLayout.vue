@@ -236,7 +236,7 @@ function isActive(href) {
 .sidebar-user-info { min-width: 0; overflow: hidden; }
 
 .sidebar-user-name {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -246,9 +246,9 @@ function isActive(href) {
 
 .sidebar-role-badge {
   display: inline-flex;
-  padding: 0.1rem 0.5rem;
+  padding: 0.15rem 0.6rem;
   border-radius: 9999px;
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   font-weight: 700;
   margin-top: 0.2rem;
 }
@@ -277,10 +277,10 @@ function isActive(href) {
 .sidebar-section { margin-bottom: 0.25rem; }
 
 .sidebar-section-label {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   color: var(--text-subtle);
   padding: 0.625rem 0.75rem 0.375rem;
 }
@@ -296,13 +296,13 @@ function isActive(href) {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0.65rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-muted);
   text-decoration: none;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   border-left: 3px solid transparent;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }

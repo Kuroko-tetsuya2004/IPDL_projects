@@ -5,11 +5,11 @@
 
 @section('content')
 <div class="container" style="padding-top: 2rem;">
-    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.03) 0%, rgba(37, 99, 235, 0.05) 100%); border-bottom: 2px solid var(--color-border); padding: 3rem 2rem; border-radius: var(--radius); margin-bottom: 2rem; text-align: center;">
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem; color: var(--color-primary);">
+    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.03) 0%, rgba(37, 99, 235, 0.05) 100%); border-bottom: 2px solid var(--border); padding: 3rem 2rem; border-radius: var(--radius); margin-bottom: 2rem; text-align: center;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem; color: var(--primary);">
             Recherche Académique Mondiale
         </h1>
-        <p style="font-size: 1.1rem; color: var(--color-text-muted); max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 800px; margin: 0 auto;">
             Interrogez simultanément OpenAlex, Semantic Scholar, CORE et CrossRef pour trouver des publications en libre accès.
         </p>
     </div>
@@ -30,10 +30,10 @@
     </div>
 
     <div id="loading-indicator" style="display: none; text-align: center; padding: 3rem 0;">
-        <svg style="animation: spin 1s linear infinite; color: var(--color-primary-light);" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg style="animation: spin 1s linear infinite; color: var(--primary-light);" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        <p style="margin-top: 1rem; color: var(--color-text-muted); font-weight: 600;">Interrogation des bases mondiales en cours...</p>
+        <p style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Interrogation des bases mondiales en cours...</p>
     </div>
 
     <div id="results-container" class="grid-3" style="margin-top: 2rem;">
@@ -42,7 +42,7 @@
     
     <div id="no-results" class="card text-center" style="display: none; padding: 4rem 1rem; margin-bottom: 4rem; margin-top: 2rem;">
         <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
-        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.5rem;">Aucun résultat</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Aucun résultat</h2>
         <p class="text-muted">Essayez d'autres mots-clés ou termes en anglais.</p>
     </div>
 </div>
@@ -50,9 +50,9 @@
 <style>
 @keyframes spin { 100% { transform: rotate(360deg); } }
 .result-card {
-    background: var(--color-surface);
+    background: var(--surface);
     border-radius: var(--radius);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border);
     padding: 1.5rem;
     box-shadow: var(--shadow);
     display: flex;
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="source-badge ${sourceClass}">${item.source}</span>
                                 <span style="font-size: 0.8rem; font-weight: 700; color: #94a3b8;">${item.year || ''}</span>
                             </div>
-                            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.5rem; line-height: 1.3;">
+                            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; line-height: 1.3;">
                                 ${item.title}
                             </h3>
                             ${authorsHtml}

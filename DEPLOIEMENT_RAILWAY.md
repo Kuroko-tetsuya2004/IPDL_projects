@@ -1,95 +1,137 @@
-# 🚂 Guide de Déploiement Complet — Railway
+# 🚂 Guide de Déploiement Complet de A à Z — Railway
 
-## Présentation
-
-[Railway](https://railway.app) est une plateforme cloud performante. Grâce au fichier `docker-compose.yml` unifié présent à la racine du projet, Railway est capable de déployer et de lier **automatiquement tous les composants** de l'application UMMISCO (Laravel, PostgreSQL, Redis, MinIO, Keycloak).
+Ce document est le guide de référence ultime pour déployer **l'intégralité** de l'infrastructure du Portail UMMISCO sur la plateforme Cloud [Railway](https://railway.app).
 
 ---
 
-## 🚀 Méthode de Déploiement Automatisée (Recommandée)
+## 1. Architecture de Production sur Railway
 
-Puisque nous avons fusionné l'environnement de développement et de production dans un seul fichier `docker-compose.yml`, Railway va lire ce fichier et créer un "Service" pour chaque bloc défini.
+Grâce au fichier `docker-compose.yml` unifié, Railway est capable de déployer et lier automatiquement tous les composants. L'infrastructure finale comprendra les services suivants :
 
-### Étape 1 : Importer le projet sur Railway
+*   **`nginx`** : Le proxy web (Point d'entrée public du portail).
+*   **`app`** : L'API Laravel et le frontend compilé.
+*   **`postgres`** : La base de données avec la recherche Full-Text.
+*   **`redis`** : Le cache, les sessions et le courtier de messages.
+*   **`scheduler`** : Déclenche les tâches récurrentes (Cron).
+*   **`queue_worker`** : Traite les imports lourds en arrière-plan (DataCite/OpenAlex).
+*   **`minio`** : Serveur de stockage d'objets (S3) pour les PDF et datasets.
+*   **`keycloak`** : Serveur d'authentification centralisé (SSO).
 
-1. Allez sur le [Dashboard Railway](https://railway.app/dashboard).
+---
+
+## 2. ÉTAPE 1 : Déploiement Initial (Le Cœur)
+
+1. Connectez-vous sur le [Dashboard Railway](https://railway.app/dashboard).
 2. Cliquez sur **New Project** > **Deploy from GitHub Repo**.
 3. Sélectionnez le dépôt `Portail-UMMISCO`.
-4. Railway va détecter le `docker-compose.yml` et automatiquement créer 8 services :
-   - `nginx` (Le proxy web public)
-   - `app` (L'API Laravel / Frontend)
-   - `scheduler` (Tâches cron)
-   - `queue_worker` (Jobs asynchrones / Horizon)
-   - `postgres` (Base de données)
-   - `redis` (Cache et sessions)
-   - `minio` (Stockage S3)
-   - `keycloak` (Serveur d'authentification SSO)
+4. Railway détecte le fichier `docker-compose.yml` et lance la création des 8 services.
+5. **Volumes persistants** : Railway associe automatiquement des volumes persistants aux services qui le nécessitent (`postgres_data`, `minio_data`).
 
-### Étape 2 : Configuration des Volumes (Stockage Persistant)
+---
 
-Railway associera automatiquement des volumes persistants aux services qui en déclarent dans le `docker-compose.yml` (ex: `postgres_data`, `minio_data`). Aucune action n'est requise.
+## 3. ÉTAPE 2 : Exposition des Domaines (Networking)
 
-### Étape 3 : Injection des Variables de Production
+Sur Railway, tous les services sont privés par défaut. Vous devez rendre publics uniquement ceux qui interagissent avec les utilisateurs.
 
-Par défaut, le fichier utilise des valeurs de "Développement". Sur Railway, allez dans **Settings > Variables** de chaque service ou dans **Shared Variables** (Variables partagées du projet) pour imposer la configuration de production :
+1. **Service `nginx` (Le portail Web)**
+   * Allez dans le service `nginx` > **Settings** > **Networking**.
+   * Cliquez sur **Generate Domain** (ex: `portail-ummisco.up.railway.app` ou ajoutez votre domaine personnalisé).
+2. **Service `keycloak` (Authentification)**
+   * Allez dans `keycloak` > **Settings** > **Networking**.
+   * Générez un domaine (ex: `auth-ummisco.up.railway.app`).
+3. **Service `minio` (Stockage S3)**
+   * Allez dans `minio` > **Settings** > **Networking**.
+   * Exposez le port `9000` (API S3) et générez le domaine `storage-ummisco.up.railway.app`.
+   * Cliquez sur **Expose Another Port**, exposez le port `9001` (Console d'administration) et générez le domaine `console-storage-ummisco.up.railway.app`.
 
-#### Variables Partagées (Shared Variables)
-Ajoutez ces variables au niveau de l'environnement global Railway pour qu'elles s'appliquent à tous les services :
+---
 
-| Clé | Valeur (Exemple) |
-|-----|------------------|
-| `APP_ENV` | `production` |
-| `APP_DEBUG` | `false` |
-| `APP_URL` | `https://portail.ummisco.sn` |
-| `DB_PASSWORD` | *(Générez un mot de passe fort)* |
-| `REDIS_PASSWORD` | *(Générez un mot de passe fort)* |
-| `MINIO_ROOT_PASSWORD`| *(Générez un mot de passe fort)* |
-| `KEYCLOAK_ADMIN_PASSWORD` | *(Générez un mot de passe fort)* |
-| `KEYCLOAK_COMMAND` | `start --optimized` *(Active le mode prod de Keycloak)* |
-| `KEYCLOAK_HOSTNAME` | `auth.ummisco.sn` |
+## 4. ÉTAPE 3 : Configuration Globale (Variables Partagées)
 
-*(Note : Le `docker-compose.yml` reliera automatiquement `app` à `postgres` et `redis` car ils partagent les mêmes variables réseaux internes).*
+Pour que les conteneurs basculent du mode "Développement" au mode "Production", utilisez les **Shared Variables** (Variables Partagées) de Railway. Elles s'appliqueront à tous les services.
 
-### Étape 4 : Exposition des Domaines (Networking)
+Allez dans les paramètres globaux du projet (Cmd/Ctrl + K > *Shared Variables*) et ajoutez :
 
-Sur Railway, par défaut, tous les services sont privés. Vous devez exposer uniquement les services qui doivent être accessibles depuis l'extérieur.
+| Clé | Valeur | Description |
+|-----|--------|-------------|
+| `APP_ENV` | `production` | Active les optimisations Laravel |
+| `APP_DEBUG` | `false` | Désactive l'affichage des erreurs critiques |
+| `APP_URL` | `https://portail-ummisco.up.railway.app` | L'URL générée à l'étape 2 pour Nginx |
+| `DB_PASSWORD` | `votre_mdp_postgres` | Mot de passe robuste pour la base |
+| `REDIS_PASSWORD` | `votre_mdp_redis` | Mot de passe robuste pour Redis |
+| `MINIO_ROOT_PASSWORD` | `votre_mdp_minio` | Mot de passe d'administration S3 |
+| `KEYCLOAK_ADMIN_PASSWORD`| `votre_mdp_keycloak` | Mot de passe administrateur SSO |
+| `SESSION_SECURE_COOKIE` | `true` | Obligatoire en HTTPS pour l'OIDC |
 
-1. Allez dans le service **`nginx`** > **Settings** > **Networking**.
-2. Cliquez sur **Generate Domain** (ex: `ummisco-nginx.up.railway.app`) ou ajoutez votre domaine personnalisé (`portail.ummisco.sn`).
-3. Allez dans le service **`keycloak`** > **Settings** > **Networking**.
-4. Exposez-le sur `auth.ummisco.sn`.
-5. Allez dans le service **`minio`** > **Settings** > **Networking**.
-6. Exposez le port 9000 sur `storage.ummisco.sn` (API S3) et le port 9001 sur `console.storage.ummisco.sn` (Interface Web).
+*(Note : Laravel, Postgres et Redis communiqueront via le réseau interne de Railway sans avoir besoin d'exposer leurs ports).*
 
-### Étape 5 : Initialisation de la Base de Données
+---
 
-Le `docker-compose.yml` inclut déjà le montage du fichier `ummisco_database.sql`. Lors du premier démarrage du service `postgres` sur Railway, la base de données sera **automatiquement initialisée** avec l'intégralité du schéma (tables, types enum, triggers d'audit).
+## 5. ÉTAPE 4 : Configuration Spécifique de Keycloak
 
-Pour forcer les optimisations Laravel au premier lancement, allez dans le service **`app`** > **Deploy** > **Start Command** et insérez :
+Pour que Keycloak fonctionne derrière le proxy SSL de Railway, vous devez lui injecter ces variables spécifiques dans l'onglet **Variables** du service `keycloak` :
+
+*   `KC_PROXY_HEADERS` = `xforwarded` (Critique)
+*   `KC_HOSTNAME` = `auth-ummisco.up.railway.app`
+*   `KC_HTTP_ENABLED` = `true`
+*   `KC_DB` = `postgres`
+*   `KC_DB_URL` = `jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}`
+*   `KC_DB_USERNAME` = `${{Postgres.PGUSER}}`
+*   `KC_DB_PASSWORD` = `${{Postgres.PGPASSWORD}}`
+*   `JAVA_OPTS_APPEND` = `-Xms128m -Xmx200m -XX:MaxMetaspaceSize=96m` (Évite le crash mémoire)
+
+**Start Command** (Dans l'onglet Deploy du service Keycloak) :
 ```bash
-php artisan config:cache && php artisan route:cache && php artisan view:cache && php-fpm
+/opt/keycloak/bin/kc.sh start --optimized
 ```
 
----
+### 5.1 Création du Client OIDC dans Keycloak
+Une fois Keycloak démarré, connectez-vous sur l'URL de sa console, créez le Realm `ummisco`, puis le client `laravel-app`. 
+Assurez-vous que les **Valid redirect URIs** pointent vers `https://portail-ummisco.up.railway.app/auth/callback`.
 
-## 🔧 Architecture de la Configuration Unifiée
-
-### Pourquoi un seul fichier `docker-compose.yml` ?
-1. **Source de vérité unique** : Fini la désynchronisation entre le mode local et la prod.
-2. **Fallback natif** : Nous utilisons la syntaxe `${VARIABLE:-valeur_par_defaut}`.
-   - En local, si aucune variable n'est définie, Laravel démarre avec la base locale `ummisco_app`, le user `ummisco_user`.
-   - Sur Railway, les variables injectées écrasent les valeurs par défaut.
-3. **Optimisation des coûts** : Railway facture à l'usage. En encapsulant le tout dans un seul compose, l'orchestration interne est gérée efficacement.
-
-### Spécificités de développement
-En mode développement local, le code source (`./app`) est monté via un volume vers `/var/www/html`. Sur Railway, ce montage de code local est ignoré au profit du code compilé directement dans l'image Docker.
+### 5.2 Lier Laravel à Keycloak
+Dans les variables partagées de Railway, ajoutez la configuration OIDC :
+*   `KEYCLOAK_MOCK` = `false`
+*   `KEYCLOAK_BASE_URL` = `https://auth-ummisco.up.railway.app`
+*   `KEYCLOAK_CLIENT_SECRET` = `(le secret généré dans l'interface Keycloak)`
+*   `KEYCLOAK_REDIRECT_URI` = `https://portail-ummisco.up.railway.app/auth/callback`
 
 ---
 
-## ✅ Checklist de Validation en Production
+## 6. ÉTAPE 5 : Configuration Spécifique de MinIO
 
-1. [ ] **Accès public** : Le domaine pointe bien vers le conteneur `nginx`.
-2. [ ] **SSO** : Keycloak est fonctionnel en mode `start --optimized` et la page de login s'affiche via `auth.ummisco.sn`.
-3. [ ] **MinIO** : Le stockage d'objets répond sur `storage.ummisco.sn`.
-4. [ ] **Cron** : Le service `scheduler` ne génère pas d'erreur de connexion à la DB.
-5. [ ] **Performances** : Le service `redis` est bien utilisé pour la session (`SESSION_DRIVER=redis`).
+Connectez-vous à l'URL de la console MinIO (ex: `https://console-storage-ummisco.up.railway.app`) avec `minio_admin` et votre `MINIO_ROOT_PASSWORD`.
+Créez un bucket nommé **`ummisco-public`**.
+
+Ensuite, liez Laravel à MinIO via les variables partagées de Railway :
+
+*   `FILESYSTEM_DISK` = `minio`
+*   `MINIO_ENDPOINT` = `http://minio.railway.internal:9000` (Communication interne ultra-rapide)
+*   `MINIO_KEY` = `minio_admin`
+*   `MINIO_SECRET` = `(votre_mdp_minio)`
+*   `MINIO_BUCKET_PUBLIC` = `ummisco-public`
+*   `MINIO_USE_PATH_STYLE` = `true`
+
+---
+
+## 7. ÉTAPE 6 : Initialisation de l'Application (Post-Déploiement)
+
+La base de données est initialisée automatiquement avec le schéma grâce au montage de `ummisco_database.sql` dans Postgres.
+
+Pour forcer les optimisations Laravel et vérifier les migrations, allez dans le service **`app`** > **Deploy** > **Start Command** et insérez la commande de production :
+
+```bash
+php artisan optimize && php artisan view:cache && php-fpm
+```
+
+*(Si la base de données semble vide, exécutez la commande `php artisan migrate:fresh --seed` depuis le terminal Railway du service `app`).*
+
+---
+
+## 8. ✅ Checklist de Validation
+
+1. [ ] **Portail Web** : `https://portail-ummisco.up.railway.app` s'affiche correctement sans erreur 500.
+2. [ ] **Authentification** : Le bouton "Connexion" redirige bien vers Keycloak (`auth-ummisco...`) en HTTPS, et la redirection retour fonctionne.
+3. [ ] **Stockage MinIO** : Les documents importés se téléchargent bien depuis le bucket interne.
+4. [ ] **Tâches Asynchrones** : Le service `queue_worker` affiche "Processing..." dans ses logs lors d'une synchronisation ORCID.
+5. [ ] **Performances** : La session est bien maintenue par le service `redis`.

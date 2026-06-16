@@ -25,7 +25,7 @@
                         · {{ $wf->date_soumission?->format('d/m/Y H:i') }}
                     </p>
                     @if($wf->commentaire_auteur)
-                        <p class="mt-1" style="font-size: 0.825rem; background: #F8FAFC; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-accent);">
+                        <p class="mt-1" style="font-size: 0.825rem; background: #F8FAFC; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent);">
                             💬 {{ $wf->commentaire_auteur }}
                         </p>
                     @endif
@@ -33,7 +33,7 @@
                         <p class="text-muted mt-1" style="font-size: 0.8rem;">
                             ⏰ Date limite de validation : <strong>{{ $wf->date_limite->format('d/m/Y') }}</strong>
                             @if($wf->date_limite->isPast())
-                                <span style="color: var(--color-danger); font-weight: 600;"> — Dépassée !</span>
+                                <span style="color: var(--danger); font-weight: 600;"> — Dépassée !</span>
                             @endif
                         </p>
                     @endif

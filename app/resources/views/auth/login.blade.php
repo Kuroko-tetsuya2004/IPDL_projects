@@ -110,7 +110,7 @@
         font-family: 'Outfit', sans-serif;
         font-size: 1.85rem;
         font-weight: 800;
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 60%, var(--color-accent) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--accent) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;
@@ -119,7 +119,7 @@
 
     .login-subtitle {
         font-size: 0.875rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         margin-top: 0.5rem;
         font-weight: 500;
         letter-spacing: 0.02em;
@@ -134,7 +134,7 @@
         display: block;
         font-size: 0.75rem;
         font-weight: 700;
-        color: var(--color-text);
+        color: var(--text);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin-bottom: 0.5rem;
@@ -156,13 +156,13 @@
         font-size: 0.925rem;
         font-weight: 500;
         background: rgba(255, 255, 255, 0.7);
-        color: var(--color-text);
+        color: var(--text);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         outline: none;
     }
 
     .form-input-custom:focus {
-        border-color: var(--color-primary-light);
+        border-color: var(--primary-light);
         background: #ffffff;
         box-shadow: 
             0 0 0 4px rgba(37, 99, 235, 0.08), 
@@ -172,7 +172,7 @@
     .form-input-icon-custom {
         position: absolute;
         left: 1rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         transition: color 0.25s ease;
         pointer-events: none;
         display: flex;
@@ -181,14 +181,14 @@
     }
 
     .form-input-custom:focus + .form-input-icon-custom {
-        color: var(--color-primary-light);
+        color: var(--primary-light);
     }
 
     /* Submitting button with load/glow style */
     .btn-login-custom {
         width: 100%;
         height: 48px;
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         font-weight: 700;
         font-size: 0.95rem;
@@ -250,7 +250,7 @@
 
     .login-footer-text {
         font-size: 0.85rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         margin: 0;
         font-weight: 500;
     }
@@ -260,13 +260,13 @@
         margin-top: 0.5rem;
         font-weight: 700;
         font-size: 0.875rem;
-        color: var(--color-primary-light);
+        color: var(--primary-light);
         text-decoration: none;
         transition: color 0.2s ease;
     }
 
     .login-footer-link:hover {
-        color: var(--color-primary);
+        color: var(--primary);
         text-decoration: underline;
     }
 </style>

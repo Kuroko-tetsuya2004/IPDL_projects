@@ -100,7 +100,7 @@
         font-family: 'Outfit', sans-serif;
         font-size: 1.75rem;
         font-weight: 800;
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 60%, var(--color-accent) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--accent) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;
@@ -109,7 +109,7 @@
 
     .register-subtitle {
         font-size: 0.875rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         margin-top: 0.5rem;
         font-weight: 500;
         letter-spacing: 0.02em;
@@ -130,7 +130,7 @@
         display: block;
         font-size: 0.75rem;
         font-weight: 700;
-        color: var(--color-text);
+        color: var(--text);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin-bottom: 0.4rem;
@@ -151,13 +151,13 @@
         font-size: 0.9rem;
         font-weight: 500;
         background: rgba(255, 255, 255, 0.7);
-        color: var(--color-text);
+        color: var(--text);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         outline: none;
     }
 
     .form-input-custom:focus {
-        border-color: var(--color-primary-light);
+        border-color: var(--primary-light);
         background: #ffffff;
         box-shadow: 
             0 0 0 4px rgba(37, 99, 235, 0.08), 
@@ -167,7 +167,7 @@
     .form-input-icon-custom {
         position: absolute;
         left: 0.85rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         transition: color 0.25s ease;
         pointer-events: none;
         display: flex;
@@ -176,7 +176,7 @@
     }
 
     .form-input-custom:focus + .form-input-icon-custom {
-        color: var(--color-primary-light);
+        color: var(--primary-light);
     }
 
     /* Select element styling */
@@ -192,7 +192,7 @@
     /* Conditional section styles */
     .conditional-panel {
         display: none;
-        border-left: 3px solid var(--color-primary-light);
+        border-left: 3px solid var(--primary-light);
         background: rgba(37, 99, 235, 0.02);
         border-radius: 0 12px 12px 0;
         padding: 1.25rem 1.25rem 0.25rem;
@@ -211,7 +211,7 @@
     .btn-register-custom {
         width: 100%;
         height: 46px;
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         font-weight: 700;
         font-size: 0.95rem;
@@ -262,7 +262,7 @@
 
     .register-footer-text {
         font-size: 0.85rem;
-        color: var(--color-text-muted);
+        color: var(--text-muted);
         margin: 0;
         font-weight: 500;
     }
@@ -272,13 +272,13 @@
         margin-top: 0.5rem;
         font-weight: 700;
         font-size: 0.875rem;
-        color: var(--color-primary-light);
+        color: var(--primary-light);
         text-decoration: none;
         transition: color 0.2s ease;
     }
 
     .register-footer-link:hover {
-        color: var(--color-primary);
+        color: var(--primary);
         text-decoration: underline;
     }
 </style>
@@ -372,7 +372,7 @@
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
                     </span>
                 </div>
-                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem; font-weight: 500;">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; font-weight: 500;">
                     Renseignez votre ORCID pour une validation automatique du compte (si affilié à l'UMMISCO).
                 </p>
             </div>
@@ -405,7 +405,7 @@
             </div>
 
             {{-- Champs Doctorant --}}
-            <div id="doctoral-fields" class="conditional-panel" style="border-left-color: var(--color-accent); background: rgba(14, 165, 233, 0.02);">
+            <div id="doctoral-fields" class="conditional-panel" style="border-left-color: var(--accent); background: rgba(14, 165, 233, 0.02);">
                 <div class="form-group-custom">
                     <label for="domaine_expertise" class="form-label-custom">Domaine d'expertise *</label>
                     <div class="form-input-wrapper">

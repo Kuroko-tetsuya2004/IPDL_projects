@@ -7,7 +7,7 @@
     <div class="card" style="text-align: center;">
         <div style="margin-bottom: 1.5rem;">
             <span style="font-size: 2.5rem;">🔐</span>
-            <h1 style="font-size: 1.5rem; margin-top: 0.75rem; color: var(--color-primary);">Connexion — Mode Développement</h1>
+            <h1 style="font-size: 1.5rem; margin-top: 0.75rem; color: var(--primary);">Connexion — Mode Développement</h1>
             <p class="text-muted mt-1" style="font-size: 0.875rem;">
                 Sélectionnez un rôle pour simuler une connexion.<br>
                 <strong>Ce mode n'est disponible qu'en environnement de développement.</strong>
