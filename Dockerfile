@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copier package.json en premier pour profiter du cache Docker
 COPY app/package.json app/package-lock.json ./
-RUN npm ci --ignore-scripts
+RUN npm install
 
 # Copier tout le code source
 COPY app/ .
