@@ -10,6 +10,8 @@ const props = defineProps({
   query: String,
   results: Object,
   total: Number,
+  externalResults: Array,
+  source: String,
   axes: Array,
   types: Object,
   filters: Object,
@@ -37,7 +39,7 @@ const statutTypeIcon = {
     <form @submit.prevent="doSearch" class="flex gap-3">
       <div class="relative flex-1">
         <MagnifyingGlassIcon class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-        <input v-model="search" type="text" placeholder="Chercher des publications, thèses, événements..."
+        <input v-model="search" type="text" placeholder="Rechercher..."
           class="w-full bg-slate-900/60 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all" />
       </div>
       <button type="submit" class="px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-semibold transition-all">
@@ -66,9 +68,45 @@ const statutTypeIcon = {
         <span class="text-brand-400">"{{ query }}"</span>
       </p>
 
-      <div v-if="total === 0" class="text-center py-16 bg-slate-900/60 border border-white/8 rounded-xl">
+      <div v-if="total === 0 && source !== 'openalex'" class="text-center py-16 bg-slate-900/60 border border-white/8 rounded-xl">
         <MagnifyingGlassIcon class="w-12 h-12 text-slate-600 mx-auto mb-4" />
         <p class="text-slate-400">Aucun résultat trouvé pour cette recherche.</p>
+      </div>
+
+      <div v-else-if="source === 'openalex'" class="space-y-6">
+        <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-3 text-sm">
+          <span class="text-2xl">🌐</span>
+          <div>
+            <h3 class="font-semibold text-amber-400">Aucun résultat local. Voici des résultats externes provenant de sources académiques libres (OpenAlex).</h3>
+            <p class="text-slate-400 mt-1">Vous pouvez consulter ces publications en externe.</p>
+          </div>
+        </div>
+
+        <div v-if="externalResults && externalResults.length === 0" class="text-center py-16 bg-slate-900/60 border border-white/8 rounded-xl">
+          <p class="text-slate-400">Aucun résultat externe trouvé non plus.</p>
+        </div>
+
+        <div v-else class="space-y-4">
+          <div v-for="ext in externalResults" :key="ext.doi"
+            class="bg-slate-900/60 border border-white/8 rounded-xl p-5 hover:border-brand-500/30 transition-all group">
+            <div class="flex items-start gap-3">
+              <span class="text-2xl">🌐</span>
+              <div class="min-w-0 flex-1">
+                <a :href="ext.doi || ext.url" target="_blank" class="font-semibold text-white group-hover:text-brand-400 transition-colors">
+                  {{ ext.title || ext.titre }}
+                </a>
+                <div class="flex flex-wrap items-center gap-2 mt-1">
+                  <span class="text-xs px-2 py-0.5 rounded bg-slate-800 border border-white/5 text-slate-400 capitalize">Externe</span>
+                  <span class="text-xs text-slate-500">{{ (ext.authors || ext.auteurs || []).map(a => a.name || a.nom).join(', ') }}</span>
+                  <span v-if="ext.year || ext.annee" class="text-xs text-slate-500">· {{ ext.year || ext.annee }}</span>
+                </div>
+                <p v-if="ext.abstract || ext.resume" class="text-xs text-slate-400 mt-2 line-clamp-2">
+                  {{ ext.abstract || ext.resume }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-else class="space-y-4">

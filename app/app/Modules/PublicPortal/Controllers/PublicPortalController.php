@@ -60,12 +60,6 @@ class PublicPortalController extends Controller
         $query = Publication::visibleForUser($userId, $userRole)
             ->with(['auteur:id,nom,prenom,photo_url', 'axe:id,nom_fr,nom_en,code,couleur_hex']);
 
-        // Filtre par recherche full-text
-        if ($search = $request->input('q')) {
-            $lang = current_locale();
-            $query->search($search, $lang);
-        }
-
         // Filtre par type de publication
         if ($type = $request->input('type')) {
             $query->byType($type);
@@ -76,8 +70,38 @@ class PublicPortalController extends Controller
             $query->byAxe($axeId);
         }
 
-        // Tri par défaut : date de publication décroissante
-        if (!$search) {
+        $search = $request->input('q');
+
+        if ($search) {
+            $isDoi = preg_match('/^10\.\d{4,9}\/[-._;()\/:A-Z0-9]+$/i', $search);
+            $isOrcid = preg_match('/^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/i', $search);
+
+            if ($isDoi) {
+                $query->where('doi', $search);
+            } elseif ($isOrcid) {
+                $query->whereHas('auteur', function ($q) use ($search) {
+                    $q->where('orcid_id', $search);
+                });
+            } else {
+                // Recherche par mots-clés (partielle, insensible à la casse)
+                $query->where(function ($q) use ($search) {
+                    $q->where('titre_fr', 'ILIKE', "%{$search}%")
+                      ->orWhere('titre_en', 'ILIKE', "%{$search}%")
+                      ->orWhere('resume_fr', 'ILIKE', "%{$search}%")
+                      ->orWhere('resume_en', 'ILIKE', "%{$search}%");
+                });
+
+                // Tri avec priorité sur le titre
+                $query->orderByRaw("
+                    CASE 
+                        WHEN titre_fr ILIKE ? THEN 1
+                        WHEN titre_en ILIKE ? THEN 1
+                        ELSE 2
+                    END ASC
+                ", ["%{$search}%", "%{$search}%"])
+                ->orderBy('date_publication', 'desc');
+            }
+        } else {
             $query->orderBy('date_publication', 'desc');
         }
 
@@ -87,6 +111,87 @@ class PublicPortalController extends Controller
             ->value('valeur') ?: 12;
 
         $publications = $query->paginate($perPage)->withQueryString();
+
+        // Fallback transparent vers OpenAlex / DataCite si aucun résultat local
+        if ($search && $publications->isEmpty()) {
+            $externalResults = [];
+            try {
+                // Si l'utilisateur filtre spécifiquement par "dataset", on utilise DataCite
+                if ($type === Publication::TYPE_DATASET) {
+                    $dataCite = app(\App\Modules\Integration\Services\DataCiteService::class);
+                    $dcResults = [];
+                    
+                    if ($isDoi) {
+                        $res = $dataCite->fetchByDoi($search);
+                        if ($res) $dcResults[] = $res;
+                    } elseif ($isOrcid) {
+                        $dcResults = $dataCite->fetchByOrcid($search, $perPage);
+                    } else {
+                        $dcResults = $dataCite->searchByQuery($search, $perPage);
+                    }
+
+                    foreach ($dcResults as $item) {
+                        $pub = new \App\Modules\Content\Models\Publication([
+                            'titre_fr' => $item['titre'] ?? 'Sans titre',
+                            'type' => Publication::TYPE_DATASET,
+                            'date_publication' => $item['annee'] ? \Carbon\Carbon::createFromFormat('Y', $item['annee'])->startOfYear() : null,
+                            'doi' => $item['doi'],
+                            'url_externe' => $item['lien_acces'],
+                        ]);
+                        $pub->id = $item['external_id'];
+                        $pub->auteurs_externes = isset($item['auteurs']) ? json_decode($item['auteurs'], true) : [];
+                        $externalResults[] = $pub;
+                    }
+                } 
+                // Sinon on utilise OpenAlex (qui est plus généraliste pour les articles)
+                else {
+                    $openAlexUrl = 'https://api.openalex.org/works';
+                    $params = ['per-page' => $perPage];
+
+                    if ($isDoi) {
+                        $params['filter'] = 'doi:https://doi.org/' . $search;
+                    } elseif ($isOrcid) {
+                        $params['filter'] = 'author.orcid:https://orcid.org/' . $search;
+                    } else {
+                        $params['search'] = $search;
+                    }
+
+                    $response = \Illuminate\Support\Facades\Http::timeout(10)->get($openAlexUrl, $params);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        if (!empty($data['results'])) {
+                            foreach ($data['results'] as $item) {
+                                $authors = array_map(fn($a) => $a['author']['display_name'] ?? '', $item['authorships'] ?? []);
+                                
+                                $pub = new \App\Modules\Content\Models\Publication([
+                                    'titre_fr' => $item['title'] ?? 'Sans titre',
+                                    'type' => $item['type'] ?? 'article',
+                                    'date_publication' => isset($item['publication_date']) ? \Carbon\Carbon::parse($item['publication_date']) : null,
+                                    'doi' => $item['doi'] ? str_replace('https://doi.org/', '', $item['doi']) : null,
+                                    'url_externe' => $item['doi'] ?? $item['id'],
+                                    'pdf_url' => $item['open_access']['oa_url'] ?? null,
+                                ]);
+                                $pub->id = basename($item['id']); 
+                                $pub->auteurs_externes = array_values(array_filter($authors));
+                                
+                                $externalResults[] = $pub;
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("[External API Fallback] Erreur : " . $e->getMessage());
+            }
+
+            $publications = new \Illuminate\Pagination\LengthAwarePaginator(
+                collect($externalResults),
+                count($externalResults),
+                $perPage,
+                1,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
 
         // Axes pour les filtres
         $axes = AxeThematique::actif()->get();
@@ -108,6 +213,16 @@ class PublicPortalController extends Controller
         }
 
         return view('public.publications', compact('publications', 'axes', 'types'));
+    }
+
+    /**
+     * Affiche le catalogue des datasets publics avec filtres.
+     * Utilise la même vue que les publications mais force le type.
+     */
+    public function datasets(Request $request)
+    {
+        $request->merge(['type' => Publication::TYPE_DATASET]);
+        return $this->publications($request);
     }
 
     // ── Axes thématiques ────────────────────────────────────────────────────
@@ -151,30 +266,73 @@ class PublicPortalController extends Controller
         $userId   = session('user_id');
         $userRole = session('user_role');
 
-        $publication = Publication::visibleForUser($userId, $userRole)
-            ->with([
-                'auteur:id,nom,prenom,photo_url,titre_academique,orcid_id,email',
-                'axe:id,nom_fr,nom_en,code,couleur_hex',
-                'document',
-                'dataset.fichiers',
-            ])
-            ->findOrFail($id);
+        $isUuid = \Illuminate\Support\Str::isUuid($id);
 
-        // Publications similaires du même axe visibles pour l'utilisateur
-        $similar = [];
-        if ($publication->axe_id) {
-            $similar = Publication::visibleForUser($userId, $userRole)
-                ->where('axe_id', $publication->axe_id)
-                ->where('id', '!=', $id)
-                ->with('auteur:id,nom,prenom')
-                ->orderBy('date_publication', 'desc')
-                ->limit(3)
-                ->get();
+        if ($isUuid) {
+            $publication = Publication::visibleForUser($userId, $userRole)
+                ->with([
+                    'auteur:id,nom,prenom,photo_url,titre_academique,orcid_id,email',
+                    'axe:id,nom_fr,nom_en,code,couleur_hex',
+                    'document',
+                    'dataset.fichiers',
+                ])
+                ->findOrFail($id);
+
+            // Publications similaires du même axe visibles pour l'utilisateur
+            $similar = [];
+            if ($publication->axe_id) {
+                $similar = Publication::visibleForUser($userId, $userRole)
+                    ->where('axe_id', $publication->axe_id)
+                    ->where('id', '!=', $id)
+                    ->with('auteur:id,nom,prenom')
+                    ->orderBy('date_publication', 'desc')
+                    ->limit(3)
+                    ->get();
+            }
+
+            $canDownload = $this->checkDownloadPermission($publication, $userId, $userRole);
+
+            return view('public.publication', compact('publication', 'similar', 'canDownload'));
         }
 
-        $canDownload = $this->checkDownloadPermission($publication, $userId, $userRole);
+        // Tentative OpenAlex pour les ID externes (ex: W3123456)
+        $response = \Illuminate\Support\Facades\Http::timeout(10)->get("https://api.openalex.org/works/{$id}");
+        
+        if ($response->successful()) {
+            $item = $response->json();
+            $authors = array_map(fn($a) => $a['author']['display_name'] ?? '', $item['authorships'] ?? []);
+            
+            $abstract = null;
+            if (!empty($item['abstract_inverted_index'])) {
+                $words = [];
+                foreach ($item['abstract_inverted_index'] as $word => $positions) {
+                    foreach ($positions as $pos) {
+                        $words[$pos] = $word;
+                    }
+                }
+                ksort($words);
+                $abstract = implode(' ', $words);
+            }
 
-        return view('public.publication', compact('publication', 'similar', 'canDownload'));
+            $publication = new Publication([
+                'titre_fr' => $item['title'] ?? 'Sans titre',
+                'resume_fr' => $abstract,
+                'type' => $item['type'] ?? 'article',
+                'date_publication' => isset($item['publication_date']) ? \Carbon\Carbon::parse($item['publication_date']) : null,
+                'doi' => $item['doi'] ? str_replace('https://doi.org/', '', $item['doi']) : null,
+                'url_externe' => $item['doi'] ?? $item['id'],
+                'pdf_url' => $item['open_access']['oa_url'] ?? null,
+            ]);
+            $publication->id = basename($item['id']);
+            $publication->auteurs_externes = array_values(array_filter($authors));
+            
+            $similar = [];
+            $canDownload = false; // Géré par le lien externe
+
+            return view('public.publication', compact('publication', 'similar', 'canDownload'));
+        }
+
+        abort(404, "Publication introuvable.");
     }
 
     // ── Newsletter ──────────────────────────────────────────────────────────

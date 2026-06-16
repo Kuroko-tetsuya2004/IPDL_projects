@@ -2,130 +2,211 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design System UMMISCO ──────────────────────────────────────────────── */
-:root {
-    --color-primary: #1F4E79;
-    --color-secondary: #2E75B6;
-    --color-accent: #2E86C1;
-    --color-success: #0F6E56;
-    --color-warning: #854F0B;
-    --color-danger: #993C1D;
-}
+/* ══════════════════════════════════════════════════════════════════════
+   UMMISCO — Unified Design System
+   Theme is managed via  data-theme="light|dark"  on <html>
+   (identical to the public portal — dashboard.blade.php sets this)
+   ══════════════════════════════════════════════════════════════════════ */
 
+/* ── Color-scheme bridge for Tailwind dark: utilities ── */
+[data-theme="dark"]  { color-scheme: dark; }
+[data-theme="light"] { color-scheme: light; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
+
+/* ── Base layer: body background / text ────────────────────────── */
 @layer base {
     body {
-        @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg, #f5f7fa);
+        color:      var(--text, #0a0f1e);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.35s ease, color 0.35s ease;
     }
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   COMPONENT CLASSES — same tokens as public portal
+   ══════════════════════════════════════════════════════════════════════ */
 @layer components {
-    .btn-brand {
-        @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all;
-        @apply bg-blue-600 text-white hover:bg-blue-500 active:scale-95;
+
+    /* ── Buttons ───────────────────────────────────────────────── */
+    .btn-primary {
+        @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: #fff;
+        box-shadow: 0 4px 14px var(--primary-glow);
+        border: none;
     }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.08);
+        box-shadow: 0 8px 24px var(--primary-glow);
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold text-sm transition-all;
+        background: var(--surface);
+        color: var(--text-muted);
+        border: 1px solid var(--border-strong);
+    }
+    .btn-secondary:hover {
+        color: var(--primary-light);
+        background: var(--primary-glow);
+        border-color: var(--primary-light);
+    }
+
     .btn-ghost {
-        @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all;
-        @apply text-slate-400 hover:text-white hover:bg-white/5;
+        @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold text-sm transition-all;
+        color: var(--text-muted);
+        background: transparent;
+        border: none;
     }
-    .card-dark {
-        @apply bg-slate-900/60 border border-white/8 rounded-xl p-5;
+    .btn-ghost:hover {
+        background: var(--bg-tertiary);
+        color: var(--text);
     }
-    .input-dark {
-        @apply w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500;
-        @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all;
+
+    /* btn-sm modifier */
+    .btn-sm { @apply px-2.5 py-1 text-xs rounded-lg; height: 30px; }
+
+    /* ── Cards ─────────────────────────────────────────────────── */
+    .card {
+        background: var(--card-bg, var(--surface));
+        border-radius: var(--radius, 16px);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        transition: box-shadow 0.3s ease, border-color 0.3s ease,
+                    transform 0.3s ease, background 0.35s ease;
     }
+    .card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--border-strong);
+    }
+
+    /* ── Input / Form ──────────────────────────────────────────── */
+    .input {
+        @apply w-full rounded-xl text-sm transition-all outline-none;
+        padding: 0.65rem 1rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border-strong);
+        color: var(--text);
+        font-family: inherit;
+    }
+    .input::placeholder { color: var(--text-subtle); }
+    .input:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    /* ── Badges ────────────────────────────────────────────────── */
+    .badge-blue {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full font-semibold;
+        background: var(--primary-glow);
+        color: var(--primary-light);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        font-size: 0.7rem;
+    }
+
     .badge-role {
         @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
     }
+
+    /* ── Nav link (used inside NavBar) ─────────────────────────── */
+    .nav-link {
+        @apply inline-flex items-center gap-1.5 rounded-lg transition-all;
+        padding: 0.45rem 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+    .nav-link:hover {
+        color: var(--text);
+        background: var(--primary-glow);
+    }
 }
 
-/* ── Light Mode System Overrides ────────────────────────────────────────── */
-html:not(.dark) {
-    --color-primary: #1F4E79;
-    --color-secondary: #2E75B6;
-    --color-accent: #2E86C1;
-}
+/* ══════════════════════════════════════════════════════════════════════
+   LIGHT-MODE OVERRIDES for Tailwind utility classes
+   (covers legacy classes still present in templates)
+   ══════════════════════════════════════════════════════════════════════ */
 
-html:not(.dark) body {
-    background-color: #f8fafc !important; /* bg-slate-50 */
-    color: #0f172a !important; /* text-slate-900 */
-}
-
-html:not(.dark) .bg-slate-950, 
-html:not(.dark) .bg-surface-900\/80, 
-html:not(.dark) .bg-slate-900\/60, 
-html:not(.dark) .bg-slate-900, 
-html:not(.dark) .bg-surface-800\/40, 
-html:not(.dark) .bg-slate-800 {
+/* Backgrounds */
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] .bg-surface-900\/80,
+[data-theme="light"] .bg-surface-900\/90,
+[data-theme="light"] .bg-surface-800\/95,
+[data-theme="light"] .bg-slate-900\/60,
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] .bg-surface-800\/40,
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] .bg-black\/30,
+[data-theme="light"] .bg-black\/20 {
     background-color: #ffffff !important;
 }
 
-html:not(.dark) .bg-slate-100 {
-    background-color: #f1f5f9 !important; /* bg-slate-100 */
-}
+[data-theme="light"] .bg-slate-100 { background-color: #f1f5f9 !important; }
 
-html:not(.dark) .border-white\/8, 
-html:not(.dark) .border-white\/10, 
-html:not(.dark) .border-white\/5, 
-html:not(.dark) .border-slate-800 {
-    border-color: #e2e8f0 !important; /* border-slate-200 */
-}
-
-html:not(.dark) .divide-white\/5, 
-html:not(.dark) .divide-white\/8 {
+/* Borders */
+[data-theme="light"] .border-white\/8,
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-slate-800 {
     border-color: #e2e8f0 !important;
 }
 
-html:not(.dark) .text-white, 
-html:not(.dark) .text-slate-100 {
-    color: #0f172a !important; /* text-slate-900 */
-}
+[data-theme="light"] .divide-white\/5,
+[data-theme="light"] .divide-white\/8 { border-color: #e2e8f0 !important; }
 
-html:not(.dark) .text-slate-400 {
-    color: #475569 !important; /* text-slate-600 */
-}
+/* Text */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100 { color: #0f172a !important; }
 
-html:not(.dark) .text-slate-300 {
-    color: #334155 !important; /* text-slate-700 */
-}
+[data-theme="light"] .text-slate-400 { color: #475569 !important; }
+[data-theme="light"] .text-slate-300 { color: #334155 !important; }
+[data-theme="light"] .text-slate-500 { color: #64748b !important; }
+[data-theme="light"] .text-slate-600 { color: #475569 !important; }
 
-html:not(.dark) .text-slate-500 {
-    color: #64748b !important; /* text-slate-500 */
-}
-
-html:not(.dark) .hover\:bg-white\/5:hover, 
-html:not(.dark) .hover\:bg-white\/3:hover, 
-html:not(.dark) .hover\:bg-white\/2:hover {
+/* Hover backgrounds */
+[data-theme="light"] .hover\:bg-white\/5:hover,
+[data-theme="light"] .hover\:bg-white\/3:hover,
+[data-theme="light"] .hover\:bg-white\/2:hover {
     background-color: #f1f5f9 !important;
 }
 
-html:not(.dark) .bg-brand-600\/20 {
+/* Badges */
+[data-theme="light"] .bg-brand-600\/20 {
     background-color: rgba(37, 99, 235, 0.1) !important;
     color: #2563eb !important;
 }
 
-html:not(.dark) .input-dark, 
-html:not(.dark) input, 
-html:not(.dark) select, 
-html:not(.dark) textarea {
+/* Inputs */
+[data-theme="light"] .input-dark,
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
     background-color: #ffffff !important;
-    border-color: #cbd5e1 !important; /* border-slate-300 */
+    border-color: #cbd5e1 !important;
     color: #0f172a !important;
 }
 
-html:not(.dark) .input-dark::placeholder, 
-html:not(.dark) input::placeholder, 
-html:not(.dark) select::placeholder, 
-html:not(.dark) textarea::placeholder {
+[data-theme="light"] .input-dark::placeholder,
+[data-theme="light"] input::placeholder,
+[data-theme="light"] select::placeholder,
+[data-theme="light"] textarea::placeholder {
     color: #94a3b8 !important;
 }
 
-html:not(.dark) .btn-ghost {
-    color: #475569 !important;
-}
+/* Backdrop */
+[data-theme="light"] .backdrop-blur-xl { backdrop-filter: blur(20px); }
 
-html:not(.dark) .btn-ghost:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-    color: #0f172a !important;
+/* Legacy .dark class — keep support for components not yet migrated */
+html:not(.dark) body {
+    background-color: var(--bg, #f5f7fa) !important;
+    color: var(--text, #0a0f1e) !important;
 }

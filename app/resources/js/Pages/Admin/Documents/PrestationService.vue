@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
 import { ClipboardDocumentListIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
@@ -36,10 +36,35 @@ const fmt = (v) => v ? Number(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "
 const fmtCFA = (v) => v ? fmt(v) + ' F CFA' : ''
 
 const generating = ref(false)
+const previewUrl = ref('')
+let previewTimeout = null
+
+async function updatePreview() {
+  try {
+    const doc = await buildPDF()
+    const pdfBlob = doc.output('blob')
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value)
+    }
+    previewUrl.value = URL.createObjectURL(pdfBlob)
+  } catch (e) {
+    console.error("Erreur génération aperçu PDF :", e)
+  }
+}
+
+watch(form, () => {
+  clearTimeout(previewTimeout)
+  previewTimeout = setTimeout(updatePreview, 600)
+}, { deep: true })
+
+onMounted(() => updatePreview())
+
+onUnmounted(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+})
 
 // ── Génération PDF fidèle au document original FI-8 V5 ────────────────────
-async function genererPDF() {
-  generating.value = true
+async function buildPDF() {
   const { jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
 
@@ -267,14 +292,41 @@ async function genererPDF() {
   y += 4
   doc.text('(**) Montant maximum autorisé : 100.000 F CFA/prestation.', mL, y)
 
+  return doc
+}
+
+async function genererPDF() {
+  generating.value = true
+  const doc = await buildPDF()
   const pdfBlob = doc.output('blob')
+  
+  await saveToHistory(pdfBlob)
+
   const blobUrl = URL.createObjectURL(pdfBlob)
   window.open(blobUrl, '_blank')
   generating.value = false
 }
 
-function imprimer() {
-  window.print()
+async function imprimer() {
+  generating.value = true
+  const doc = await buildPDF()
+  const pdfBlob = doc.output('blob')
+  
+  await saveToHistory(pdfBlob)
+  generating.value = false
+  setTimeout(() => window.print(), 300)
+}
+
+async function saveToHistory(pdfBlob) {
+  try {
+    const formData = new FormData()
+    formData.append('type_document', 'prestation_service')
+    formData.append('donnees', JSON.stringify(form.value))
+    formData.append('pdf_file', pdfBlob, 'prestation.pdf')
+    await window.axios.post('/admin/documents/store', formData)
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de l\'historique', error)
+  }
 }
 </script>
 
@@ -448,155 +500,17 @@ function imprimer() {
       </div>
 
       <!-- ─── APERÇU FIDÈLE AU DOCUMENT FI-8 V5 ─── -->
-      <div class="xl:sticky xl:top-6 xl:self-start">
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu — fidèle au document FI-8 V5</span>
+      <div class="xl:sticky xl:top-6 xl:self-start flex flex-col h-[80vh]">
+        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 flex items-center justify-between shrink-0">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu en direct — fidèle au document officiel</span>
         </div>
-        <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
-          <div style="width:794px; padding:24px 32px; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#000; background:#fff;">
-
-            <!-- En-tête 3 colonnes -->
-            <table style="width:100%; border-collapse:collapse; border:1.5px solid #000; margin-bottom:0;">
-              <tr>
-                <td style="border:1px solid #000; padding:8px; width:30%; text-align:center; vertical-align:top; font-size:9px; line-height:1.5;">
-                  <img v-if="logoIrd" :src="logoIrd" alt="Logo IRD" style="height:35px; margin:0 auto 10px; display:block;" />
-                  <strong>Représentation de l'IRD<br>au Sénégal</strong><br>
-                  Tél : 00221 33 849 35 35<br>
-                  BP 1386 - Dakar
-                </td>
-                <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:middle; font-size:14px; font-weight:bold; width:40%;">
-                  RECU DE PRESTATION DE SERVICE
-                </td>
-                <td style="border:1px solid #000; padding:8px; text-align:right; vertical-align:middle; font-size:8px; line-height:1.6; width:30%;">
-                  Identification : FI - 8<br>
-                  Date de création : 10/07/08<br>
-                  Date de Modification : 24/08/2011<br>
-                  Version : V5
-                </td>
-              </tr>
-            </table>
-
-            <!-- Champs prestataire -->
-            <table style="width:100%; border-collapse:collapse; border:1px solid #000; border-top:0;">
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold; width:30%;">NOM :</td>
-                <td style="border:1px solid #999; padding:5px 8px; width:20%;">{{ form.nom }}</td>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold; width:15%;">Prénoms :</td>
-                <td style="border:1px solid #999; padding:5px 8px; width:35%;">{{ form.prenoms }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">né le :</td>
-                <td style="border:1px solid #999; padding:5px 8px;">{{ form.ne_le }}</td>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">à :</td>
-                <td style="border:1px solid #999; padding:5px 8px;">{{ form.a }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="1">Adresse :</td>
-                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.adresse }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Tél :</td>
-                <td style="border:1px solid #999; padding:5px 8px;">{{ form.tel }}</td>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Emploi/Fonction :</td>
-                <td style="border:1px solid #999; padding:5px 8px;">{{ form.emploi_fonction }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Objet de la prestation :</td>
-                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.objet }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Produits attendus :</td>
-                <td style="border:1px solid #999; padding:5px 8px; white-space:pre-wrap; word-break:break-word;" colspan="3">{{ form.produits_attendus }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Durée (maximum 9 jours consécutifs) :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">
-                  {{ form.duree }}&nbsp;&nbsp;&nbsp;
-                  <span v-if="form.date_debut || form.date_fin">du : {{ form.date_debut }}&nbsp;&nbsp;au : {{ form.date_fin }}</span>
-                </td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">Nom du responsable du suivi :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.responsable_suivi }}</td>
-              </tr>
-              <!-- Montants -->
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="2">
-                  Montant net à percevoir soit 95% du montant brut (en chiffres) (**) :
-                </td>
-                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; text-align:right;" colspan="1">{{ montantNet > 0 ? fmt(montantNet) : '' }}</td>
-                <td style="border:1px solid #999; padding:5px 8px;">F CFA</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="2">Montant net à percevoir (en lettres) (**) :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="2">{{ form.montant_net_lettres }}</td>
-              </tr>
-              <!-- Section admin -->
-              <tr>
-                <td style="border:1px solid #000; padding:5px 8px; text-align:center; font-weight:bold; background:#ddd;" colspan="4">
-                  À remplir par l'administration
-                </td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="2">Impôt sur le revenu : 5% du montant brut (*) :</td>
-                <td style="border:1px solid #999; padding:5px 8px; text-align:right; font-weight:bold;">{{ impot > 0 ? fmt(impot) : '' }}</td>
-                <td style="border:1px solid #999; padding:5px 8px;">F CFA</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;" colspan="2">Montant brut de la prestation :</td>
-                <td style="border:1px solid #999; padding:5px 8px; text-align:right; font-weight:bold;">{{ montantBrut > 0 ? fmt(montantBrut) : '' }}</td>
-                <td style="border:1px solid #999; padding:5px 8px;">F CFA</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">SERVICE/UR/US :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.service }}</td>
-              </tr>
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; background:#f5f5f5; font-weight:bold;">IMPUTATION<br>code EOTP ou centre<br>(budget de fonctionnement) :</td>
-                <td style="border:1px solid #999; padding:5px 8px;" colspan="3">{{ form.imputation }}</td>
-              </tr>
-            </table>
-
-            <!-- Certifié le service fait -->
-            <table style="width:100%; border-collapse:collapse; border:1px solid #000; border-top:0; margin-bottom:0;">
-              <tr>
-                <td style="border:1px solid #999; padding:8px; text-align:center; width:50%; height:55px; vertical-align:bottom;">
-                  <div>Certifié le service fait</div>
-                  <div style="margin-top:28px;">Le Responsable du suivi</div>
-                </td>
-                <td style="border:1px solid #999; padding:8px; text-align:center; width:50%; vertical-align:bottom;">
-                  <div>Certifié le service fait</div>
-                  <div style="margin-top:28px;">L'Ordonnateur</div>
-                </td>
-              </tr>
-            </table>
-
-            <!-- Pour acquit -->
-            <table style="width:100%; border-collapse:collapse; border:1px solid #000; border-top:0; margin-bottom:10px;">
-              <tr>
-                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; width:60%; height:28px;">POUR ACQUIT :</td>
-                <td style="border:1px solid #999; padding:5px 8px; width:40%;">Date : {{ form.date_acquit }}</td>
-              </tr>
-            </table>
-
-            <!-- Notes -->
-            <div style="font-size:8px; color:#333; line-height:1.8; margin-top:4px;">
-              <p>(*) Si le montant de la prestation est égal ou supérieur à 25 000 F CFA.</p>
-              <p>NB : Les impôts ne sont pas prélevés pour les prestations effectuées hors du Sénégal par des non-résidents.</p>
-              <p>(**) Montant maximum autorisé : 100.000 F CFA/prestation.</p>
-            </div>
-
+        <div class="flex-1 rounded-xl border border-white/5 bg-slate-900/40 shadow-2xl overflow-hidden relative">
+          <iframe v-if="previewUrl" :src="previewUrl" class="absolute inset-0 w-full h-full" frameborder="0"></iframe>
+          <div v-else class="absolute inset-0 flex items-center justify-center text-slate-500 font-medium text-sm">
+            Génération de l'aperçu PDF...
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style>
-@media print {
-  body * { visibility: hidden; }
-  #print-zone, #print-zone * { visibility: visible; }
-  #print-zone { position: fixed; top: 0; left: 0; width: 100%; background: white !important; }
-}
-</style>

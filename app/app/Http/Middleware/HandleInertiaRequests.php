@@ -51,10 +51,11 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $userId ? [
-                    'id'    => $userId,
-                    'name'  => $userName,
-                    'email' => session('user_email'),
-                    'role'  => $userRole,
+                    'id'       => $userId,
+                    'name'     => $userName,
+                    'email'    => session('user_email'),
+                    'role'     => $userRole,
+                    'orcid_id' => \App\Modules\User\Models\User::find($userId)?->orcid_id,
                 ] : null,
                 'authenticated' => !is_null($userId),
             ],
@@ -62,6 +63,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),
                 'warning' => $request->session()->get('warning'),
+                'info'    => $request->session()->get('info'),
             ],
             'locale' => $locale,
             'unread_count' => function () use ($userId, $userRole) {

@@ -9,6 +9,7 @@ use App\Modules\Dataset\Controllers\DatasetController;
 use App\Modules\Integration\Controllers\ImportController;
 use App\Modules\Notification\Controllers\NotificationController;
 use App\Modules\PublicPortal\Controllers\PublicPortalController;
+use App\Modules\PublicPortal\Controllers\UmmiscoController;
 use App\Modules\Search\Controllers\SearchController;
 use App\Modules\User\Controllers\DashboardController;
 use App\Modules\User\Controllers\ProfileController;
@@ -20,18 +21,13 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// ── Routes publiques ────────────────────────────────────────────────────────
-
+// ── Accueil et Pages Publiques ─────────────────────────────────────────────
 Route::get('/', [PublicPortalController::class, 'home'])->name('home');
 Route::get('/publications', [PublicPortalController::class, 'publications'])->name('publications');
 Route::get('/publications/{id}', [PublicPortalController::class, 'show'])->name('publications.show')->whereUuid('id');
+Route::get('/datasets', [PublicPortalController::class, 'datasets'])->name('datasets');
 Route::get('/axes', [PublicPortalController::class, 'axes'])->name('axes');
 Route::get('/projets', [PublicPortalController::class, 'projets'])->name('projets');
-Route::get('/search', [SearchController::class, 'index'])->name('search');
-Route::get('/recherche', [SearchController::class, 'index'])->name('recherche');
-Route::get('/documents/{id}/download', [PublicPortalController::class, 'downloadDocument'])->name('documents.download')->whereUuid('id');
-Route::get('/documents/{id}/view', [PublicPortalController::class, 'viewDocument'])->name('documents.view')->whereUuid('id');
-Route::get('/datasets/files/{id}/download', [PublicPortalController::class, 'downloadDatasetFile'])->name('datasets.files.download')->whereUuid('id');
 
 // ── Publications externes (lecture seule — Semantic Scholar, OpenAlex, arXiv) ──
 Route::get('/publications/externes', [ImportController::class, 'publicIndex'])->name('publications.externes');
@@ -51,6 +47,9 @@ Route::get('/recherches/modelisation', [PublicPortalController::class, 'modelisa
 Route::get('/recherches/milieux', [PublicPortalController::class, 'milieux'])->name('recherches.milieux');
 Route::get('/actualites', [PublicPortalController::class, 'actualites'])->name('actualites');
 Route::get('/contact', [PublicPortalController::class, 'contact'])->name('contact');
+
+// Scraping UMMISCO
+Route::get('/centres', [UmmiscoController::class, 'centres'])->name('centres');
 
 // Gestion de la langue
 Route::post('/langue/{lang}', function ($lang) {
@@ -114,8 +113,12 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
 
     // ── Datasets ──────────────────────────────────────────────────────────
     Route::get('/mes-datasets', [DatasetController::class, 'index'])->name('mes-datasets');
-    Route::get('/datasets/nouveau', [DatasetController::class, 'create'])->name('datasets.create');
-    Route::post('/datasets', [DatasetController::class, 'store'])->name('datasets.store');
+    
+    // Import DataCite
+    Route::post('/datasets/import-doi', [DatasetController::class, 'importByDoi'])->name('datasets.import-doi');
+    Route::post('/datasets/sync-orcid', [DatasetController::class, 'syncOrcid'])->name('datasets.sync-orcid');
+    Route::post('/datasets/fetch-live', [DatasetController::class, 'fetchLive'])->name('datasets.fetch-live');
+    Route::get('/datasets/externes', [DatasetController::class, 'externalIndex'])->name('datasets.externes');
 
     // ── Notifications ─────────────────────────────────────────────────────
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
@@ -145,9 +148,12 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
         // ── Documents administratifs (super_admin uniquement) ─────────────────
         Route::prefix('documents')->name('documents.')->middleware('role:super_admin')->group(function () {
             Route::get('/', [DocumentController::class, 'index'])->name('index');
+            Route::get('/historique', [DocumentController::class, 'historique'])->name('historique');
             Route::get('/convention-stage', [DocumentController::class, 'conventionStage'])->name('convention-stage');
             Route::get('/prestation-service', [DocumentController::class, 'prestationService'])->name('prestation-service');
             Route::get('/bon-achat', [DocumentController::class, 'bonAchat'])->name('bon-achat');
+            Route::post('/store', [DocumentController::class, 'store'])->name('store');
+            Route::get('/{id}/download', [DocumentController::class, 'download'])->name('download')->whereUuid('id');
         });
 
         // ── Import publications externes — supervision (super_admin) ──────────

@@ -1,84 +1,84 @@
-# 📖 Guide d'Utilisation — Portail UMMISCO
+# Guide Utilisateur Complet — Portail Web UMMISCO
 
-Bienvenue sur le guide d'utilisation du portail institutionnel de l'UMMISCO. Ce document est destiné aux utilisateurs de l'application pour les guider dans les opérations courantes.
-
----
-
-## 1. Rôles et Profils Utilisateurs
-
-L'accès aux différentes sections dépend de votre profil :
-- **Visiteur** : Peut consulter publiquement les articles, les axes de recherche et les publications agrégées depuis des bases de données externes.
-- **Chercheur** : Possède un espace personnel (Dashboard). Il peut publier des articles et des jeux de données de façon directe.
-- **Doctorant** : Possède un espace personnel, mais ses publications doivent obligatoirement passer par un **processus de validation** avant d'être publiques (règle institutionnelle).
-- **Responsable d'Axe (axe_admin)** : Peut valider ou rejeter les soumissions des doctorants rattachés à son axe de recherche.
-- **Super Administrateur** : A accès au panneau d'administration, à la gestion documentaire (génération de PDF), à la configuration des imports scientifiques et aux statistiques globales.
+Bienvenue sur le portail scientifique UMMISCO ! Ce guide s'adresse à toute personne découvrant l'application, qu'il s'agisse d'un simple visiteur, d'un chercheur, d'un responsable d'équipe ou de l'administrateur système. Il vous explique pas à pas comment naviguer et tirer profit de la plateforme.
 
 ---
 
-## 2. Le Portail Public (Visiteurs)
+## 1. Le Portail Public (Accessible à tous)
+Dès votre arrivée sur le site (`/`), vous accédez à l'espace public (sans avoir besoin de compte). Il sert de vitrine au laboratoire.
 
-Accessible à l'URL racine (`/`), le portail public est la vitrine de l'UMMISCO.
+* **Accueil** : Présentation générale du laboratoire, derniers chiffres et actualités.
+* **Publications** : Le moteur de recherche principal. Vous y trouverez tous les articles, thèses et rapports validés par le laboratoire. Vous pouvez chercher par mot-clé, filtrer par année ou par type de document.
+* **Données (Datasets)** : Le catalogue dédié exclusivement aux jeux de données produits par le laboratoire.
+* **Axes** : Liste des équipes (Axes de recherche), présentant les responsables et les membres affiliés.
+* **Projets** : Vitrine des projets de recherche en cours.
 
-### 2.1 Rechercher une publication
-1. Naviguez dans l'onglet **Publications**.
-2. Vous pouvez filtrer les travaux réalisés en interne par type, par année ou par axe thématique.
-3. La barre de recherche intègre un moteur "Full-Text" très performant pour scanner le contenu exact des résumés.
-
-### 2.2 Consulter des données externes (Monde Scientifique)
-1. Allez dans l'onglet **Articles externes**.
-2. Vous avez ici accès à une base de données agrégée comprenant des millions de publications issues de sources reconnues : **Semantic Scholar, OpenAlex, arXiv et CrossRef**.
-3. Si un PDF gratuit est disponible, un bouton "Télécharger le PDF" apparaîtra (via l'intégration d'Unpaywall).
+> **Astuce Recherche** : Si une publication ou un dataset public n'est pas hébergé localement, le système cherchera en temps réel sur les bases de données mondiales (OpenAlex / DataCite) pour vous fournir l'information !
 
 ---
 
-## 3. L'Espace Connecté (Chercheurs et Doctorants)
+## 2. Connexion et Profils
+Pour publier des travaux ou gérer le site, cliquez sur **Connexion** (en haut à droite). 
+Selon les permissions qui vous ont été accordées par l'administrateur, vous disposerez d'un des 4 rôles suivants :
 
-Accessible après connexion, depuis l'URL (`/dashboard`).
-
-### 3.1 Soumettre une nouvelle publication (Doctorants)
-1. Dans le menu latéral, cliquez sur **Mes publications** puis sur le bouton **Nouvelle publication**.
-2. Remplissez le formulaire de soumission (titre, résumé, fichier PDF, mots-clés, axe de rattachement).
-3. Une fois soumis, l'état de l'article passe "En attente". Un email ou une notification est envoyé au responsable de votre axe.
-4. Si le responsable demande des modifications, l'article vous sera renvoyé. Vous devrez modifier le contenu et soumettre de nouveau.
-
-### 3.2 Publier directement (Chercheurs)
-Les chercheurs de l'UMMISCO sont exemptés du workflow de validation. Une fois que vous remplissez et soumettez le même formulaire, votre contenu est immédiatement publié et visible de tous.
-
-### 3.3 Partager un Dataset
-1. Allez dans **Mes datasets** > **Nouveau dataset**.
-2. Remplissez la description. Vous devrez obligatoirement choisir une licence (ex: *Creative Commons CC BY 4.0*) avant de pouvoir uploader votre fichier CSV, JSON ou Excel.
-3. Le fichier sera stocké de manière sécurisée et mis à la disposition du public.
+1. **Visiteur** : Un compte simple (limité à la consultation).
+2. **Chercheur / Doctorant** : Permet de soumettre, importer et gérer ses propres travaux scientifiques. *Note : les travaux des doctorants sont soumis à validation.*
+3. **Responsable d'Axe** : Autorise la modération (validation ou rejet) des travaux soumis par les membres de l'axe.
+4. **Super Administrateur** : Contrôle absolu sur la plateforme, les utilisateurs et les paramètres.
 
 ---
 
-## 4. L'Espace Administration (Responsables d'axe)
+## 3. Espace Chercheur (Votre Tableau de Bord)
+Si vous êtes membre du laboratoire, vous accédez après connexion à votre espace privé.
 
-### 4.1 Valider les soumissions (Workflow)
-1. Dans la barre latérale du dashboard, cliquez sur le menu **Soumissions** (un badge rouge indique le nombre d'articles en attente).
-2. Pour chaque article, vous pouvez consulter le contenu (titre, résumé, téléchargement du fichier joint).
-3. Vous disposez de deux actions :
-   - **Approuver** : L'article devient immédiatement public.
-   - **Rejeter (Demande de révision)** : Vous devez impérativement saisir un motif clair expliquant pourquoi la publication est renvoyée au doctorant.
+### 3.1. Mon Profil (La base)
+* Allez dans **Paramètres > Profil**.
+* Renseignez vos informations (Axe de recherche, spécialité).
+* **Action très recommandée** : Ajoutez votre **Identifiant ORCID** (ex: `0000-0002-1234-5678`). C'est la clé qui permettra au portail d'automatiser tout votre travail !
 
----
+### 3.2. Gérer ses Travaux ("Mes Publications" et "Mes Datasets")
+Ces deux menus regroupent l'ensemble de votre production. Vos documents peuvent avoir trois statuts :
+* 📝 *Brouillon* : Vous travaillez encore dessus.
+* ⏳ *En attente* : Le document a été envoyé au responsable de votre axe pour validation.
+* ✅ *Publié* : Le document a été validé et est désormais visible de tous sur le portail public.
 
-## 5. Le Back-Office Global (Super Administrateur)
+### 3.3. Comment ajouter des travaux ? (3 Méthodes simples)
+Fini la saisie manuelle interminable ! Le portail vous propose 3 façons d'ajouter vos travaux :
 
-L'interface est accessible depuis la route sécurisée `/admin` ou via l'icône de la barre de navigation.
-
-### 5.1 Génération de PDF Administratifs (Gestion documentaire)
-1. Allez dans **Documents admin.**
-2. Vous y trouverez des formulaires dynamiques (ex: *Bon de commande d'achat*, *Prestation de service*, *Convention de stage*).
-3. Remplissez le formulaire directement sur le site. Les totaux (TVA, TTC) se calculent automatiquement.
-4. Cliquez sur **Générer le PDF**. Un document officiel, reprenant fidèlement les chartes de l'UMMISCO, de l'IRD et de l'UCAD, sera téléchargé sur votre machine.
-
-### 5.2 Supervision des imports scientifiques
-Bien que l'import d'articles depuis OpenAlex, CrossRef, etc. soit exécuté automatiquement chaque nuit à 02h00, vous pouvez le piloter manuellement.
-1. Allez dans **Import scientifique**.
-2. Vous visualiserez les statistiques des bases de données.
-3. Le bouton **"Lancer la synchronisation"** permet de forcer une récupération immédiate sur un mot clé spécifique.
+1. **✨ La Synchronisation Automatique (ORCID)** 
+   * Si vous avez renseigné votre ORCID dans votre profil, allez dans *Mes Publications* ou *Mes Datasets* et cliquez sur **Synchroniser**.
+   * Le portail va fouiller le web mondial (OpenAlex pour les articles, DataCite pour les données) et importera automatiquement tout ce que vous avez publié récemment.
+2. **🔍 L'Import par DOI**
+   * Vous avez le DOI d'un de vos jeux de données (ex: `10.5061/dryad.cv0k0`) ? Collez-le dans la barre d'importation dans l'onglet *Mes Datasets*. Le système récupèrera l'intégralité du dataset pour vous !
+3. **✍️ La Saisie Manuelle**
+   * Pour les travaux non publiés ailleurs, vous pouvez toujours soumettre un document en remplissant un formulaire classique (titre, résumé, fichier PDF, etc.).
 
 ---
 
-### Une question ou un problème ?
-> L'ensemble des événements (soumissions, validations, connexions) est suivi dans un journal d'audit sécurisé afin de garantir la traçabilité des opérations. Si vous rencontrez un comportement inattendu, veuillez contacter l'administrateur technique du laboratoire.
+## 4. Espace Responsable d'Axe (Le Validateur)
+En tant que chef d'équipe, un menu spécial apparaît dans votre barre latérale : **Soumissions**.
+C'est ici que tombent les travaux déposés manuellement par les doctorants de votre axe.
+
+* Pour chaque document, vous pouvez consulter ses détails (ou son fichier PDF).
+* Vous pouvez cliquer sur **Approuver** : le document bascule instantanément sur le site public.
+* Vous pouvez cliquer sur **Rejeter** : le document retourne à son auteur, et vous devez laisser un motif clair expliquant ce qui doit être corrigé.
+
+---
+
+## 5. Espace Super Administrateur (La Tour de Contrôle)
+L'administrateur gère l'infrastructure via le panneau d'administration :
+
+* **Utilisateurs et Accès** : Permet de bloquer des comptes ou de changer les privilèges (ex: nommer un nouveau responsable d'axe).
+* **Documents admin** : Génération de PDF Administratifs (bons de commande, attestations de stage) avec calculs automatiques, exportables directement.
+* **Publications Globales** : Permet de voir et de modifier toutes les publications de la plateforme, quel que soit l'auteur.
+* **Journaux d'Audit (Sécurité)** : C'est le carnet de bord intouchable du système. Il liste "Qui a fait quoi et quand" (ex: connexion, modification de rôle, validation de publication). Utile en cas d'erreur ou de litige.
+
+---
+
+## 6. La Cloche de Notifications 🔔
+Gardez un œil sur l'icône de la cloche en haut à droite ! Elle vous alerte en temps réel :
+* Lorsqu'une de vos publications vient d'être validée (ou rejetée).
+* Lorsqu'un de vos imports ORCID est terminé avec le bilan des données récupérées.
+* Lorsqu'une nouvelle tâche vous attend (pour les responsables d'axe).
+
+> *En cas de comportement inattendu, n'hésitez pas à vous rapprocher de l'administrateur technique. L'ensemble des événements étant tracé, le support sera très rapide.*

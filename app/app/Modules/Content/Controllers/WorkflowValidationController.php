@@ -80,7 +80,12 @@ class WorkflowValidationController extends Controller
 
         try {
             $stats = $importService->syncUserOrcid($user);
-            return back()->with('success', "Synchronisation ORCID terminée : {$stats['new']} nouvelle(s) publication(s) ajoutée(s).");
+            
+            if ($stats['fetched'] === 0) {
+                return back()->with('info', 'Aucune publication trouvée sur OpenAlex pour votre ORCID.');
+            }
+            
+            return back()->with('success', "Synchronisation ORCID terminée : {$stats['fetched']} publication(s) trouvée(s), {$stats['new']} nouvelle(s) importée(s).");
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("[ORCID Sync] Erreur pour l'utilisateur {$userId}", ['error' => $e->getMessage()]);
             return back()->withErrors(['orcid' => 'Une erreur est survenue lors de la synchronisation avec ORCID.']);

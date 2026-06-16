@@ -116,14 +116,43 @@ class AuthController extends Controller
             'nom'               => 'required|string|max:100',
             'email'             => 'required|email|max:255|unique:users,email',
             'password'          => 'required|string|min:6|confirmed',
-            'role'              => 'required|in:researcher,doctoral_student,super_admin',
+            'role'              => 'required|in:researcher,doctoral_student',
+            'orcid_id'          => 'nullable|string|regex:/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/',
             'specialite'        => 'required_if:role,researcher|nullable|string|max:200',
             'domaine_expertise' => 'required_if:role,doctoral_student|nullable|string|max:200',
             'axe_principal_id'  => 'required_if:role,doctoral_student|nullable|uuid|exists:axes_thematiques,id',
         ]);
 
         return DB::transaction(function () use ($validated) {
-            $isSuperAdmin = $validated['role'] === 'super_admin';
+            $isAutoApproved = false;
+
+            if (!empty($validated['orcid_id'])) {
+                try {
+                    $openAlex = app(\App\Modules\Integration\Services\OpenAlexService::class);
+                    $works = $openAlex->searchByOrcid($validated['orcid_id'], 10);
+                    
+                    foreach ($works as $work) {
+                        $rawAuthors = $work['raw_data']['authorships'] ?? [];
+                        foreach ($rawAuthors as $authorship) {
+                            $institutions = $authorship['institutions'] ?? [];
+                            foreach ($institutions as $inst) {
+                                $name = strtolower($inst['display_name'] ?? '');
+                                if (str_contains($name, 'ummisco') || 
+                                    str_contains($name, 'cheikh anta diop') || 
+                                    str_contains($name, 'ucad') || 
+                                    str_contains($name, 'ird') ||
+                                    str_contains($name, 'institut de recherche pour le développement') ||
+                                    str_contains($name, 'ecole supérieure polytechnique')) {
+                                    $isAutoApproved = true;
+                                    break 3;
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Erreur lors de la validation ORCID pour {$validated['email']} : " . $e->getMessage());
+                }
+            }
 
             $user = User::create([
                 'keycloak_id'         => 'local-register-' . uniqid(),
@@ -131,8 +160,9 @@ class AuthController extends Controller
                 'nom'                 => $validated['nom'],
                 'email'               => $validated['email'],
                 'role'                => $validated['role'],
-                'statut'              => $isSuperAdmin ? 'active' : 'pending',
+                'statut'              => $isAutoApproved ? 'active' : 'pending',
                 'password'            => Hash::make($validated['password']),
+                'orcid_id'            => $validated['orcid_id'] ?? null,
                 'axe_principal_id'    => $validated['role'] === 'doctoral_student' ? $validated['axe_principal_id'] : null,
                 'langue_preference'   => 'fr',
                 'email_notifications' => true,
@@ -155,7 +185,7 @@ class AuthController extends Controller
 
             $this->registerUserInKeycloak($user, $validated['password']);
 
-            if ($isSuperAdmin) {
+            if ($isAutoApproved) {
                 $this->enableUserInKeycloak($user);
 
                 $accessToken = $this->authenticateWithKeycloak($validated['email'], $validated['password']);
@@ -168,11 +198,11 @@ class AuthController extends Controller
                         $user->id,
                         'user',
                         $user->id,
-                        ['mode' => 'register_auto_login', 'role' => 'super_admin'],
+                        ['mode' => 'register_auto_login', 'role' => $user->role],
                     );
 
                     return redirect()->route('dashboard')
-                        ->with('success', "Compte Super-Administrateur créé et connecté avec succès ! Bienvenue, {$user->nom_complet}.");
+                        ->with('success', "Inscription validée automatiquement grâce à votre affiliation UMMISCO (via ORCID). Bienvenue, {$user->nom_complet} !");
                 }
             }
 

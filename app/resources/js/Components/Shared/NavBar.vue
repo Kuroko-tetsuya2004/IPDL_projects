@@ -8,38 +8,34 @@ import {
   SunIcon, MoonIcon, HomeIcon, GlobeAltIcon
 } from '@heroicons/vue/24/outline'
 
-const page     = usePage()
-const user     = computed(() => page.props.auth?.user)
-const locale   = computed(() => page.props.locale ?? 'fr')
-const mobileOpen = ref(false)
+const page         = usePage()
+const user         = computed(() => page.props.auth?.user)
+const locale       = computed(() => page.props.locale ?? 'fr')
+const mobileOpen   = ref(false)
 const userMenuOpen = ref(false)
-
-const isDark = ref(true)
+const isDark       = ref(false)
 
 onMounted(() => {
-  isDark.value = document.documentElement.classList.contains('dark')
+  // Align with the portal's data-theme system
+  isDark.value = document.documentElement.getAttribute('data-theme') === 'dark'
 })
 
 function toggleTheme() {
-  if (document.documentElement.classList.contains('dark')) {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme', 'light')
-    isDark.value = false
-  } else {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
-    isDark.value = true
-  }
+  const html  = document.documentElement
+  const current = html.getAttribute('data-theme')
+  const next    = current === 'dark' ? 'light' : 'dark'
+  html.setAttribute('data-theme', next)
+  localStorage.setItem('ummisco-theme', next)
+  isDark.value = next === 'dark'
 }
 
 const navLinks = [
-  { label: 'Accueil',              labelEn: 'Home',               href: '/'},
-  { label: 'Publications',         labelEn: 'Publications',        href: '/publications'},
-  { label: 'Axes',                 labelEn: 'Research Areas',      href: '/axes'},
-  { label: 'Données',              labelEn: 'Datasets',            href: '/datasets'},
-  { label: 'Articles externes',    labelEn: 'External Articles',   href: '/publications/externes'},
-  { label: 'Équipe',               labelEn: 'Team',                href: '/equipe'},
-  { label: 'Contact',              labelEn: 'Contact',             href: '/contact'},
+  { label: 'Accueil',            labelEn: 'Home',             href: '/'},
+  { label: 'Publications',       labelEn: 'Publications',      href: '/publications'},
+  { label: 'Axes',               labelEn: 'Research Areas',    href: '/axes'},
+  { label: 'Données',            labelEn: 'Datasets',          href: '/datasets'},
+  { label: 'Membres',            labelEn: 'Members',           href: '/unite/membres'},
+  { label: 'Contact',            labelEn: 'Contact',           href: '/contact'},
 ]
 
 function label(link) {
@@ -51,7 +47,6 @@ function toggleLocale() {
   window.axios.post(`/langue/${next}`).then(() => window.location.reload())
 }
 
-// ✅ Logout propre via router.post()
 function handleLogout() {
   userMenuOpen.value = false
   router.post('/auth/logout')
@@ -59,196 +54,582 @@ function handleLogout() {
 </script>
 
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50">
-    <!-- Fond translucide -->
-    <div class="absolute inset-0 bg-surface-900/90 backdrop-blur-xl border-b border-white/8" />
+  <!-- ═══ NAVBAR — aligned with public portal design ═══ -->
+  <div class="navbar-wrapper">
 
-    <!-- Bande supérieure partenaires (desktop) -->
-    <div class="relative border-b border-white/5 bg-black/30 hidden lg:block">
-      <div class="max-w-7xl mx-auto px-6 h-8 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-            <img src="/images/logo_ucad.webp" alt="UCAD" class="h-5 w-auto object-contain filter brightness-110" />
-            <span class="text-[10px] text-slate-500 font-medium">Université Cheikh Anta Diop</span>
-          </div>
-          <span class="text-white/10">|</span>
-          <div class="flex items-center gap-2 opacity-80">
-            <span class="text-[10px] text-slate-500 font-medium">IRD · CNRS · Sorbonne Université</span>
-          </div>
-        </div>
-        <div class="text-[10px] text-slate-600 font-medium tracking-wide uppercase">
-          Portail Scientifique — UMMISCO Dakar
-        </div>
-      </div>
-    </div>
+    <!-- Gradient accent line (identical to public portal) -->
+    <div class="navbar-accent-line"></div>
 
-    <nav class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-      <!-- Logo UMMISCO -->
-      <Link href="/" class="flex items-center gap-3 group shrink-0">
-        <div class="relative flex items-center gap-2">
-          <img
-            src="/images/logo_ummisco.webp"
-            alt="UMMISCO"
-            class="h-9 w-auto object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
-          />
-          <img
-            src="/images/logo_ucad.webp"
-            alt="UCAD"
-            class="h-7 w-auto object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
-          />
-          <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <nav class="navbar-inner">
+
+      <!-- ── Brand / Logo ── -->
+      <Link href="/" class="navbar-brand">
+        <div class="navbar-logos">
+          <img src="/images/logo_ummisco.webp" alt="UMMISCO" />
+          <img src="/images/logo_ucad.webp"    alt="UCAD"    />
         </div>
-        <div class="hidden sm:block leading-none">
-          <span class="text-white font-extrabold text-sm tracking-wide bg-gradient-to-r from-white via-slate-200 to-brand-300 bg-clip-text text-transparent">
-            UMMISCO
-          </span>
-          <span class="block text-slate-500 text-[10px] uppercase font-semibold tracking-wider mt-0.5">
-            Portail de recherche
-          </span>
+        <div class="navbar-label">
+          <span class="navbar-label-title">UMMISCO</span>
+          <span class="navbar-label-sub">Portail scientifique</span>
         </div>
       </Link>
 
-      <!-- Nav desktop -->
-      <div class="hidden lg:flex items-center gap-1">
-        <Link v-for="link in navLinks" :key="link.href" :href="link.href"
-          class="nav-link text-xs font-medium">
-          {{ label(link) }}
-        </Link>
-      </div>
+      <!-- ── Nav links desktop ── -->
+      <ul class="navbar-nav" :class="{ 'is-open': mobileOpen }" id="dashNavbarNav">
+        <li v-for="link in navLinks" :key="link.href">
+          <Link
+            :href="link.href"
+            class="nav-link"
+            :class="{ active: page.url === link.href || (link.href !== '/' && page.url.startsWith(link.href)) }"
+            @click="mobileOpen = false"
+          >
+            {{ label(link) }}
+          </Link>
+        </li>
+      </ul>
 
-      <!-- Actions droite -->
-      <div class="flex items-center gap-2">
-        <!-- Recherche -->
-        <Link href="/recherche" class="btn-ghost btn-sm rounded-lg hidden sm:flex">
-          <MagnifyingGlassIcon class="w-4 h-4" />
-        </Link>
+      <!-- ── Right actions ── -->
+      <div class="navbar-actions">
 
-        <!-- Langue -->
-        <button @click="toggleLocale"
-          class="btn-ghost btn-sm rounded-lg hidden sm:flex items-center gap-1 text-xs font-semibold uppercase"
-          :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'">
-          <LanguageIcon class="w-4 h-4" />
-          {{ locale === 'fr' ? 'EN' : 'FR' }}
+        <!-- Theme toggle -->
+        <button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Mode clair' : 'Mode sombre'" aria-label="Changer le thème">
+          <SunIcon  v-if="isDark"  class="icon-svg" />
+          <MoonIcon v-else         class="icon-svg" />
         </button>
 
-        <!-- Thème -->
-        <button @click="toggleTheme"
-          class="btn-ghost btn-sm rounded-lg flex items-center justify-center"
-          :title="isDark ? 'Passer au mode clair' : 'Passer au mode sombre'">
-          <SunIcon v-if="isDark" class="w-4 h-4 text-amber-400" />
-          <MoonIcon v-else class="w-4 h-4 text-slate-500" />
+        <!-- Language toggle -->
+        <button class="lang-btn" @click="toggleLocale" :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'">
+          <LanguageIcon class="icon-svg-sm" />
+          <span>{{ locale === 'fr' ? 'EN' : 'FR' }}</span>
         </button>
 
-        <!-- User connecté -->
+        <!-- Authenticated user -->
         <template v-if="user">
-          <!-- Notifications -->
-          <Link href="/notifications" class="btn-ghost btn-sm rounded-lg relative">
-            <BellIcon class="w-4 h-4" />
-            <span v-if="page.props.unread_count > 0"
-              class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white text-[10px]
-                     font-bold rounded-full flex items-center justify-center">
-              {{ Math.min(page.props.unread_count, 9) }}
-            </span>
+          <!-- Notifications bell -->
+          <Link href="/notifications" class="notif-btn">
+            <BellIcon class="icon-svg" />
+            <span
+              v-if="page.props.unread_count > 0"
+              class="notif-badge"
+            >{{ Math.min(page.props.unread_count, 9) }}</span>
           </Link>
 
-          <!-- Menu user -->
-          <div class="relative">
-            <button @click="userMenuOpen = !userMenuOpen"
-              class="flex items-center gap-2 btn-secondary btn-sm rounded-xl">
-              <img v-if="user.photo_url" :src="user.photo_url" :alt="user.prenom"
-                class="w-5 h-5 rounded-full object-cover" />
-              <UserCircleIcon v-else class="w-5 h-5 text-slate-400" />
-              <span class="hidden sm:block text-xs max-w-[100px] truncate">{{ user.prenom }}</span>
-              <ChevronDownIcon class="w-3 h-3 text-slate-400 transition-transform"
-                :class="{ 'rotate-180': userMenuOpen }" />
+          <!-- User dropdown -->
+          <div class="user-menu-wrap">
+            <button class="user-btn" @click="userMenuOpen = !userMenuOpen">
+              <img v-if="user.photo_url" :src="user.photo_url" :alt="user.prenom" class="user-avatar-img" />
+              <UserCircleIcon v-else class="user-avatar-icon" />
+              <span class="user-name">{{ user.prenom }}</span>
+              <ChevronDownIcon class="chevron-icon" :class="{ rotated: userMenuOpen }" />
             </button>
 
-            <!-- Dropdown -->
-            <Transition name="slide-down">
-              <div v-if="userMenuOpen"
-                class="absolute right-0 top-full mt-2 w-56 card border border-white/10 shadow-xl py-1 z-50"
-                @click.outside="userMenuOpen = false">
-                <!-- User info -->
-                <div class="px-4 py-3 border-b border-white/8">
-                  <p class="text-sm font-semibold text-white truncate">{{ user.prenom }} {{ user.nom }}</p>
-                  <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
-                  <span class="badge-blue mt-1 text-[10px]">{{ user.role.replace('_', ' ') }}</span>
+            <Transition name="dropdown-fade">
+              <div v-if="userMenuOpen" class="user-dropdown" @click.outside="userMenuOpen = false">
+                <!-- User info header -->
+                <div class="dropdown-header">
+                  <p class="dropdown-fullname">{{ user.prenom }} {{ user.nom }}</p>
+                  <p class="dropdown-email">{{ user.email }}</p>
+                  <span class="dropdown-role-badge">{{ user.role.replace('_', ' ') }}</span>
                 </div>
-                <nav class="py-1">
-                  <Link href="/dashboard"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
-                    <HomeIcon class="w-4 h-4" /> Tableau de bord
+
+                <nav class="dropdown-nav">
+                  <Link href="/dashboard" class="dropdown-item" @click="userMenuOpen = false">
+                    <HomeIcon class="icon-svg-sm" /> Tableau de bord
                   </Link>
-                  <Link href="/profile"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
-                    <UserCircleIcon class="w-4 h-4" /> Mon profil
+                  <Link href="/profile" class="dropdown-item" @click="userMenuOpen = false">
+                    <UserCircleIcon class="icon-svg-sm" /> Mon profil
                   </Link>
-                  <a href="/"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
-                    <GlobeAltIcon class="w-4 h-4" /> Portail public
+                  <a href="/" class="dropdown-item">
+                    <GlobeAltIcon class="icon-svg-sm" /> Portail public
                   </a>
-                  <Link v-if="['axe_admin','super_admin'].includes(user.role)"
+                  <Link
+                    v-if="['axe_admin','super_admin'].includes(user.role)"
                     href="/admin"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5">
+                    class="dropdown-item"
+                    @click="userMenuOpen = false"
+                  >
                     Administration
                   </Link>
-                  <div class="border-t border-white/8 mt-1 pt-1">
-                    <!-- ✅ Logout via router.post() -->
-                    <button
-                      @click="handleLogout"
-                      class="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/5">
-                      <ArrowRightOnRectangleIcon class="w-4 h-4" /> Déconnexion
-                    </button>
-                  </div>
+
+                  <div class="dropdown-divider"></div>
+
+                  <button @click="handleLogout" class="dropdown-item dropdown-logout">
+                    <ArrowRightOnRectangleIcon class="icon-svg-sm" /> Déconnexion
+                  </button>
                 </nav>
               </div>
             </Transition>
           </div>
         </template>
 
-        <!-- Non connecté -->
-        <a v-else href="/auth/login" class="btn-primary btn-sm rounded-xl">
-          Connexion SSO
+        <!-- Not authenticated -->
+        <a v-else href="/auth/login" class="btn-cta">
+          Connexion
         </a>
 
-        <!-- Burger mobile -->
-        <button @click="mobileOpen = !mobileOpen" class="btn-ghost btn-sm rounded-lg lg:hidden">
-          <XMarkIcon v-if="mobileOpen" class="w-5 h-5" />
-          <Bars3Icon v-else class="w-5 h-5" />
+        <!-- Mobile burger -->
+        <button class="menu-toggle" @click="mobileOpen = !mobileOpen" aria-label="Menu">
+          <XMarkIcon  v-if="mobileOpen" class="icon-svg" />
+          <Bars3Icon  v-else            class="icon-svg" />
         </button>
+
       </div>
     </nav>
-
-    <!-- Menu mobile -->
-    <Transition name="slide-down">
-      <div v-if="mobileOpen"
-        class="lg:hidden relative bg-surface-800/95 backdrop-blur-xl border-b border-white/8 px-4 pb-4">
-        <!-- Logos mobiles -->
-        <div class="flex items-center gap-4 py-3 border-b border-white/5 mb-2">
-          <img src="/images/logo_ummisco.webp" alt="UMMISCO" class="h-7 w-auto object-contain" />
-          <img src="/images/logo_ucad.webp" alt="UCAD" class="h-6 w-auto object-contain opacity-70" />
-        </div>
-        <nav class="flex flex-col gap-1 pt-2">
-          <Link v-for="link in navLinks" :key="link.href" :href="link.href"
-            @click="mobileOpen = false"
-            class="nav-link text-sm">
-            {{ label(link) }}
-          </Link>
-          <div class="border-t border-white/8 mt-2 pt-2 flex gap-2">
-            <Link href="/recherche" class="btn-secondary btn-sm flex-1 justify-center">
-              <MagnifyingGlassIcon class="w-4 h-4" /> Recherche
-            </Link>
-            <button @click="toggleLocale" class="btn-secondary btn-sm px-3 uppercase text-xs font-bold">
-              {{ locale === 'fr' ? 'EN' : 'FR' }}
-            </button>
-          </div>
-        </nav>
-      </div>
-    </Transition>
-  </header>
+  </div>
 </template>
 
 <style scoped>
-.slide-down-enter-active, .slide-down-leave-active { transition: all 0.2s ease; }
-.slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
+/* ═══════════════════════════════════════════════════════════════════
+   NavBar — Dashboard  (aligned 1:1 with public portal design)
+   Uses the same CSS custom-properties set in dashboard.blade.php
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper ────────────────────────────────────────────────────── */
+.navbar-wrapper {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: var(--navbar-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--navbar-border);
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+
+/* Gradient accent line at bottom — identical to public portal */
+.navbar-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--primary) 30%, var(--accent) 70%, transparent 100%);
+  opacity: 0.3;
+}
+
+.navbar-accent-line { display: none; } /* handled by ::after */
+
+/* ── Inner nav ──────────────────────────────────────────────────── */
+.navbar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+/* ── Brand ──────────────────────────────────────────────────────── */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.navbar-logos {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.navbar-logos img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover .navbar-logos img { transform: scale(1.04); }
+
+[data-theme="dark"] .navbar-logos img {
+  filter: brightness(0.9) drop-shadow(0 0 6px rgba(59, 130, 246, 0.3));
+}
+
+.navbar-label {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  border-left: 1.5px solid var(--border-strong);
+  padding-left: 0.875rem;
+}
+
+.navbar-label-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-label-sub {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ── Nav links list ─────────────────────────────────────────────── */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-nav > li { position: relative; }
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-sm, 10px);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: calc(100% - 1.75rem);
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-light), var(--accent));
+  border-radius: 1px;
+  transition: transform 0.22s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--text);
+  background: var(--primary-glow);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ── Right actions ──────────────────────────────────────────────── */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--primary-light);
+  background: var(--primary-glow);
+  border-color: var(--primary-light);
+  transform: rotate(15deg);
+}
+
+/* Language button */
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.75rem;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lang-btn:hover {
+  color: var(--primary-light);
+  background: var(--primary-glow);
+  border-color: var(--primary-light);
+}
+
+/* Notifications */
+.notif-btn {
+  position: relative;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  transition: all 0.22s ease;
+}
+
+.notif-btn:hover {
+  color: var(--primary-light);
+  background: var(--primary-glow);
+  border-color: var(--primary-light);
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px; right: -4px;
+  width: 16px; height: 16px;
+  background: var(--danger, #e11d48);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* User button */
+.user-menu-wrap { position: relative; }
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.875rem 0.35rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.22s ease;
+}
+
+.user-btn:hover {
+  border-color: var(--primary-light);
+  background: var(--primary-glow);
+}
+
+.user-avatar-img {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-avatar-icon {
+  width: 22px; height: 22px;
+  color: var(--text-muted);
+}
+
+.user-name {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.chevron-icon {
+  width: 13px; height: 13px;
+  color: var(--text-subtle);
+  transition: transform 0.2s ease;
+}
+
+.chevron-icon.rotated { transform: rotate(180deg); }
+
+/* User dropdown */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius, 16px);
+  box-shadow: var(--shadow-lg, 0 20px 48px rgba(0,0,0,0.08));
+  overflow: hidden;
+  z-index: 200;
+}
+
+.dropdown-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdown-fullname {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.15rem;
+}
+
+.dropdown-role-badge {
+  display: inline-flex;
+  margin-top: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: var(--primary-glow);
+  color: var(--primary-light);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.dropdown-nav {
+  padding: 0.375rem;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm, 10px);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  transition: all 0.18s ease;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  color: var(--primary-light);
+  background: var(--primary-glow);
+  transform: translateX(2px);
+}
+
+.dropdown-logout { color: var(--danger, #e11d48); }
+.dropdown-logout:hover { color: var(--danger, #e11d48); background: rgba(225, 29, 72, 0.08); }
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.25rem 0;
+}
+
+/* CTA button (non-authenticated) */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.125rem;
+  height: 36px;
+  border-radius: var(--radius-sm, 10px);
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+  color: #fff;
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  box-shadow: 0 4px 16px var(--primary-glow);
+  transition: all 0.22s ease;
+}
+
+.btn-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px var(--primary-glow);
+  filter: brightness(1.1);
+}
+
+/* Mobile burger */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm, 10px);
+  transition: all 0.22s ease;
+}
+
+.menu-toggle:hover {
+  background: var(--primary-glow);
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+}
+
+/* SVG icon sizes */
+.icon-svg    { width: 18px; height: 18px; }
+.icon-svg-sm { width: 16px; height: 16px; }
+
+/* ── Dropdown transition ─────────────────────────────────────────── */
+.dropdown-fade-enter-active,
+.dropdown-fade-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.dropdown-fade-enter-from,
+.dropdown-fade-leave-to     { opacity: 0; transform: translateY(-6px); }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .menu-toggle { display: flex; }
+
+  .navbar-nav {
+    display: none;
+  }
+
+  .navbar-nav.is-open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 70px; left: 0; right: 0;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-strong);
+    padding: 1rem 1.5rem 1.5rem;
+    gap: 0.25rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+  }
+
+  .navbar-nav.is-open .nav-link { width: 100%; }
+
+  .lang-btn span { display: none; }
+}
+
+@media (max-width: 768px) {
+  .navbar-inner { padding: 0 1rem; }
+  .navbar-label { display: none; }
+  .user-name    { display: none; }
+}
 </style>

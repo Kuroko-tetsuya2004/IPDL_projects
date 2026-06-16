@@ -45,15 +45,21 @@ const documents = [
   <div class="p-6 max-w-5xl mx-auto space-y-8 animate-fade-in">
 
     <!-- Header -->
-    <div class="border-b border-white/5 pb-6">
-      <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-        <ClipboardDocumentListIcon class="w-8 h-8 text-brand-400" />
-        Documents Administratifs
-      </h1>
-      <p class="text-slate-400 text-sm mt-2">
-        Générez, téléchargez et imprimez les documents officiels IRD/UMMISCO au format PDF.
-        <span class="text-amber-400 font-semibold">Accès réservé au Super Administrateur.</span>
-      </p>
+    <div class="border-b border-white/5 pb-6 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+          <ClipboardDocumentListIcon class="w-8 h-8 text-brand-400" />
+          Documents Administratifs
+        </h1>
+        <p class="text-slate-400 text-sm mt-2">
+          Générez, téléchargez et imprimez les documents officiels IRD/UMMISCO au format PDF.
+          <span class="text-amber-400 font-semibold">Accès réservé au Super Administrateur.</span>
+        </p>
+      </div>
+      <Link href="/admin/documents/historique" class="flex items-center shrink-0 gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
+        <DocumentTextIcon class="w-5 h-5" />
+        Historique des Archives
+      </Link>
     </div>
 
     <!-- Cards -->

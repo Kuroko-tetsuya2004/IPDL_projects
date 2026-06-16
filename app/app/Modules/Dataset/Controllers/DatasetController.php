@@ -8,6 +8,9 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Modules\Integration\Services\DatasetImportService;
+use App\Modules\Integration\Models\ExternalDataset;
+use App\Modules\User\Models\User;
 
 class DatasetController extends Controller
 {
@@ -25,81 +28,98 @@ class DatasetController extends Controller
         ]);
     }
 
-    public function create(): Response
+    // ── Importation DataCite ────────────────────────────────────────────────
+
+    /**
+     * Importe un dataset spécifiquement via son DOI DataCite
+     */
+    public function importByDoi(Request $request, DatasetImportService $importService)
     {
-        return Inertia::render('Dataset/Nouveau');
-    }
-
-    public function store(Request $request)
-    {
-        $userId = session('user_id');
-
-        // Prétraitement de mots_cles s'il est envoyé sous forme de chaîne de caractères
-        if ($request->has('mots_cles') && is_string($request->input('mots_cles'))) {
-            $motsCles = array_filter(array_map('trim', explode(',', $request->input('mots_cles'))));
-            $request->merge(['mots_cles' => $motsCles]);
-        }
-
-        $validated = $request->validate([
-            'titre_fr'    => 'required|string|max:500',
-            'titre_en'    => 'nullable|string|max:500',
-            'resume_fr'   => 'required|string',
-            'licence'     => 'required|string|max:100', // RG-007
-            'mots_cles'   => 'nullable|array',
-            'axe_id'      => 'nullable|uuid|exists:axes_thematiques,id',
-            'fichier'     => 'nullable|file|max:51200',
+        $request->validate([
+            'doi' => 'required|string|min:5|max:255',
         ]);
 
-        $licenceMap = [
-            'CC BY 4.0' => 'cc_by',
-            'CC BY-SA 4.0' => 'cc_by_sa',
-            'CC BY-NC 4.0' => 'cc_by_nc',
-            'CC BY-NC-SA 4.0' => 'cc_by_nc_sa',
-            'CC0 1.0 (Domaine public)' => 'cc0',
-            'Propriétaire' => 'proprietary',
-        ];
-        $dbLicence = $licenceMap[$validated['licence']] ?? 'restricted';
+        $user = User::findOrFail(session('user_id'));
+        
+        try {
+            $dataset = $importService->fetchAndImportByDoi($request->input('doi'), $user);
 
-        return DB::transaction(function () use ($validated, $userId, $dbLicence, $request) {
-            $pub = Publication::create([
-                'auteur_id'        => $userId,
-                'type'             => 'dataset',
-                'statut'           => 'published',
-                'visibilite'       => 'public',
-                'titre_fr'         => $validated['titre_fr'],
-                'titre_en'         => $validated['titre_en'] ?? null,
-                'resume_fr'        => $validated['resume_fr'],
-                'mots_cles'        => $validated['mots_cles'] ?? null,
-                'axe_id'           => $validated['axe_id'] ?? null,
-                'date_publication' => now(),
-            ]);
-
-            DB::table('datasets')->insert([
-                'publication_id'   => $pub->id,
-                'licence'          => $dbLicence,
-                'format_principal' => $request->hasFile('fichier') ? strtoupper($request->file('fichier')->getClientOriginalExtension()) : 'CSV',
-                'version'          => '1.0',
-            ]);
-
-            if ($request->hasFile('fichier')) {
-                $file = $request->file('fichier');
-                $path = $file->store('datasets', 'minio');
-
-                DB::table('datasets_fichiers')->insert([
-                    'id'            => \Illuminate\Support\Str::uuid(),
-                    'dataset_id'    => $pub->id,
-                    'nom'           => $file->getClientOriginalName(),
-                    'chemin_minio'  => $path,
-                    'bucket_minio'  => 'ummisco-public',
-                    'taille_octets' => $file->getSize(),
-                    'format'        => strtoupper($file->getClientOriginalExtension()),
-                    'est_principal' => true,
-                    'created_at'    => now(),
-                ]);
+            if (!$dataset) {
+                return back()->with('error', 'Dataset introuvable sur DataCite avec ce DOI.');
             }
 
-            return redirect()->route('mes-datasets')
-                ->with('success', 'Dataset « ' . $pub->titre_fr . ' » créé avec succès.');
-        });
+            return back()->with('success', 'Dataset importé avec succès depuis DataCite.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("[Dataset Import DOI] Erreur : " . $e->getMessage());
+            return back()->with('error', 'Une erreur est survenue lors de l\'importation depuis DataCite.');
+        }
+    }
+
+    /**
+     * Synchronise les datasets du chercheur depuis son profil ORCID
+     */
+    public function syncOrcid(DatasetImportService $importService)
+    {
+        $user = User::findOrFail(session('user_id'));
+
+        if (empty($user->orcid_id)) {
+            return back()->with('error', 'Vous devez d\'abord renseigner votre ORCID dans votre profil.');
+        }
+
+        try {
+            $stats = $importService->syncUserOrcid($user);
+
+            if ($stats['fetched'] === 0) {
+                return back()->with('info', 'Aucun dataset trouvé sur DataCite pour votre ORCID.');
+            }
+
+            return back()->with('success', "Synchronisation terminée : {$stats['fetched']} datasets trouvés, {$stats['new']} nouveaux importés.");
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("[Dataset ORCID Sync] Erreur : " . $e->getMessage());
+            return back()->with('error', 'Une erreur inattendue est survenue lors de la synchronisation ORCID.');
+        }
+    }
+
+    /**
+     * Recherche en direct sur l'API DataCite
+     */
+    public function fetchLive(Request $request, DatasetImportService $importService)
+    {
+        $query = $request->input('q');
+        if (!$query) {
+            return back()->with('error', 'Veuillez saisir un terme de recherche.');
+        }
+
+        $stats = $importService->fetchAndStore($query, 50);
+
+        return back()->with('success', "Recherche DataCite terminée : {$stats['fetched']} trouvés, {$stats['new']} nouveaux importés dans l'index.");
+    }
+
+    /**
+     * Recherche et liste les datasets DataCite (fallback pour l'interface publique ou admin)
+     */
+    public function externalIndex(Request $request)
+    {
+        $query  = $request->get('q', '');
+        $annee  = $request->get('annee', '');
+        $perPage = 20;
+
+        $datasets = ExternalDataset::disponible()
+            ->when($query, fn($q) => $q->where(fn($sq) =>
+                $sq->where('titre', 'ilike', "%{$query}%")
+                   ->orWhere('resume', 'ilike', "%{$query}%")
+                   ->orWhere('auteurs', 'ilike', "%{$query}%")
+                   ->orWhere('doi', 'ilike', "%{$query}%")
+            ))
+            ->when($annee, fn($q) => $q->where('annee', $annee))
+            ->orderByDesc('annee')
+            ->orderByDesc('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return Inertia::render('Dataset/ExternalDatasets', [
+            'datasets' => $datasets,
+            'filters'  => compact('query', 'annee'),
+        ]);
     }
 }

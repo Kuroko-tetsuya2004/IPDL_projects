@@ -365,13 +365,25 @@
             </div>
 
             <div class="form-group-custom">
+                <label for="orcid_id" class="form-label-custom">ORCID (Optionnel)</label>
+                <div class="form-input-wrapper">
+                    <input type="text" name="orcid_id" id="orcid_id" class="form-input-custom" placeholder="0000-0000-0000-0000" value="{{ old('orcid_id') }}" pattern="\d{4}-\d{4}-\d{4}-\d{3}[\dX]">
+                    <span class="form-input-icon-custom">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                    </span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem; font-weight: 500;">
+                    Renseignez votre ORCID pour une validation automatique du compte (si affilié à l'UMMISCO).
+                </p>
+            </div>
+
+            <div class="form-group-custom">
                 <label for="role" class="form-label-custom">Rôle / Profil *</label>
                 <div class="form-input-wrapper">
                     <select name="role" id="role" class="form-input-custom" required>
                         <option value="" disabled selected>— Sélectionner un profil —</option>
                         <option value="researcher" {{ old('role') === 'researcher' ? 'selected' : '' }}>🔬 Chercheur</option>
                         <option value="doctoral_student" {{ old('role') === 'doctoral_student' ? 'selected' : '' }}>🎓 Doctorant</option>
-                        <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>⚡ Super-Administrateur (Connexion directe)</option>
                     </select>
                     <span class="form-input-icon-custom">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>

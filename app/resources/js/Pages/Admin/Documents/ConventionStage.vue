@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
 import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
@@ -36,13 +36,38 @@ const form = ref({
 })
 
 const generating = ref(false)
+const previewUrl = ref('')
+let previewTimeout = null
+
+async function updatePreview() {
+  try {
+    const doc = await buildPDF()
+    const pdfBlob = doc.output('blob')
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value)
+    }
+    previewUrl.value = URL.createObjectURL(pdfBlob)
+  } catch (e) {
+    console.error("Erreur génération aperçu PDF :", e)
+  }
+}
+
+watch(form, () => {
+  clearTimeout(previewTimeout)
+  previewTimeout = setTimeout(updatePreview, 600)
+}, { deep: true })
+
+onMounted(() => updatePreview())
+
+onUnmounted(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+})
 
 const ajouterActivite = () => form.value.activites.push('')
 const supprimerActivite = (i) => { if (form.value.activites.length > 1) form.value.activites.splice(i, 1) }
 
 // ── Génération PDF multi-pages fidèle au document Convention de Stage ───────
-async function genererPDF() {
-  generating.value = true
+async function buildPDF() {
   const { jsPDF } = await import('jspdf')
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
@@ -332,14 +357,41 @@ async function genererPDF() {
   doc.line(col2, y, col2 + sigW, y)
   doc.line(col3, y, col3 + sigW, y)
 
+  return doc
+}
+
+async function genererPDF() {
+  generating.value = true
+  const doc = await buildPDF()
   const pdfBlob = doc.output('blob')
+  
+  await saveToHistory(pdfBlob)
+
   const blobUrl = URL.createObjectURL(pdfBlob)
   window.open(blobUrl, '_blank')
   generating.value = false
 }
 
-function imprimer() {
-  window.print()
+async function imprimer() {
+  generating.value = true
+  const doc = await buildPDF()
+  const pdfBlob = doc.output('blob')
+  
+  await saveToHistory(pdfBlob)
+  generating.value = false
+  setTimeout(() => window.print(), 300)
+}
+
+async function saveToHistory(pdfBlob) {
+  try {
+    const formData = new FormData()
+    formData.append('type_document', 'convention_stage')
+    formData.append('donnees', JSON.stringify(form.value))
+    formData.append('pdf_file', pdfBlob, 'convention.pdf')
+    await window.axios.post('/admin/documents/store', formData)
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de l\'historique', error)
+  }
 }
 </script>
 
@@ -553,115 +605,18 @@ function imprimer() {
       </div>
 
       <!-- ─── APERÇU ─── -->
-      <div class="xl:sticky xl:top-6 xl:self-start">
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3">
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Aperçu — fidèle au document original</p>
+      <div class="xl:sticky xl:top-6 xl:self-start flex flex-col h-[80vh]">
+        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 shrink-0">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Aperçu en direct — fidèle au document original</p>
           <p class="text-[11px] text-slate-500">Le PDF généré est multi-pages et reproduit fidèlement les 13 articles officiels de la Convention de Stage IRD.</p>
         </div>
-        <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
-          <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#000; background:#fff; line-height:1.6;">
-
-            <!-- Logos En-tête -->
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-              <img v-if="logoIrd" :src="logoIrd" alt="Logo IRD" style="height:35px;" />
-              <img v-if="logoUcad" :src="logoUcad" alt="Logo UCAD" style="height:45px;" />
-            </div>
-
-            <!-- Titre -->
-            <div style="background-color:#F2F2F2; border:1px solid #000; padding:10px; margin-bottom:20px; text-align:center;">
-              <div style="font-size:16px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">CONVENTION DE STAGE</div>
-            </div>
-
-            <p style="font-weight:bold; margin-bottom:6px;">ENTRE,</p>
-            <p style="margin-bottom:10px;">L'Institut de Recherche pour le développement, établissement public à caractère scientifique et technologique (EPST) ayant son siège 44 boulevard de Dunkerque - CS 9009 - 13572 Marseille France, représenté par M. Pierre MORAND, Représentant de l'IRD au Sénégal, ci-après dénommé «IRD»</p>
-
-            <p style="font-weight:bold; margin-bottom:6px;">ET,</p>
-            <div style="background:#f9f9f9; border:1px solid #ccc; padding:8px 12px; margin-bottom:10px; font-size:9.5px; line-height:1.7;">
-              <div>Nom de l'organisme de formation : <strong>{{ form.etablissement_nom || '...........................' }}</strong></div>
-              <div>Statut juridique : <strong>{{ form.etablissement_statut || '...........................' }}</strong></div>
-              <div>Siège social : <strong>{{ form.etablissement_siege || '...........................' }}</strong></div>
-              <div>Représenté par : <strong>{{ form.etablissement_representant || '...........................' }}</strong></div>
-              <div>Ci-après dénommé «Etablissement»</div>
-            </div>
-
-            <p style="font-weight:bold; margin-bottom:6px;">CONCERNANT LE STAGE DE :</p>
-            <div style="background:#f9f9f9; border:1px solid #ccc; padding:8px 12px; margin-bottom:10px; font-size:9.5px; line-height:1.7;">
-              <div>Nom, Prénom : <strong>{{ form.stagiaire_nom }} {{ form.stagiaire_prenom }}</strong></div>
-              <div>Adresse : <strong>{{ form.stagiaire_adresse || '...........................' }}</strong></div>
-              <div>Tel : <strong>{{ form.stagiaire_tel || '...........................' }}</strong></div>
-              <div>Email : <strong>{{ form.stagiaire_email || '...........................' }}</strong></div>
-              <div>Etudiant pour l'année universitaire : <strong>{{ form.stagiaire_annee_univ || '.........' }}</strong></div>
-              <div>Diplôme préparé : <strong>{{ form.stagiaire_diplome || '...........................' }}</strong></div>
-              <div>Spécialité : <strong>{{ form.stagiaire_specialite || '...........................' }}</strong></div>
-            </div>
-
-            <p style="font-weight:bold; margin-bottom:4px;">CONSIDERANT :</p>
-            <p style="margin-bottom:3px;">que l'étudiant est inscrit régulièrement dans un établissement du Sénégal habilité à délivré le diplôme.</p>
-            <p style="margin-bottom:3px;">que la formation de Licence/Master est organisée sous la forme de cours, de conférences, de séminaires, de travaux dirigés, de travaux pratiques, de stages et de conduites de projets individuels et collectifs.</p>
-            <p style="margin-bottom:3px;">La mission de formation de l'IRD</p>
-            <p style="margin-bottom:10px;">Le partenariat entre l'Université et l'IRD</p>
-
-            <p style="text-align:center; font-weight:bold; font-size:12px; text-decoration:underline; margin-bottom:12px;">IL EST CONVENU CE QUI SUIT :</p>
-
-            <!-- Articles -->
-            <p style="font-weight:bold; margin-bottom:2px;">Article 1 : objet</p>
-            <p style="margin-bottom:8px;">La présente convention a pour objet de préciser les modalités d'accueil du stagiaire à l'IRD dans le cadre de la préparation de son diplôme.</p>
-
-            <p style="font-weight:bold; margin-bottom:2px;">Article 2 : champ d'application</p>
-            <p style="margin-bottom:4px;">Le stage a pour objet de permettre à l'étudiant de mettre en pratique les outils théoriques et méthodologiques acquis au cours de sa formation universitaire, d'identifier ses compétences et découvrir un milieu professionnel.</p>
-            <p style="margin-bottom:8px;">Le stagiaire n'effectue pas une prestation de service mais une étude qui s'inscrit dans le cadre de la formation et du projet de l'étudiant en accord avec l'IRD sur le thème : <strong style="white-space:pre-wrap; word-break:break-word;">{{ form.theme || '.....................................' }}</strong></p>
-
-            <p style="font-weight:bold; margin-bottom:2px;">Article 3 : activités du stagiaire</p>
-            <p style="margin-bottom:3px;">Les responsables scientifiques ou administratifs s'engagent à ne faire exécuter au stagiaire que des travaux ou activités qui concourent à sa formation.</p>
-            <p style="margin-bottom:3px;">Les activités confiées porteront sur les aspects suivants :</p>
-            <ul style="margin-left:16px; margin-bottom:8px; line-height:1.9;">
-              <li v-for="(act, i) in form.activites" :key="i" style="white-space:pre-wrap; word-break:break-word;">- {{ act || '.......................................................................' }}</li>
-            </ul>
-
-            <p style="font-weight:bold; margin-bottom:2px;">Article 4 : modalités</p>
-            <p>Le stage s'effectue du <strong>{{ form.date_debut || '......' }}</strong> au <strong>{{ form.date_fin || '......' }}</strong></p>
-            <p>Lieu du stage : <strong>{{ form.lieu_stage || '..............................' }}</strong></p>
-            <p>Structure d'accueil : <strong>{{ form.structure_accueil || '..............................' }}</strong></p>
-            <p>Encadrement :</p>
-            <p style="margin-left:12px;">Responsable scientifique/administratif pour l'IRD : <strong>{{ form.responsable_ird || '...' }}</strong></p>
-            <p style="margin-left:12px; margin-bottom:8px;">Responsable pédagogique pour l'établissement d'enseignement : <strong>{{ form.responsable_etablissement || '...' }}</strong></p>
-
-            <p style="font-weight:bold; margin-bottom:2px;">Article 5 : gratification</p>
-            <p>La gratification est fixée à <strong>{{ form.gratification_montant || '.........' }}</strong> par mois, à ce montant s'ajoute :</p>
-            <p style="margin-left:12px;">une indemnité de transport de <strong>{{ form.indemnite_transport || '.........' }}</strong> par mois,</p>
-            <p style="margin-left:12px;">une indemnité de restauration de <strong>{{ form.indemnite_restauration || '.........' }}</strong> par mois.</p>
-            <p style="margin-bottom:8px;">Le montant de cette gratification est imputé sur : <strong>{{ form.imputation || '.........' }}</strong></p>
-
-            <p style="color:#555; font-style:italic; margin-bottom:6px;">[ Articles 6 à 13 inclus dans le PDF généré — statut, confidentialité, propriété intellectuelle, clause informatique, absence, responsabilité civile, exclusion, pièces contractuelles ]</p>
-
-            <!-- Signatures (aperçu) -->
-            <hr style="border:none; border-top:1px solid #ccc; margin:12px 0;" />
-            <p style="text-align:center; margin-bottom:12px;">Fait en trois exemplaires, à Dakar, le <strong>{{ form.date_signature }}</strong></p>
-            <div style="display:flex; justify-content:space-between; margin-top:20px;">
-              <div style="text-align:center; width:30%;">
-                <div style="font-weight:bold; font-size:9px; border-bottom:1px solid #000; padding-bottom:4px;">Pour l'Etablissement</div>
-                <div style="height:40px;"></div>
-              </div>
-              <div style="text-align:center; width:30%;">
-                <div style="font-weight:bold; font-size:9px; border-bottom:1px solid #000; padding-bottom:4px;">Pour le stagiaire</div>
-                <div style="height:40px;"></div>
-              </div>
-              <div style="text-align:center; width:30%;">
-                <div style="font-weight:bold; font-size:9px; border-bottom:1px solid #000; padding-bottom:4px;">Pour l'IRD</div>
-                <div style="height:40px;"></div>
-              </div>
-            </div>
+        <div class="flex-1 rounded-xl border border-white/5 bg-slate-900/40 shadow-2xl overflow-hidden relative">
+          <iframe v-if="previewUrl" :src="previewUrl" class="absolute inset-0 w-full h-full" frameborder="0"></iframe>
+          <div v-else class="absolute inset-0 flex items-center justify-center text-slate-500 font-medium text-sm">
+            Génération de l'aperçu PDF...
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style>
-@media print {
-  body * { visibility: hidden; }
-  #print-zone, #print-zone * { visibility: visible; }
-  #print-zone { position: fixed; top: 0; left: 0; width: 100%; background: white !important; }
-}
-</style>
