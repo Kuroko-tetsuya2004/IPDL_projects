@@ -6,7 +6,7 @@ FROM node:20-alpine AS node_builder
 WORKDIR /app
 
 # Copier package.json en premier pour profiter du cache Docker
-COPY app/package.json app/package-lock.json ./
+COPY app/package.json ./
 RUN npm install
 
 # Copier tout le code source
