@@ -92,7 +92,7 @@ class DocumentController extends Controller
         }
 
         $validated = $request->validate([
-            'type_document' => 'required|string|in:convention_stage,prestation_service',
+            'type_document' => 'required|string|in:convention_stage,prestation_service,bon_achat',
             'donnees' => 'required|string',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
         ]);

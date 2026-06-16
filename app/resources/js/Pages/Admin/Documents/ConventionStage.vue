@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
-import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { logoIrd, logoUcad, logoReuUmmisco } from '@/utils/logos.js'
 
 defineOptions({ layout: DashboardLayout })
@@ -38,6 +38,12 @@ const form = ref({
 const generating = ref(false)
 const previewUrl = ref('')
 let previewTimeout = null
+
+const showPdfModal = ref(false)
+const pdfBlobUrlFinal = ref(null)
+const pdfBlobFileFinal = ref(null)
+const saving = ref(false)
+const iframeRef = ref(null)
 
 async function updatePreview() {
   try {
@@ -365,11 +371,29 @@ async function genererPDF() {
   const doc = await buildPDF()
   const pdfBlob = doc.output('blob')
   
-  await saveToHistory(pdfBlob)
-
-  const blobUrl = URL.createObjectURL(pdfBlob)
-  window.open(blobUrl, '_blank')
+  pdfBlobFileFinal.value = pdfBlob
+  pdfBlobUrlFinal.value = URL.createObjectURL(pdfBlob)
+  showPdfModal.value = true
   generating.value = false
+}
+
+async function enregistrer(background = false) {
+  if (!pdfBlobFileFinal.value) return
+  if (!background) saving.value = true
+
+  await saveToHistory(pdfBlobFileFinal.value)
+
+  if (!background) {
+    saving.value = false
+    showPdfModal.value = false
+  }
+}
+
+function imprimerFromModal() {
+  enregistrer(true)
+  if (iframeRef.value) {
+    iframeRef.value.contentWindow.print()
+  }
 }
 
 async function imprimer() {
@@ -616,6 +640,33 @@ async function saveToHistory(pdfBlob) {
             Génération de l'aperçu PDF...
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal PDF Viewer -->
+    <div v-if="showPdfModal" class="fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-sm animate-fade-in">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <DocumentTextIcon class="w-5 h-5 text-blue-400" />
+          Aperçu de la Convention de Stage
+        </h3>
+        <div class="flex items-center gap-3">
+          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-white/10">
+            <PrinterIcon class="w-4 h-4" />
+            Imprimer
+          </button>
+          <button @click="enregistrer(false)" :disabled="saving" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20">
+            <ArrowDownTrayIcon class="w-4 h-4" />
+            {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <div class="w-px h-6 bg-white/20 mx-1"></div>
+          <button @click="showPdfModal = false" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+            <XMarkIcon class="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 w-full h-full p-4 flex justify-center bg-slate-900/50 overflow-hidden">
+        <iframe ref="iframeRef" :src="pdfBlobUrlFinal" class="w-full max-w-5xl h-full rounded-xl shadow-2xl bg-white border border-white/10"></iframe>
       </div>
     </div>
   </div>

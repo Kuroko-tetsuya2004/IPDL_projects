@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
-import { ShoppingCartIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { ShoppingCartIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 import { logoIrd, logoUcad, logoReuUmmisco } from '@/utils/logos.js'
 
@@ -37,6 +37,11 @@ const totalGeneral = computed(() =>
 const fmt = (v) => v != null && v !== '' ? Number(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : ''
 
 const generating = ref(false)
+const showPdfModal = ref(false)
+const pdfBlobUrl = ref(null)
+const pdfBlobFile = ref(null)
+const saving = ref(false)
+const iframeRef = ref(null)
 
 // ── Génération PDF fidèle au document original ─────────────────────────────
 async function genererPDF() {
@@ -189,9 +194,46 @@ async function genererPDF() {
   doc.line(colRight, y, colRight + 55, y)
 
   const pdfBlob = doc.output('blob')
-  const blobUrl = URL.createObjectURL(pdfBlob)
-  window.open(blobUrl, '_blank')
+  pdfBlobFile.value = pdfBlob
+  pdfBlobUrl.value = URL.createObjectURL(pdfBlob)
+  showPdfModal.value = true
   generating.value = false
+}
+
+async function enregistrer(background = false) {
+  if (!pdfBlobFile.value) return
+  if (!background) saving.value = true
+
+  const formData = new FormData()
+  formData.append('type_document', 'bon_achat')
+  formData.append('donnees', JSON.stringify({ 
+    ...form.value, 
+    articles: articles.value, 
+    total: totalGeneral.value 
+  }))
+  formData.append('pdf_file', pdfBlobFile.value, 'bon_achat.pdf')
+
+  router.post('/admin/documents/store', formData, {
+    preserveScroll: true,
+    onSuccess: () => {
+      if (!background) {
+        saving.value = false
+        showPdfModal.value = false
+      }
+    },
+    onError: () => {
+      if (!background) saving.value = false
+    }
+  })
+}
+
+function imprimerFromModal() {
+  // Enregistrer en arrière-plan sans bloquer
+  enregistrer(true)
+  // Imprimer l'iframe
+  if (iframeRef.value) {
+    iframeRef.value.contentWindow.print()
+  }
 }
 
 function imprimer() {
@@ -437,6 +479,33 @@ function imprimer() {
 
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal PDF Viewer -->
+    <div v-if="showPdfModal" class="fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-sm animate-fade-in">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <ShoppingCartIcon class="w-5 h-5 text-amber-400" />
+          Aperçu du Bon d'Achat
+        </h3>
+        <div class="flex items-center gap-3">
+          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-white/10">
+            <PrinterIcon class="w-4 h-4" />
+            Imprimer
+          </button>
+          <button @click="enregistrer(false)" :disabled="saving" class="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-amber-500/20">
+            <ArrowDownTrayIcon class="w-4 h-4" />
+            {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <div class="w-px h-6 bg-white/20 mx-1"></div>
+          <button @click="showPdfModal = false" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+            <XMarkIcon class="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 w-full h-full p-4 flex justify-center bg-slate-900/50 overflow-hidden">
+        <iframe ref="iframeRef" :src="pdfBlobUrl" class="w-full max-w-5xl h-full rounded-xl shadow-2xl bg-white border border-white/10"></iframe>
       </div>
     </div>
   </div>
