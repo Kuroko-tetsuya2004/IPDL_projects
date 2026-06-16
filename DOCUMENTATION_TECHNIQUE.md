@@ -217,7 +217,7 @@ portail_web/
 
 ### 5.1 Vue d'ensemble
 
-- **35 tables** PostgreSQL 16
+- **37 tables** PostgreSQL 16
 - **9 types ENUM** personnalisés
 - **4 extensions** : `uuid-ossp`, `pg_trgm`, `unaccent`, `btree_gin`
 - **Colonnes TSVECTOR** générées automatiquement pour la recherche full-text
@@ -231,9 +231,11 @@ portail_web/
 | `axes_thematiques` | Axes de recherche UMMISCO | UUID |
 | `workflow_validations` | Cycle de validation des soumissions | UUID |
 | `audit_logs` | Journal d'audit (append-only, immuable) | UUID |
+| `external_datasets` | Jeux de données importés (DataCite/ORCID) | UUID |
+| `documents_administratifs`| Conventions, accords, prestations de services | UUID |
 | `users_axes` | Relation N:N utilisateurs ↔ axes | Composite |
 | `publications_auteurs` | Co-auteurs des publications | Composite |
-| `datasets` | Jeux de données scientifiques | UUID |
+| `datasets` | Jeux de données scientifiques internes | UUID |
 | `medias` | Fichiers médias (stockés sur MinIO) | UUID |
 | `parametres_systeme` | Configuration dynamique | Clé texte |
 
