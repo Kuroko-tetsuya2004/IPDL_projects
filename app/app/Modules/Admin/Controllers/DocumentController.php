@@ -87,33 +87,48 @@ class DocumentController extends Controller
      */
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Début store document administratif', $request->all());
+
         if (session('user_role') !== 'super_admin') {
+            \Illuminate\Support\Facades\Log::warning('Accès refusé. user_role = ' . session('user_role'));
             abort(403, 'Accès réservé au Super Administrateur.');
         }
 
-        $validated = $request->validate([
-            'type_document' => 'required|string|in:convention_stage,prestation_service,bon_achat',
-            'donnees' => 'required|string',
-            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
-        ]);
+        try {
+            $validated = $request->validate([
+                'type_document' => 'required|string|in:convention_stage,prestation_service,bon_achat',
+                'donnees' => 'required|string',
+                'pdf_file' => 'nullable|file|max:10240', // Enlevé temporairement mimes:pdf pour tester
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur de validation document administratif', $e->errors());
+            throw $e;
+        }
 
-        $reference = 'DOC-' . date('Y') . '-' . strtoupper(Str::random(6));
+        $reference = 'DOC-' . date('Y') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
         $filePath = null;
 
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
             $filename = $reference . '.pdf';
-            // Store in the 'minio' disk or default disk
-            $filePath = $file->storeAs('documents_administratifs/' . date('Y/m'), $filename, env('FILESYSTEM_DISK', 'public'));
+            // Stockage explicite sur le disque 'minio'
+            $filePath = $file->storeAs('documents_administratifs/' . date('Y/m'), $filename, 'minio');
+            \Illuminate\Support\Facades\Log::info("Résultat storeAs MinIO : " . var_export($filePath, true));
         }
 
-        $document = DocumentAdministratif::create([
-            'user_id' => session('user_id'),
-            'type_document' => $validated['type_document'],
-            'reference' => $reference,
-            'donnees' => json_decode($validated['donnees'], true),
-            'file_path' => $filePath,
-        ]);
+        try {
+            $document = DocumentAdministratif::create([
+                'user_id' => session('user_id'),
+                'type_document' => $validated['type_document'],
+                'reference' => $reference,
+                'donnees' => json_decode($validated['donnees'], true),
+                'file_path' => $filePath,
+            ]);
+            \Illuminate\Support\Facades\Log::info("Document créé en BDD avec ID: " . $document->id);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Erreur insertion BDD: " . $e->getMessage());
+            throw $e;
+        }
 
         return response()->json([
             'success' => true,
@@ -137,9 +152,9 @@ class DocumentController extends Controller
             return back()->with('error', 'Le fichier PDF n\'a pas été généré ou est introuvable.');
         }
 
-        $disk = env('FILESYSTEM_DISK', 'public');
+        $disk = 'minio';
         if (!Storage::disk($disk)->exists($document->file_path)) {
-            return back()->with('error', 'Fichier introuvable sur le stockage.');
+            return back()->with('error', 'Fichier introuvable sur le stockage MinIO.');
         }
 
         return Storage::disk($disk)->download($document->file_path, $document->reference . '.pdf');

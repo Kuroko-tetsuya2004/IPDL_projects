@@ -11,12 +11,14 @@ const props = defineProps({
 
 const getDocTitle = (type) => {
   return type === 'convention_stage' ? 'Convention de Stage' : 
-         type === 'prestation_service' ? 'Prestation de Service' : 'Document Administratif'
+         type === 'prestation_service' ? 'Prestation de Service' :
+         type === 'bon_achat' ? "Bon d'Achat" : 'Document Administratif'
 }
 
 const getDocColor = (type) => {
   return type === 'convention_stage' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : 
-         type === 'prestation_service' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-[var(--text-subtle)] bg-slate-500/10 border-slate-500/20'
+         type === 'prestation_service' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
+         type === 'bon_achat' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 'text-[var(--text-subtle)] bg-slate-500/10 border-slate-500/20'
 }
 </script>
 

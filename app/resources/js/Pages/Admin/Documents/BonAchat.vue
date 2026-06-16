@@ -37,7 +37,7 @@ const totalGeneral = computed(() =>
 const fmt = (v) => v != null && v !== '' ? Number(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : ''
 
 const generating = ref(false)
-const showPdfModal = ref(false)
+const pdfGeneratedMode = ref(false)
 const pdfBlobUrl = ref(null)
 const pdfBlobFile = ref(null)
 const saving = ref(false)
@@ -196,7 +196,7 @@ async function genererPDF() {
   const pdfBlob = doc.output('blob')
   pdfBlobFile.value = pdfBlob
   pdfBlobUrl.value = URL.createObjectURL(pdfBlob)
-  showPdfModal.value = true
+  pdfGeneratedMode.value = true
   generating.value = false
 }
 
@@ -213,39 +213,49 @@ async function enregistrer(background = false) {
   }))
   formData.append('pdf_file', pdfBlobFile.value, 'bon_achat.pdf')
 
-  router.post('/admin/documents/store', formData, {
-    preserveScroll: true,
-    onSuccess: () => {
-      if (!background) {
-        saving.value = false
-        showPdfModal.value = false
-      }
-    },
-    onError: () => {
-      if (!background) saving.value = false
+  try {
+    await window.axios.post('/admin/documents/store', formData)
+    if (!background) {
+      saving.value = false
+      router.visit('/admin/documents')
     }
-  })
+  } catch (error) {
+    if (!background) saving.value = false
+    console.error("Erreur lors de l'enregistrement:", error)
+  }
 }
 
 function imprimerFromModal() {
-  // Enregistrer en arrière-plan sans bloquer
-  enregistrer(true)
-  // Imprimer l'iframe
-  if (iframeRef.value) {
-    iframeRef.value.contentWindow.print()
+  if (window.confirm("Voulez-vous confirmer l'impression ? Le document sera automatiquement enregistré dans l'historique.")) {
+    enregistrer(true)
+    if (iframeRef.value) {
+      iframeRef.value.contentWindow.print()
+      retour()
+    }
   }
 }
 
 function imprimer() {
   window.print()
 }
+function retour() {
+  pdfGeneratedMode.value = false
+  if (pdfBlobUrl.value) {
+    URL.revokeObjectURL(pdfBlobUrl.value)
+    pdfBlobUrl.value = null
+  }
+}
 </script>
 
 <template>
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
+    <!-- HEADER COMMUN -->
     <div class="flex items-center gap-4">
-      <Link href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
+      <button v-if="pdfGeneratedMode" @click="retour" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
+        <ArrowLeftIcon class="w-4 h-4" />
+      </button>
+      <Link v-else href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
       </Link>
       <div>
@@ -260,7 +270,8 @@ function imprimer() {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <!-- MODE: FORMULAIRE -->
+    <div v-show="!pdfGeneratedMode" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
       <!-- ─── FORMULAIRE ─── -->
       <div class="space-y-5">
@@ -482,15 +493,18 @@ function imprimer() {
       </div>
     </div>
 
-    <!-- Modal PDF Viewer -->
-    <div v-if="showPdfModal" class="fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-sm animate-fade-in">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <ShoppingCartIcon class="w-5 h-5 text-amber-400" />
-          Aperçu du Bon d'Achat
+    <!-- MODE: PDF GÉNÉRÉ -->
+    <div v-if="pdfGeneratedMode" class="flex flex-col h-[85vh] bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--surface-alt)]">
+        <h3 class="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+          Aperçu final du document
         </h3>
         <div class="flex items-center gap-3">
-          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-white/10">
+          <button @click="retour" class="flex items-center gap-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all">
+            <ArrowLeftIcon class="w-4 h-4" />
+            Retour
+          </button>
+          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-[var(--border)]">
             <PrinterIcon class="w-4 h-4" />
             Imprimer
           </button>
@@ -498,16 +512,13 @@ function imprimer() {
             <ArrowDownTrayIcon class="w-4 h-4" />
             {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
           </button>
-          <div class="w-px h-6 bg-white/20 mx-1"></div>
-          <button @click="showPdfModal = false" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-            <XMarkIcon class="w-6 h-6" />
-          </button>
         </div>
       </div>
-      <div class="flex-1 w-full h-full p-4 flex justify-center bg-slate-900/50 overflow-hidden">
-        <iframe ref="iframeRef" :src="pdfBlobUrl" class="w-full max-w-5xl h-full rounded-xl shadow-2xl bg-white border border-white/10"></iframe>
+      <div class="flex-1 w-full bg-slate-900/50 overflow-hidden">
+        <iframe ref="iframeRef" :src="pdfBlobUrl" class="w-full h-full border-none"></iframe>
       </div>
     </div>
+
   </div>
 </template>
 

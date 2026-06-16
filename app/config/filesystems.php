@@ -68,8 +68,8 @@ return [
             'bucket' => env('MINIO_BUCKET_PUBLIC', 'ummisco-public'),
             'endpoint' => env('MINIO_ENDPOINT', 'http://minio:9000'),
             'use_path_style_endpoint' => env('MINIO_USE_PATH_STYLE', true),
-            'throw' => false,
-            'report' => false,
+            'throw' => true,
+            'report' => true,
         ],
 
     ],

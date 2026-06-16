@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@layouts/DashboardLayout.vue'
 import { DocumentTextIcon, PrinterIcon, ArrowDownTrayIcon, ArrowLeftIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { logoIrd, logoUcad, logoReuUmmisco } from '@/utils/logos.js'
@@ -39,7 +39,7 @@ const generating = ref(false)
 const previewUrl = ref('')
 let previewTimeout = null
 
-const showPdfModal = ref(false)
+const pdfGeneratedMode = ref(false)
 const pdfBlobUrlFinal = ref(null)
 const pdfBlobFileFinal = ref(null)
 const saving = ref(false)
@@ -57,6 +57,8 @@ async function updatePreview() {
     console.error("Erreur génération aperçu PDF :", e)
   }
 }
+
+
 
 watch(form, () => {
   clearTimeout(previewTimeout)
@@ -373,7 +375,7 @@ async function genererPDF() {
   
   pdfBlobFileFinal.value = pdfBlob
   pdfBlobUrlFinal.value = URL.createObjectURL(pdfBlob)
-  showPdfModal.value = true
+  pdfGeneratedMode.value = true
   generating.value = false
 }
 
@@ -381,40 +383,39 @@ async function enregistrer(background = false) {
   if (!pdfBlobFileFinal.value) return
   if (!background) saving.value = true
 
-  await saveToHistory(pdfBlobFileFinal.value)
-
-  if (!background) {
-    saving.value = false
-    showPdfModal.value = false
-  }
-}
-
-function imprimerFromModal() {
-  enregistrer(true)
-  if (iframeRef.value) {
-    iframeRef.value.contentWindow.print()
-  }
-}
-
-async function imprimer() {
-  generating.value = true
-  const doc = await buildPDF()
-  const pdfBlob = doc.output('blob')
-  
-  await saveToHistory(pdfBlob)
-  generating.value = false
-  setTimeout(() => window.print(), 300)
-}
-
-async function saveToHistory(pdfBlob) {
   try {
     const formData = new FormData()
     formData.append('type_document', 'convention_stage')
     formData.append('donnees', JSON.stringify(form.value))
-    formData.append('pdf_file', pdfBlob, 'convention.pdf')
+    formData.append('pdf_file', pdfBlobFileFinal.value, 'convention.pdf')
+    
     await window.axios.post('/admin/documents/store', formData)
+    
+    if (!background) {
+      saving.value = false
+      router.visit('/admin/documents')
+    }
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde de l\'historique', error)
+    if (!background) saving.value = false
+    console.error("Erreur lors de l'enregistrement :", error)
+  }
+}
+
+function imprimerFromModal() {
+  if (window.confirm("Voulez-vous confirmer l'impression ? Le document sera automatiquement enregistré dans l'historique.")) {
+    enregistrer(true)
+    if (iframeRef.value) {
+      iframeRef.value.contentWindow.print()
+      retour()
+    }
+  }
+}
+
+function retour() {
+  pdfGeneratedMode.value = false
+  if (pdfBlobUrlFinal.value) {
+    URL.revokeObjectURL(pdfBlobUrlFinal.value)
+    pdfBlobUrlFinal.value = null
   }
 }
 </script>
@@ -422,8 +423,12 @@ async function saveToHistory(pdfBlob) {
 <template>
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
+    <!-- HEADER COMMUN -->
     <div class="flex items-center gap-4">
-      <Link href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
+      <button v-if="pdfGeneratedMode" @click="retour" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
+        <ArrowLeftIcon class="w-4 h-4" />
+      </button>
+      <Link v-else href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
       </Link>
       <div>
@@ -437,7 +442,8 @@ async function saveToHistory(pdfBlob) {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <!-- MODE: FORMULAIRE -->
+    <div v-show="!pdfGeneratedMode" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
       <!-- ─── FORMULAIRE ─── -->
       <div class="space-y-5">
@@ -643,15 +649,18 @@ async function saveToHistory(pdfBlob) {
       </div>
     </div>
 
-    <!-- Modal PDF Viewer -->
-    <div v-if="showPdfModal" class="fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-sm animate-fade-in">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <DocumentTextIcon class="w-5 h-5 text-blue-400" />
-          Aperçu de la Convention de Stage
+    <!-- MODE: PDF GÉNÉRÉ -->
+    <div v-if="pdfGeneratedMode" class="flex flex-col h-[85vh] bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--surface-alt)]">
+        <h3 class="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+          Aperçu final du document
         </h3>
         <div class="flex items-center gap-3">
-          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-white/10">
+          <button @click="retour" class="flex items-center gap-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all">
+            <ArrowLeftIcon class="w-4 h-4" />
+            Retour
+          </button>
+          <button @click="imprimerFromModal" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm border border-[var(--border)]">
             <PrinterIcon class="w-4 h-4" />
             Imprimer
           </button>
@@ -659,15 +668,12 @@ async function saveToHistory(pdfBlob) {
             <ArrowDownTrayIcon class="w-4 h-4" />
             {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
           </button>
-          <div class="w-px h-6 bg-white/20 mx-1"></div>
-          <button @click="showPdfModal = false" class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-            <XMarkIcon class="w-6 h-6" />
-          </button>
         </div>
       </div>
-      <div class="flex-1 w-full h-full p-4 flex justify-center bg-slate-900/50 overflow-hidden">
-        <iframe ref="iframeRef" :src="pdfBlobUrlFinal" class="w-full max-w-5xl h-full rounded-xl shadow-2xl bg-white border border-white/10"></iframe>
+      <div class="flex-1 w-full bg-slate-900/50 overflow-hidden">
+        <iframe ref="iframeRef" :src="pdfBlobUrlFinal" class="w-full h-full border-none"></iframe>
       </div>
     </div>
+
   </div>
 </template>
