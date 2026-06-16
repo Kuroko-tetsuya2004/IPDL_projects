@@ -203,15 +203,15 @@ function imprimer() {
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
     <div class="flex items-center gap-4">
-      <Link href="/admin/documents" class="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+      <Link href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
       </Link>
       <div>
-        <h1 class="text-2xl font-extrabold text-white flex items-center gap-3">
+        <h1 class="text-2xl font-extrabold text-[var(--text)] flex items-center gap-3">
           <ShoppingCartIcon class="w-7 h-7 text-amber-400" />
           Demande de Bon d'Achat
         </h1>
-        <p class="text-slate-400 text-sm mt-0.5">
+        <p class="text-[var(--text-subtle)] text-sm mt-0.5">
           Le PDF généré sera <span class="text-amber-400 font-semibold">identique au document officiel IRD</span>.
           Accompagner de facture pro forma.
         </p>
@@ -223,26 +223,26 @@ function imprimer() {
       <!-- ─── FORMULAIRE ─── -->
       <div class="space-y-5">
 
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Informations du Demandeur</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">NOM ET PRENOM(S) DU DEMANDEUR *</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">NOM ET PRENOM(S) DU DEMANDEUR *</label>
             <input v-model="form.demandeur_nom_prenom" type="text" placeholder="Nom et prénom(s) complets"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">SERVICE ou STRUCTURE</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">SERVICE ou STRUCTURE</label>
             <input v-model="form.service_structure" type="text" placeholder="Service ou structure"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">EOTP ou CENTRE DE COÛT</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">EOTP ou CENTRE DE COÛT</label>
             <input v-model="form.eotp_centre_cout" type="text" placeholder="Code EOTP ou centre de coût"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
         </div>
 
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Articles commandés</h2>
             <button @click="ajouterLigne"
@@ -251,38 +251,38 @@ function imprimer() {
             </button>
           </div>
           <div class="space-y-3">
-            <div v-for="(art, idx) in articles" :key="idx" class="p-3 bg-slate-800/40 rounded-lg border border-white/5 space-y-2">
+            <div v-for="(art, idx) in articles" :key="idx" class="p-3 bg-[var(--surface-alt)]/40 rounded-lg border border-[var(--border)] space-y-2">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-bold text-slate-500 uppercase">Ligne {{ idx + 1 }}</span>
-                <button v-if="articles.length > 1" @click="supprimerLigne(idx)" class="p-1 rounded text-slate-500 hover:text-red-400 transition-all">
+                <span class="text-[10px] font-bold text-[var(--text-subtle)] uppercase">Ligne {{ idx + 1 }}</span>
+                <button v-if="articles.length > 1" @click="supprimerLigne(idx)" class="p-1 rounded text-[var(--text-subtle)] hover:text-red-400 transition-all">
                   <TrashIcon class="w-3.5 h-3.5" />
                 </button>
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block text-[10px] text-slate-500 mb-1">Objet de la commande</label>
+                  <label class="block text-[10px] text-[var(--text-subtle)] mb-1">Objet de la commande</label>
                   <input v-model="art.objet" type="text" placeholder="Description"
-                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                    class="w-full bg-slate-700/60 border border-[var(--border)] rounded px-3 py-2 text-xs text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
-                  <label class="block text-[10px] text-slate-500 mb-1">Fournisseur</label>
+                  <label class="block text-[10px] text-[var(--text-subtle)] mb-1">Fournisseur</label>
                   <input v-model="art.fournisseur" type="text" placeholder="Fournisseur"
-                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                    class="w-full bg-slate-700/60 border border-[var(--border)] rounded px-3 py-2 text-xs text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
               </div>
               <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="block text-[10px] text-slate-500 mb-1">Prix unitaire (F CFA)</label>
+                  <label class="block text-[10px] text-[var(--text-subtle)] mb-1">Prix unitaire (F CFA)</label>
                   <input :value="art.prix_unitaire" @input="art.prix_unitaire = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="0"
-                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                    class="w-full bg-slate-700/60 border border-[var(--border)] rounded px-3 py-2 text-xs text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
-                  <label class="block text-[10px] text-slate-500 mb-1">Quantité</label>
+                  <label class="block text-[10px] text-[var(--text-subtle)] mb-1">Quantité</label>
                   <input :value="art.quantite" @input="art.quantite = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="0"
-                    class="w-full bg-slate-700/60 border border-white/8 rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
+                    class="w-full bg-slate-700/60 border border-[var(--border)] rounded px-3 py-2 text-xs text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50" />
                 </div>
                 <div>
-                  <label class="block text-[10px] text-slate-500 mb-1">Prix Total</label>
+                  <label class="block text-[10px] text-[var(--text-subtle)] mb-1">Prix Total</label>
                   <div class="bg-slate-600/40 border border-amber-500/20 rounded px-3 py-2 text-xs font-bold text-amber-400 min-h-[32px]">
                     {{ prixTotal(art) != null ? fmt(prixTotal(art)) + ' F CFA' : '—' }}
                   </div>
@@ -291,33 +291,33 @@ function imprimer() {
             </div>
           </div>
           <div class="flex justify-between items-center p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-            <span class="text-xs font-bold text-slate-300 uppercase">Total général</span>
+            <span class="text-xs font-bold text-[var(--text-muted)] uppercase">Total général</span>
             <span class="text-base font-extrabold text-amber-400">{{ totalGeneral > 0 ? fmt(totalGeneral) + ' F CFA' : '—' }}</span>
           </div>
         </div>
 
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Livraison & Signature</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Adresse de Livraison</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Adresse de Livraison</label>
             <input v-model="form.adresse_livraison" type="text" placeholder="Adresse complète"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Dakar le</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Dakar le</label>
             <input v-model="form.date_dakar" type="text" placeholder="Ex: 11 juin 2026"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
           </div>
         </div>
 
         <div class="flex gap-3">
           <button @click="genererPDF" :disabled="generating"
-            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5">
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-[var(--text)] rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5">
             <ArrowDownTrayIcon class="w-5 h-5" />
             {{ generating ? 'Génération...' : 'Générer PDF fidèle' }}
           </button>
           <button @click="imprimer"
-            class="flex items-center gap-2 px-5 py-3 border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
+            class="flex items-center gap-2 px-5 py-3 border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
             <PrinterIcon class="w-5 h-5" />
             Imprimer
           </button>
@@ -326,10 +326,10 @@ function imprimer() {
 
       <!-- ─── APERÇU FIDÈLE ─── -->
       <div class="xl:sticky xl:top-6 xl:self-start">
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu — fidèle au document original</span>
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 mb-3 flex items-center justify-between">
+          <span class="text-xs font-semibold text-[var(--text-subtle)] uppercase tracking-wider">Aperçu — fidèle au document original</span>
         </div>
-        <div class="overflow-auto max-h-[80vh] rounded-xl border border-white/5 bg-white shadow-2xl" id="print-zone">
+        <div class="overflow-auto max-h-[80vh] rounded-xl border border-[var(--border)] bg-white shadow-2xl" id="print-zone">
           <!-- Document Bon d'Achat original -->
           <div style="width:794px; padding:36px 48px; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#000; background:#fff;">
 

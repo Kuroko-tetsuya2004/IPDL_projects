@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 // ── Accueil et Pages Publiques ─────────────────────────────────────────────
 Route::get('/', [PublicPortalController::class, 'home'])->name('home');
 Route::get('/publications', [PublicPortalController::class, 'publications'])->name('publications');
-Route::get('/publications/{id}', [PublicPortalController::class, 'show'])->name('publications.show')->whereUuid('id');
+Route::get('/publications/{id}', [PublicPortalController::class, 'show'])->name('publications.show');
 Route::get('/datasets', [PublicPortalController::class, 'datasets'])->name('datasets');
 Route::get('/axes', [PublicPortalController::class, 'axes'])->name('axes');
 Route::get('/projets', [PublicPortalController::class, 'projets'])->name('projets');

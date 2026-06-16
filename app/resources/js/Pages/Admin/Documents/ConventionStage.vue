@@ -399,15 +399,15 @@ async function saveToHistory(pdfBlob) {
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
     <div class="flex items-center gap-4">
-      <Link href="/admin/documents" class="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+      <Link href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
       </Link>
       <div>
-        <h1 class="text-2xl font-extrabold text-white flex items-center gap-3">
+        <h1 class="text-2xl font-extrabold text-[var(--text)] flex items-center gap-3">
           <DocumentTextIcon class="w-7 h-7 text-blue-400" />
           Convention de Stage
         </h1>
-        <p class="text-slate-400 text-sm mt-0.5">
+        <p class="text-[var(--text-subtle)] text-sm mt-0.5">
           Le PDF généré est <span class="text-blue-400 font-semibold">fidèle au modèle officiel IRD</span> — 13 articles, multi-pages automatiques
         </p>
       </div>
@@ -419,104 +419,104 @@ async function saveToHistory(pdfBlob) {
       <div class="space-y-5">
 
         <!-- Établissement -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400">Organisme de Formation (Établissement)</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Nom de l'organisme *</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Nom de l'organisme *</label>
             <input v-model="form.etablissement_nom" type="text" placeholder="Ex: Université Cheikh Anta Diop"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Statut juridique</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Statut juridique</label>
               <input v-model="form.etablissement_statut" type="text" placeholder="Ex: Établissement public"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Représenté par</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Représenté par</label>
               <input v-model="form.etablissement_representant" type="text" placeholder="Nom du représentant"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Siège social</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Siège social</label>
             <input v-model="form.etablissement_siege" type="text" placeholder="Adresse du siège social"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
         </div>
 
         <!-- Stagiaire -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400">Stagiaire</h2>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Nom *</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Nom *</label>
               <input v-model="form.stagiaire_nom" type="text" placeholder="NOM"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Prénom(s) *</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Prénom(s) *</label>
               <input v-model="form.stagiaire_prenom" type="text" placeholder="Prénom(s)"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Adresse</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Adresse</label>
             <input v-model="form.stagiaire_adresse" type="text" placeholder="Adresse complète"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Tél</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Tél</label>
               <input v-model="form.stagiaire_tel" type="text" placeholder="Téléphone"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Email</label>
               <input v-model="form.stagiaire_email" type="email" placeholder="email@exemple.com"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Année universitaire</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Année universitaire</label>
               <input v-model="form.stagiaire_annee_univ" type="text" placeholder="2025-2026"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Diplôme préparé</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Diplôme préparé</label>
               <input v-model="form.stagiaire_diplome" type="text" placeholder="Master, Licence…"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Spécialité</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Spécialité</label>
               <input v-model="form.stagiaire_specialite" type="text" placeholder="Spécialité"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
         </div>
 
         <!-- Stage -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400">Détails du Stage</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Thème du stage (Article 2)</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Thème du stage (Article 2)</label>
             <input v-model="form.theme" type="text" placeholder="Thème de l'étude..."
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div>
             <div class="flex items-center justify-between mb-2">
-              <label class="block text-xs font-medium text-slate-400">Activités confiées (Article 3)</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)]">Activités confiées (Article 3)</label>
               <button @click="ajouterActivite" class="flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded transition-all border border-blue-500/20">
                 <PlusIcon class="w-3 h-3" />Ajouter
               </button>
             </div>
             <div class="space-y-2">
               <div v-for="(_, idx) in form.activites" :key="idx" class="flex items-center gap-2">
-                <span class="text-slate-500 text-xs w-4">-</span>
+                <span class="text-[var(--text-subtle)] text-xs w-4">-</span>
                 <input v-model="form.activites[idx]" type="text" :placeholder="`Activité ${idx + 1}`"
-                  class="flex-1 bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
-                <button v-if="form.activites.length > 1" @click="supprimerActivite(idx)" class="p-1.5 rounded-lg border border-white/5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                  class="flex-1 bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                <button v-if="form.activites.length > 1" @click="supprimerActivite(idx)" class="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-red-400 hover:bg-red-500/10 transition-all">
                   <TrashIcon class="w-4 h-4" />
                 </button>
               </div>
@@ -524,80 +524,80 @@ async function saveToHistory(pdfBlob) {
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Date de début</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Date de début</label>
               <input v-model="form.date_debut" type="text" placeholder="JJ/MM/AAAA"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Date de fin</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Date de fin</label>
               <input v-model="form.date_fin" type="text" placeholder="JJ/MM/AAAA"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Lieu du stage</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Lieu du stage</label>
               <input v-model="form.lieu_stage" type="text" placeholder="Dakar, Sénégal"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Structure d'accueil</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Structure d'accueil</label>
               <input v-model="form.structure_accueil" type="text" placeholder="Unité / Service IRD"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Responsable scientifique/administratif pour l'IRD</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Responsable scientifique/administratif pour l'IRD</label>
             <input v-model="form.responsable_ird" type="text" placeholder="Nom et titre du responsable IRD"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Responsable pédagogique pour l'établissement</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Responsable pédagogique pour l'établissement</label>
             <input v-model="form.responsable_etablissement" type="text" placeholder="Nom du responsable pédagogique"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
         </div>
 
         <!-- Gratification -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400">Gratification (Article 5)</h2>
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Montant/mois (F CFA)</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Montant/mois (F CFA)</label>
               <input v-model="form.gratification_montant" type="text" placeholder="Ex: 50 000"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Transport/mois</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Transport/mois</label>
               <input v-model="form.indemnite_transport" type="text" placeholder="Ex: 15 000"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Restauration/mois</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Restauration/mois</label>
               <input v-model="form.indemnite_restauration" type="text" placeholder="Ex: 10 000"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Imputation (code budgétaire)</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Imputation (code budgétaire)</label>
             <input v-model="form.imputation" type="text" placeholder="Code EOTP ou centre de coût"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Date de signature</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Date de signature</label>
             <input v-model="form.date_signature" type="text" placeholder="Ex: 11 juin 2026"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
           </div>
         </div>
 
         <div class="flex gap-3">
           <button @click="genererPDF" :disabled="generating"
-            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5">
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-[var(--text)] rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5">
             <ArrowDownTrayIcon class="w-5 h-5" />
             {{ generating ? 'Génération PDF...' : 'Générer PDF fidèle (multi-pages)' }}
           </button>
           <button @click="imprimer"
-            class="flex items-center gap-2 px-5 py-3 border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
+            class="flex items-center gap-2 px-5 py-3 border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
             <PrinterIcon class="w-5 h-5" />
             Imprimer
           </button>
@@ -606,13 +606,13 @@ async function saveToHistory(pdfBlob) {
 
       <!-- ─── APERÇU ─── -->
       <div class="xl:sticky xl:top-6 xl:self-start flex flex-col h-[80vh]">
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 shrink-0">
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Aperçu en direct — fidèle au document original</p>
-          <p class="text-[11px] text-slate-500">Le PDF généré est multi-pages et reproduit fidèlement les 13 articles officiels de la Convention de Stage IRD.</p>
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 mb-3 shrink-0">
+          <p class="text-xs font-semibold text-[var(--text-subtle)] uppercase tracking-wider mb-1">Aperçu en direct — fidèle au document original</p>
+          <p class="text-[11px] text-[var(--text-subtle)]">Le PDF généré est multi-pages et reproduit fidèlement les 13 articles officiels de la Convention de Stage IRD.</p>
         </div>
-        <div class="flex-1 rounded-xl border border-white/5 bg-slate-900/40 shadow-2xl overflow-hidden relative">
+        <div class="flex-1 rounded-xl border border-[var(--border)] bg-[var(--surface)]/40 shadow-2xl overflow-hidden relative">
           <iframe v-if="previewUrl" :src="previewUrl" class="absolute inset-0 w-full h-full" frameborder="0"></iframe>
-          <div v-else class="absolute inset-0 flex items-center justify-center text-slate-500 font-medium text-sm">
+          <div v-else class="absolute inset-0 flex items-center justify-center text-[var(--text-subtle)] font-medium text-sm">
             Génération de l'aperçu PDF...
           </div>
         </div>

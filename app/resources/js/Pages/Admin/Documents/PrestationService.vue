@@ -334,15 +334,15 @@ async function saveToHistory(pdfBlob) {
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-fade-in">
 
     <div class="flex items-center gap-4">
-      <Link href="/admin/documents" class="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+      <Link href="/admin/documents" class="p-2 rounded-lg border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text)] hover:bg-white/5 transition-all">
         <ArrowLeftIcon class="w-4 h-4" />
       </Link>
       <div>
-        <h1 class="text-2xl font-extrabold text-white flex items-center gap-3">
+        <h1 class="text-2xl font-extrabold text-[var(--text)] flex items-center gap-3">
           <ClipboardDocumentListIcon class="w-7 h-7 text-emerald-400" />
           Reçu de Prestation de Service
         </h1>
-        <p class="text-slate-400 text-sm mt-0.5">
+        <p class="text-[var(--text-subtle)] text-sm mt-0.5">
           Identification : <span class="text-emerald-400 font-semibold">FI - 8 · Version V5</span> — IRD Représentation Sénégal
         </p>
       </div>
@@ -354,134 +354,134 @@ async function saveToHistory(pdfBlob) {
       <div class="space-y-5">
 
         <!-- Prestataire -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Informations du Prestataire</h2>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">NOM *</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">NOM *</label>
               <input v-model="form.nom" type="text" placeholder="NOM (majuscules)"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Prénoms *</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Prénoms *</label>
               <input v-model="form.prenoms" type="text" placeholder="Prénoms"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Né(e) le</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Né(e) le</label>
               <input v-model="form.ne_le" type="text" placeholder="JJ/MM/AAAA"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">À (lieu de naissance)</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">À (lieu de naissance)</label>
               <input v-model="form.a" type="text" placeholder="Ville"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Adresse</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Adresse</label>
             <input v-model="form.adresse" type="text" placeholder="Adresse complète"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Tél</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Tél</label>
               <input v-model="form.tel" type="text" placeholder="Téléphone"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Emploi/Fonction</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Emploi/Fonction</label>
               <input v-model="form.emploi_fonction" type="text" placeholder="Titre ou fonction"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
           </div>
         </div>
 
         <!-- Prestation -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Détails de la Prestation</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Objet de la prestation *</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Objet de la prestation *</label>
             <textarea v-model="form.objet" rows="2" placeholder="Description de la mission..."
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"></textarea>
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"></textarea>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Produits attendus</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Produits attendus</label>
             <textarea v-model="form.produits_attendus" rows="2" placeholder="Livrables attendus..."
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"></textarea>
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"></textarea>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Durée <span class="text-slate-500 font-normal">(maximum 9 jours consécutifs)</span></label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Durée <span class="text-[var(--text-subtle)] font-normal">(maximum 9 jours consécutifs)</span></label>
             <input v-model="form.duree" type="text" placeholder="Ex: 5 jours"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Du</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Du</label>
               <input v-model="form.date_debut" type="text" placeholder="JJ/MM/AAAA"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Au</label>
+              <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Au</label>
               <input v-model="form.date_fin" type="text" placeholder="JJ/MM/AAAA"
-                class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Nom du responsable du suivi</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Nom du responsable du suivi</label>
             <input v-model="form.responsable_suivi" type="text" placeholder="Nom du responsable IRD"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
         </div>
 
         <!-- Montants -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Montants</h2>
           <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3 text-xs text-emerald-300">
             💡 Saisissez le <strong>montant brut</strong> — l'impôt 5% et le net 95% sont calculés automatiquement.
             Maximum autorisé : <strong>100 000 F CFA</strong>.
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Montant brut de la prestation (F CFA) *</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Montant brut de la prestation (F CFA) *</label>
             <input :value="form.montant_brut" @input="form.montant_brut = $event.target.value.replace(/[^0-9]/g, '')" type="text" inputmode="numeric" placeholder="Ex: 50000"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <div class="bg-slate-800/40 rounded-lg p-3 border border-white/5">
-              <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Impôt sur le revenu (5%)</div>
+            <div class="bg-[var(--surface-alt)]/40 rounded-lg p-3 border border-[var(--border)]">
+              <div class="text-[10px] text-[var(--text-subtle)] uppercase font-bold mb-1">Impôt sur le revenu (5%)</div>
               <div class="text-sm font-bold text-red-400">{{ impot > 0 ? fmtCFA(impot) : '—' }}</div>
             </div>
-            <div class="bg-slate-800/40 rounded-lg p-3 border border-white/5">
-              <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Montant net à percevoir (95%)</div>
+            <div class="bg-[var(--surface-alt)]/40 rounded-lg p-3 border border-[var(--border)]">
+              <div class="text-[10px] text-[var(--text-subtle)] uppercase font-bold mb-1">Montant net à percevoir (95%)</div>
               <div class="text-sm font-bold text-emerald-400">{{ montantNet > 0 ? fmtCFA(montantNet) : '—' }}</div>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Montant net en lettres *</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Montant net en lettres *</label>
             <input v-model="form.montant_net_lettres" type="text" placeholder="Ex: Quarante sept mille cinq cents francs CFA"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
         </div>
 
         <!-- Administration -->
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 space-y-4">
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
           <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">À remplir par l'administration</h2>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">SERVICE/UR/US</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">SERVICE/UR/US</label>
             <input v-model="form.service" type="text" placeholder="Service / Unité de Recherche"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">IMPUTATION — code EOTP ou centre</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">IMPUTATION — code EOTP ou centre</label>
             <input v-model="form.imputation" type="text" placeholder="Code EOTP ou centre de coût"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Date (pour acquit)</label>
+            <label class="block text-xs font-medium text-[var(--text-subtle)] mb-1.5">Date (pour acquit)</label>
             <input v-model="form.date_acquit" type="text" placeholder="JJ/MM/AAAA"
-              class="w-full bg-slate-800/60 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              class="w-full bg-[var(--surface-alt)]/60 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm text-[var(--text)] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
         </div>
 
@@ -492,7 +492,7 @@ async function saveToHistory(pdfBlob) {
             {{ generating ? 'Génération...' : 'Générer PDF fidèle' }}
           </button>
           <button @click="imprimer"
-            class="flex items-center gap-2 px-5 py-3 border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
+            class="flex items-center gap-2 px-5 py-3 border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
             <PrinterIcon class="w-5 h-5" />
             Imprimer
           </button>
@@ -501,12 +501,12 @@ async function saveToHistory(pdfBlob) {
 
       <!-- ─── APERÇU FIDÈLE AU DOCUMENT FI-8 V5 ─── -->
       <div class="xl:sticky xl:top-6 xl:self-start flex flex-col h-[80vh]">
-        <div class="bg-slate-900/60 border border-white/8 rounded-xl p-4 mb-3 flex items-center justify-between shrink-0">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aperçu en direct — fidèle au document officiel</span>
+        <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 mb-3 flex items-center justify-between shrink-0">
+          <span class="text-xs font-semibold text-[var(--text-subtle)] uppercase tracking-wider">Aperçu en direct — fidèle au document officiel</span>
         </div>
-        <div class="flex-1 rounded-xl border border-white/5 bg-slate-900/40 shadow-2xl overflow-hidden relative">
+        <div class="flex-1 rounded-xl border border-[var(--border)] bg-[var(--surface)]/40 shadow-2xl overflow-hidden relative">
           <iframe v-if="previewUrl" :src="previewUrl" class="absolute inset-0 w-full h-full" frameborder="0"></iframe>
-          <div v-else class="absolute inset-0 flex items-center justify-center text-slate-500 font-medium text-sm">
+          <div v-else class="absolute inset-0 flex items-center justify-center text-[var(--text-subtle)] font-medium text-sm">
             Génération de l'aperçu PDF...
           </div>
         </div>

@@ -45,18 +45,18 @@ const documents = [
   <div class="p-6 max-w-5xl mx-auto space-y-8 animate-fade-in">
 
     <!-- Header -->
-    <div class="border-b border-white/5 pb-6 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
+    <div class="border-b border-[var(--border)] pb-6 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
       <div>
-        <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+        <h1 class="text-3xl font-extrabold text-[var(--text)] tracking-tight flex items-center gap-3">
           <ClipboardDocumentListIcon class="w-8 h-8 text-brand-400" />
           Documents Administratifs
         </h1>
-        <p class="text-slate-400 text-sm mt-2">
+        <p class="text-[var(--text-subtle)] text-sm mt-2">
           Générez, téléchargez et imprimez les documents officiels IRD/UMMISCO au format PDF.
           <span class="text-amber-400 font-semibold">Accès réservé au Super Administrateur.</span>
         </p>
       </div>
-      <Link href="/admin/documents/historique" class="flex items-center shrink-0 gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
+      <Link href="/admin/documents/historique" class="flex items-center shrink-0 gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-[var(--text)] rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
         <DocumentTextIcon class="w-5 h-5" />
         Historique des Archives
       </Link>
@@ -75,7 +75,7 @@ const documents = [
         ]"
       >
         <!-- Badge -->
-        <span class="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
+        <span class="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-white/5 text-[var(--text-subtle)] border border-[var(--border)]">
           {{ doc.badge }}
         </span>
 
@@ -85,8 +85,8 @@ const documents = [
         </div>
 
         <!-- Content -->
-        <h2 class="text-white font-bold text-lg leading-tight mb-2">{{ doc.title }}</h2>
-        <p class="text-slate-400 text-sm leading-relaxed flex-1">{{ doc.description }}</p>
+        <h2 class="text-[var(--text)] font-bold text-lg leading-tight mb-2">{{ doc.title }}</h2>
+        <p class="text-[var(--text-subtle)] text-sm leading-relaxed flex-1">{{ doc.description }}</p>
 
         <!-- CTA -->
         <div class="flex items-center gap-2 mt-5 text-sm font-semibold" :class="doc.color.split(' ').find(c => c.startsWith('text-'))">
@@ -97,16 +97,16 @@ const documents = [
     </div>
 
     <!-- Info banner -->
-    <div class="bg-slate-900/60 border border-white/8 rounded-xl p-5 flex items-start gap-4">
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 flex items-start gap-4">
       <div class="w-8 h-8 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0 mt-0.5">
         <DocumentTextIcon class="w-5 h-5 text-brand-400" />
       </div>
       <div>
-        <p class="text-sm font-semibold text-white mb-1">Comment ça fonctionne ?</p>
-        <p class="text-sm text-slate-400 leading-relaxed">
+        <p class="text-sm font-semibold text-[var(--text)] mb-1">Comment ça fonctionne ?</p>
+        <p class="text-sm text-[var(--text-subtle)] leading-relaxed">
           Sélectionnez le type de document, remplissez le formulaire avec les informations du concerné, puis cliquez sur
-          <strong class="text-white">« Générer PDF »</strong> pour télécharger le document, ou sur
-          <strong class="text-white">« Imprimer »</strong> pour envoyer directement à l'imprimante.
+          <strong class="text-[var(--text)]">« Générer PDF »</strong> pour télécharger le document, ou sur
+          <strong class="text-[var(--text)]">« Imprimer »</strong> pour envoyer directement à l'imprimante.
           Les documents générés sont conformes aux modèles officiels de l'IRD Sénégal.
         </p>
       </div>
