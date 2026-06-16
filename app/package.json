@@ -10,7 +10,6 @@
   "dependencies": {
     "@heroicons/vue": "^2.0",
     "@inertiajs/vue3": "^1.0",
-    "@rollup/rollup-win32-x64-msvc": "^4.62.0",
     "@vueuse/core": "^10.0",
     "axios": "^1.6",
     "date-fns": "^3.0",
