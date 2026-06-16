@@ -70,5 +70,10 @@ php artisan view:cache
 
 echo "✅ Caches optimisés"
 
+# Exécuter les migrations en production (crée les nouvelles tables si besoin)
+echo "▶ Exécution des migrations..."
+php artisan migrate --force
+echo "✅ Migrations terminées"
+
 # Lancer Supervisor (Nginx + PHP-FPM)
 exec /usr/bin/supervisord -c /etc/supervisord.conf
