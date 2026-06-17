@@ -111,9 +111,16 @@ class DocumentController extends Controller
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
             $filename = $reference . '.pdf';
-            // Stockage explicite sur le disque 'minio'
-            $filePath = $file->storeAs('documents_administratifs/' . date('Y/m'), $filename, 'minio');
-            \Illuminate\Support\Facades\Log::info("Résultat storeAs MinIO : " . var_export($filePath, true));
+            $filePath = 'documents_administratifs/' . date('Y/m') . '/' . $filename;
+            
+            // Contournement du bug "SignatureDoesNotMatch" avec les streams PHP/Guzzle vers MinIO
+            // en lisant le fichier en mémoire au lieu de l'uploader en stream
+            $contents = file_get_contents($file->getRealPath());
+            \Illuminate\Support\Facades\Storage::disk('minio')->put($filePath, $contents, [
+                'mimetype' => 'application/pdf'
+            ]);
+            
+            \Illuminate\Support\Facades\Log::info("Résultat put MinIO : " . $filePath);
         }
 
         try {
