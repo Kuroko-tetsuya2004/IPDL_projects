@@ -68,10 +68,16 @@ const getDocColor = (type) => {
                 {{ new Date(doc.created_at).toLocaleString('fr-FR') }}
               </td>
               <td class="px-6 py-4 text-right">
-                <a :href="`/admin/documents/${doc.id}/download`" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-lg transition-all">
-                  <ArrowDownTrayIcon class="w-4 h-4" />
-                  Télécharger PDF
-                </a>
+                <div class="flex items-center justify-end gap-2">
+                  <a :href="`/admin/documents/${doc.id}/view`" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 text-sky-400 text-xs font-semibold rounded-lg transition-all">
+                    <DocumentTextIcon class="w-4 h-4" />
+                    Aperçu
+                  </a>
+                  <a :href="`/admin/documents/${doc.id}/download`" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-lg transition-all">
+                    <ArrowDownTrayIcon class="w-4 h-4" />
+                    Télécharger
+                  </a>
+                </div>
               </td>
             </tr>
             <tr v-if="documents.data.length === 0">

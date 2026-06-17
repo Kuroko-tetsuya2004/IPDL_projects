@@ -225,12 +225,31 @@ async function enregistrer(background = false) {
   }
 }
 
+function resetForm() {
+  form.value = {
+    demandeur_nom_prenom: '',
+    service_structure: '',
+    eotp_centre_cout: '',
+    adresse_livraison: '',
+    date_dakar: new Date().toLocaleDateString('fr-FR'),
+  }
+  articles.value = [
+    { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
+    { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
+    { objet: '', fournisseur: '', prix_unitaire: '', quantite: '' },
+  ]
+}
+
 function imprimerFromModal() {
   if (window.confirm("Voulez-vous confirmer l'impression ? Le document sera automatiquement enregistré dans l'historique.")) {
     enregistrer(true)
     if (iframeRef.value) {
-      iframeRef.value.contentWindow.print()
-      // On n'appelle plus retour() immédiatement car cela détruit l'iframe et annule l'impression
+      const cw = iframeRef.value.contentWindow
+      cw.onafterprint = () => {
+        retour()
+        resetForm()
+      }
+      cw.print()
     }
   }
 }

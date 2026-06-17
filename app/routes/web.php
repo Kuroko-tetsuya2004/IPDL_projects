@@ -154,6 +154,7 @@ Route::middleware([KeycloakMiddleware::class])->group(function () {
             Route::get('/bon-achat', [DocumentController::class, 'bonAchat'])->name('bon-achat');
             Route::post('/store', [DocumentController::class, 'store'])->name('store');
             Route::get('/{id}/download', [DocumentController::class, 'download'])->name('download')->whereUuid('id');
+            Route::get('/{id}/view', [DocumentController::class, 'view'])->name('view')->whereUuid('id');
         });
 
         // ── Import publications externes — supervision (super_admin) ──────────

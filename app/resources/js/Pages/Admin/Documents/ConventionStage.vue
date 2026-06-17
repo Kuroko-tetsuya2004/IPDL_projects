@@ -401,12 +401,46 @@ async function enregistrer(background = false) {
   }
 }
 
+function resetForm() {
+  form.value = {
+    etablissement_nom: '',
+    etablissement_statut: '',
+    etablissement_siege: '',
+    etablissement_representant: '',
+    stagiaire_nom: '',
+    stagiaire_prenom: '',
+    stagiaire_adresse: '',
+    stagiaire_tel: '',
+    stagiaire_email: '',
+    stagiaire_annee_univ: '',
+    stagiaire_diplome: '',
+    stagiaire_specialite: '',
+    theme: '',
+    activites: ['', '', '', ''],
+    date_debut: '',
+    date_fin: '',
+    lieu_stage: '',
+    structure_accueil: '',
+    responsable_ird: '',
+    responsable_etablissement: '',
+    gratification_montant: '',
+    indemnite_transport: '',
+    indemnite_restauration: '',
+    imputation: '',
+    date_signature: new Date().toLocaleDateString('fr-FR'),
+  }
+}
+
 function imprimerFromModal() {
   if (window.confirm("Voulez-vous confirmer l'impression ? Le document sera automatiquement enregistré dans l'historique.")) {
     enregistrer(true)
     if (iframeRef.value) {
-      iframeRef.value.contentWindow.print()
-      // On n'appelle plus retour() immédiatement car cela détruit l'iframe et annule l'impression
+      const cw = iframeRef.value.contentWindow
+      cw.onafterprint = () => {
+        retour()
+        resetForm()
+      }
+      cw.print()
     }
   }
 }

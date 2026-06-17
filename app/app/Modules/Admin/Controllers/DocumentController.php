@@ -171,4 +171,31 @@ class DocumentController extends Controller
 
         return Storage::disk($disk)->download($document->file_path, $document->reference . '.pdf');
     }
+
+    /**
+     * Aperçu du document depuis l'historique
+     */
+    public function view($id)
+    {
+        if (session('user_role') !== 'super_admin') {
+            abort(403, 'Accès réservé au Super Administrateur.');
+        }
+
+        $document = DocumentAdministratif::findOrFail($id);
+
+        if (!$document->file_path) {
+            return back()->with('error', 'Le fichier PDF n\'a pas été généré ou est introuvable.');
+        }
+
+        $disk = 'minio';
+        if (!Storage::disk($disk)->exists($document->file_path)) {
+            return back()->with('error', 'Fichier introuvable sur le stockage MinIO.');
+        }
+
+        // Renvoie le fichier avec l'entête inline pour affichage direct dans le navigateur
+        return response(Storage::disk($disk)->get($document->file_path), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $document->reference . '.pdf"'
+        ]);
+    }
 }
