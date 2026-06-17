@@ -339,7 +339,7 @@ function imprimerFromModal() {
     enregistrer(true)
     if (iframeRef.value) {
       iframeRef.value.contentWindow.print()
-      retour()
+      // On n'appelle plus retour() immédiatement car cela détruit l'iframe et annule l'impression
     }
   }
 }
