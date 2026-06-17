@@ -112,15 +112,15 @@ async function buildPDF() {
 
   // ══ SECTION INFORMATIONS PRESTATAIRE ══
   const row = (label, val, bold = false) => [
-    { content: label, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
-    { content: val || '', colSpan: 3, styles: { fontSize: 9, fontStyle: 'bold', textColor: val ? [0, 0, 0] : [0, 0, 0], cellWidth: 110 } },
+    { content: label, colSpan: 2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] } },
+    { content: val || '', colSpan: 2, styles: { fontSize: 9, fontStyle: 'bold', textColor: val ? [0, 0, 0] : [0, 0, 0] } },
   ]
 
   const rowDouble = (label1, val1, label2, val2) => [
-    { content: label1, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
-    { content: val1 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val1 ? [0, 0, 0] : [0, 0, 0], cellWidth: 40 } },
-    { content: label2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
-    { content: val2 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val2 ? [0, 0, 0] : [0, 0, 0], cellWidth: 80 } },
+    { content: label1, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] } },
+    { content: val1 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val1 ? [0, 0, 0] : [0, 0, 0] } },
+    { content: label2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] } },
+    { content: val2 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val2 ? [0, 0, 0] : [0, 0, 0] } },
   ]
 
   autoTable(doc, {
@@ -133,8 +133,8 @@ async function buildPDF() {
       row('Objet de la prestation :', form.value.objet),
       row('Produits attendus :', form.value.produits_attendus),
       [
-        { content: 'Durée (maximum 9 jours consécutifs) :', styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
-        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), colSpan: 3, styles: { fontSize: 9, fontStyle: 'bold', textColor: [0, 0, 0], cellWidth: 110 } },
+        { content: 'Durée (maximum 9 jours consécutifs) :', colSpan: 2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] } },
+        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), colSpan: 2, styles: { fontSize: 9, fontStyle: 'bold', textColor: [0, 0, 0] } },
       ],
       row('Nom du responsable du suivi :', form.value.responsable_suivi),
     ],
@@ -160,21 +160,21 @@ async function buildPDF() {
       [
         {
           content: 'Montant net à percevoir soit 95% du montant brut (en chiffres) (**) :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
         },
         {
           content: montantNet.value > 0 ? fmt(montantNet.value) : '',
-          styles: { fontSize: 9, cellWidth: 40, halign: 'right', fontStyle: 'bold', textColor: montantNet.value > 0 ? [0, 0, 0] : [0, 0, 0] }
+          styles: { fontSize: 9, halign: 'right', fontStyle: 'bold', textColor: montantNet.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
-          styles: { fontSize: 9, cellWidth: 20, halign: 'center' }
+          styles: { fontSize: 9, halign: 'center' }
         },
       ],
       [
         {
           content: 'Montant net à percevoir (en lettres) (**) : ',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 80 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
         },
         {
           content: form.value.montant_net_lettres || '',
@@ -193,35 +193,35 @@ async function buildPDF() {
       [
         {
           content: 'Impôt sur le revenu : 5% du montant brut (*) :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
         },
         {
           content: impot.value > 0 ? fmt(impot.value) : '',
-          styles: { fontSize: 9, halign: 'right', cellWidth: 40, fontStyle: 'bold', textColor: impot.value > 0 ? [0, 0, 0] : [0, 0, 0] }
+          styles: { fontSize: 9, halign: 'right', fontStyle: 'bold', textColor: impot.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
-          styles: { fontSize: 9, halign: 'center', cellWidth: 20 }
+          styles: { fontSize: 9, halign: 'center' }
         },
       ],
       [
         {
           content: 'Montant brut de la prestation :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 120 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
         },
         {
           content: montantBrut.value > 0 ? fmt(montantBrut.value) : '',
-          styles: { fontSize: 9, halign: 'right', cellWidth: 40, fontStyle: 'bold', textColor: montantBrut.value > 0 ? [0, 0, 0] : [0, 0, 0] }
+          styles: { fontSize: 9, halign: 'right', fontStyle: 'bold', textColor: montantBrut.value > 0 ? [0, 0, 0] : [0, 0, 0] }
         },
         {
           content: 'F CFA',
-          styles: { fontSize: 9, halign: 'center', cellWidth: 20 }
+          styles: { fontSize: 9, halign: 'center' }
         },
       ],
       [
         {
           content: 'SERVICE/UR/US :',
-          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 40 }
+          styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245] }
         },
         {
           content: form.value.service || '',
@@ -246,6 +246,11 @@ async function buildPDF() {
     tableLineWidth: 0.5,
     styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 9 },
     margin: { left: mL, right: 15 },
+    columnStyles: {
+      0: { cellWidth: 120 },
+      1: { cellWidth: 40 },
+      2: { cellWidth: 20 }
+    }
   })
 
   y = doc.lastAutoTable.finalY + 2
@@ -253,21 +258,21 @@ async function buildPDF() {
   // ══ SIGNATURES CERTIFIÉ ══
   autoTable(doc, {
     startY: y,
-    body: [[
-      {
-        content: 'Certifié le service fait\n\n\n\nLe Responsable du suivi',
-        styles: { fontSize: 9, halign: 'center', minCellHeight: 28 }
-      },
-      {
-        content: 'Certifié le service fait\n\n\n\nL\'Ordonnateur',
-        styles: { fontSize: 9, halign: 'center', minCellHeight: 28 }
-      },
-    ]],
+    body: [
+      [
+        { content: 'Certifié service fait (*)', styles: { fontStyle: 'bold', fontSize: 9, halign: 'center', minCellHeight: 25, valign: 'top', fillColor: [245, 245, 245] } },
+        { content: 'Signature du Prestataire (*)', styles: { fontStyle: 'bold', fontSize: 9, halign: 'center', minCellHeight: 25, valign: 'top', fillColor: [245, 245, 245] } },
+      ],
+    ],
     theme: 'grid',
     tableLineColor: [0, 0, 0],
     tableLineWidth: 0.5,
     styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
     margin: { left: mL, right: 15 },
+    columnStyles: {
+      0: { cellWidth: 90 },
+      1: { cellWidth: 90 }
+    }
   })
 
   y = doc.lastAutoTable.finalY + 1
