@@ -113,14 +113,19 @@ class DocumentController extends Controller
             $filename = $reference . '.pdf';
             $filePath = 'documents_administratifs/' . date('Y/m') . '/' . $filename;
             
-            // Contournement du bug "SignatureDoesNotMatch" avec les streams PHP/Guzzle vers MinIO
-            // en lisant le fichier en mémoire au lieu de l'uploader en stream
+            // Contournement du bug "SignatureDoesNotMatch" persistant avec Flysystem + MinIO
+            // en utilisant directement le client S3 natif de l'adaptateur
             $contents = file_get_contents($file->getRealPath());
-            \Illuminate\Support\Facades\Storage::disk('minio')->put($filePath, $contents, [
-                'mimetype' => 'application/pdf'
+            $client = \Illuminate\Support\Facades\Storage::disk('minio')->getClient();
+            $client->putObject([
+                'Bucket' => config('filesystems.disks.minio.bucket'),
+                'Key' => $filePath,
+                'Body' => $contents,
+                'ContentType' => 'application/pdf',
+                'ACL' => 'public-read' // Assure la lecture publique si le bucket est configuré pour
             ]);
             
-            \Illuminate\Support\Facades\Log::info("Résultat put MinIO : " . $filePath);
+            \Illuminate\Support\Facades\Log::info("Résultat putObject S3Client MinIO : " . $filePath);
         }
 
         try {
