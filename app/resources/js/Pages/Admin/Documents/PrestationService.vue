@@ -556,10 +556,6 @@ function retour() {
             <PrinterIcon class="w-4 h-4" />
             Imprimer
           </button>
-          <button @click="enregistrer(false)" :disabled="saving" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20">
-            <ArrowDownTrayIcon class="w-4 h-4" />
-            {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
-          </button>
         </div>
       </div>
       <div class="flex-1 w-full bg-slate-900/50 overflow-hidden">
