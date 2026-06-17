@@ -113,14 +113,14 @@ async function buildPDF() {
   // ══ SECTION INFORMATIONS PRESTATAIRE ══
   const row = (label, val, bold = false) => [
     { content: label, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
-    { content: val || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val ? [0, 0, 0] : [0, 0, 0], cellWidth: 110 } },
+    { content: val || '', colSpan: 3, styles: { fontSize: 9, fontStyle: 'bold', textColor: val ? [0, 0, 0] : [0, 0, 0], cellWidth: 110 } },
   ]
 
   const rowDouble = (label1, val1, label2, val2) => [
     { content: label1, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
-    { content: val1 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val1 ? [0, 0, 0] : [0, 0, 0], cellWidth: 50 } },
+    { content: val1 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val1 ? [0, 0, 0] : [0, 0, 0], cellWidth: 40 } },
     { content: label2, styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 30 } },
-    { content: val2 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val2 ? [0, 0, 0] : [0, 0, 0], cellWidth: 70 } },
+    { content: val2 || '', styles: { fontSize: 9, fontStyle: 'bold', textColor: val2 ? [0, 0, 0] : [0, 0, 0], cellWidth: 80 } },
   ]
 
   autoTable(doc, {
@@ -134,7 +134,7 @@ async function buildPDF() {
       row('Produits attendus :', form.value.produits_attendus),
       [
         { content: 'Durée (maximum 9 jours consécutifs) :', styles: { fontStyle: 'bold', fontSize: 9, fillColor: [245, 245, 245], cellWidth: 70 } },
-        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), styles: { fontSize: 9, fontStyle: 'bold', textColor: [0, 0, 0], cellWidth: 110 } },
+        { content: (form.value.duree || '') + (form.value.date_debut || form.value.date_fin ? `    du : ${form.value.date_debut || '...'} au : ${form.value.date_fin || '...'}` : ''), colSpan: 3, styles: { fontSize: 9, fontStyle: 'bold', textColor: [0, 0, 0], cellWidth: 110 } },
       ],
       row('Nom du responsable du suivi :', form.value.responsable_suivi),
     ],
@@ -143,7 +143,12 @@ async function buildPDF() {
     tableLineWidth: 0.5,
     styles: { lineColor: [0, 0, 0], lineWidth: 0.3, minCellHeight: 9 },
     margin: { left: mL, right: 15 },
-    columnStyles: {},
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 40 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 80 },
+    },
   })
 
   y = doc.lastAutoTable.finalY + 1
